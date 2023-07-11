@@ -1,0 +1,216 @@
+Parameters:
+ ProjectName:
+   Type: String
+   Default: postvnext-asia-ext-
+ TaskCpu:
+   Type: Number
+   Default: 256
+ TaskMemory:
+   Type: Number
+   Default: 512
+ DesiredCount:
+   Type: Number
+   Default: 0
+
+ Repository:
+   Type: String
+   Default: postvnext-asia-dev-repo
+# Scaling params
+ TaskMinContainerCount:
+   Type: Number
+   Description: Minimum number of containers to run for the service
+   Default: 1
+   MinValue: 1
+   ConstraintDescription: Value must be at least one
+
+ TaskMaxContainerCount:
+   Type: Number
+   Description: Maximum number of containers to run for the service when auto scaling out
+   Default: 2
+   MinValue: 1
+   ConstraintDescription: Value must be at least one
+
+ TargetValue:
+   Type: Number
+   Default: 75.0
+
+
+Resources:
+ # -------------------------------------
+ # Cluster??
+ # -------------------------------------
+
+ Cluster:
+   Type: AWS::ECS::Cluster
+   Properties:
+     ClusterName: !Sub ${ProjectName}dev-nginx-ecs-cluster
+     ClusterSettings:
+      - Name: containerInsights
+        Value: enabled
+     
+ LogGroup:
+   Type: AWS::Logs::LogGroup
+   Properties:
+     LogGroupName: !Sub /ecs/${ProjectName}dev-ecs-log-group
+# -------------------------------------
+ # LB??
+ # -------------------------------------
+ LoadBalancer:
+   Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+   Properties:
+     Name: !Sub ${ProjectName}dev-lb  
+     Scheme: internet-facing
+     Subnets: 
+       - subnet-028cc198b464cb4e4
+       - subnet-049a2c43e6ed241dd
+     Type: network
+
+ HttpListnener:
+   Type: AWS::ElasticLoadBalancingV2::Listener
+   Properties:
+     DefaultActions:
+       - Type: forward
+         TargetGroupArn: !Ref TargetGroup
+     LoadBalancerArn: !Ref LoadBalancer
+     Port: 443
+     Protocol: TCP
+   DependsOn:
+     - TargetGroup
+     
+ TargetGroup:
+   Type: AWS::ElasticLoadBalancingV2::TargetGroup
+   Properties:
+     Name: postvnext-ex-dev-targetgroup-002
+     Port: 443
+     Protocol: TCP
+     UnhealthyThresholdCount: 3
+     TargetType: ip
+     VpcId: vpc-09190f4860fec73b6
+     TargetGroupAttributes: 
+       - Key: "preserve_client_ip.enabled"
+         Value: true
+
+ # -------------------------------------
+ # Fargate??SG??
+ # -------------------------------------
+ FargateSecurityGroup:
+   Type: AWS::EC2::SecurityGroup
+   Properties:
+     Tags:
+       - Key: Name
+         Value: !Sub ${ProjectName}dev-fargate-sg
+     GroupName: !Sub ${ProjectName}dev-fargate-sg
+     GroupDescription: Security group for the service
+     VpcId: vpc-09190f4860fec73b6
+     SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 35.79.182.119/32
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 10.0.0.128/25
+     SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 35.79.182.119/32
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        CidrIp: 10.0.0.0/16
+
+
+
+ # -------------------------------------
+ # Fargate ?????
+ # -------------------------------------
+ TaskDefinition:
+   Type: AWS::ECS::TaskDefinition
+   Properties:
+     Family: !Sub ${ProjectName}dev-ecs-task-definition
+     RequiresCompatibilities:
+       - FARGATE
+     Cpu: !Ref TaskCpu
+     Memory: !Ref TaskMemory
+     NetworkMode: awsvpc
+     ExecutionRoleArn: arn:aws:iam::321103485566:role/postvnext-asia-dev-ECS-Task-IAMR
+     TaskRoleArn: arn:aws:iam::321103485566:role/postvnext-asia-dev-ECS-Task-IAMR
+     ContainerDefinitions:
+       - Name: !Sub ${ProjectName}dev-ecs-container
+         Image: !Sub ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${Repository}
+         PortMappings:
+           - ContainerPort: 443
+             HostPort: 443
+             Protocol: tcp
+         Environment:
+           - Name: TZ
+             Value: Asia/Tokyo
+         LogConfiguration:
+           LogDriver: awslogs
+           Options:
+             awslogs-region: !Ref 'AWS::Region'
+             awslogs-group: !Ref LogGroup
+             awslogs-stream-prefix: app
+
+ # -------------------------------------
+ # Services ?????
+ # -------------------------------------
+ Service:
+   Type: AWS::ECS::Service
+   Properties:
+     Cluster: !Ref Cluster
+     DesiredCount: !Ref DesiredCount
+     LaunchType: FARGATE
+     LoadBalancers:
+       - ContainerName: !Sub ${ProjectName}dev-ecs-container
+         ContainerPort: 443
+         TargetGroupArn: !Ref TargetGroup
+     NetworkConfiguration:
+       AwsvpcConfiguration:
+         AssignPublicIp: DISABLED  # PublicSubnet????????ENABLED???????????
+         SecurityGroups:
+           - !Ref FargateSecurityGroup
+         Subnets: 
+           - subnet-057e3d284349d8e73
+           - subnet-0861a730499116155
+     ServiceName: !Sub ${ProjectName}dev-ecs-service-name
+     TaskDefinition: !Ref TaskDefinition
+   DependsOn:
+     - TargetGroup
+     - HttpListnener
+     - FargateSecurityGroup
+
+# -------------------------------------
+ # Auto Scaling??
+ # -------------------------------------
+ ServiceScalingTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    Properties:
+      MinCapacity: !Ref TaskMinContainerCount
+      MaxCapacity: !Ref TaskMaxContainerCount
+      ResourceId: !Sub
+        - service/${EcsClusterName}/${EcsDefaultServiceName}
+        - EcsClusterName: !Ref Cluster
+          EcsDefaultServiceName: !Sub ${ProjectName}dev-ecs-service-name
+      RoleARN: arn:aws:iam::321103485566:role/postvnext-asia-poc-proxy-ECS-AutoScale-IAMR
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+    DependsOn:
+     - Service
+
+ TargetTrackingScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties:
+      PolicyName: !Sub ${ProjectName}dev-nginx-ecs-scalingpolicy
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ServiceScalingTarget
+      TargetTrackingScalingPolicyConfiguration:
+        TargetValue: !Ref TargetValue
+        ScaleInCooldown: 60
+        ScaleOutCooldown: 60
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+    DependsOn:
+      - ServiceScalingTarget

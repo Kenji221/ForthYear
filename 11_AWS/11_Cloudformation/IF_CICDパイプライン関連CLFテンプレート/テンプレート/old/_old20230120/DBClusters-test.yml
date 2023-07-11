@@ -1,0 +1,327 @@
+# AWSTemplateFormatVersion: "2010-09-09"
+# Transform:
+#   Name: 'AWS::Include'
+#   Parameters:
+#     Location: !Sub 's3://${BucketName02}/output_Mappings_RDSDBCluster.yml'
+
+# Mappings:
+#   SystemEnvironmentMapping:
+#     OQSMNT: 
+#       VpcId: "vpc-00e76fb71e22cbe6f"
+#       VpcSecurityGroupId: "sg-0c3acfe46acc82ce1"
+#       Subnet1: subnet-0f9c10353986900d7
+#       Subnet2: subnet-0089f0ef7a3fc92cf
+#       Subnet3: subnet-0401a2c5ca75688d1
+#       KmsKeyId: "9d216efa-c8f2-4074-b1bb-51256883eb3a"  
+#       SnsTopicName: SNS-OQS-MNT-RDS-EVENTS
+
+
+    # OQSSTG:
+    #   SystemNameUpper: OQS
+    #   EnvironmentNameUpper: STG
+    #   SystemNameLower: oqs     
+    #   EnvironmentNameLower: stg  
+    #   VpcId: "vpc-11111111111"
+    #   VpcSecurityGroupId: "sg-111111111"
+    #   Subnet: 
+    #     - "subnet-111111111111"
+    #     - "subnet-222222222222"
+    #     - "subnet-333333333333"
+    #   KmsKeyId: "-"
+    #   DataBaseName: qsh      
+    #   # SnsTopicName: SNS-OQS-STG-RDS-EVENTS      
+
+Parameters:
+  # SystemEnvironmentName: 
+  #   Type: String
+  #   Default: 'OQSMNT'
+  #   AllowedValues: ['OQSMNT','OQSSTG','IRKMNT','YZKSTG']
+  DBClusterNumber:
+    Type: Number 
+    Default: '01'
+    AllowedValues: ['01','02']
+  # ReadInstanceNumber:
+  #   Type: Number 
+  #   Default: '02'
+  #   AllowedValues: ['02','03']
+  # MaxCapacity:
+  #   Type: Number
+  #   Default: 0
+  # MinCapacity:
+  #   Type: Number
+  #   Default: 0
+  # MasterUserPassword: 
+  #   Type: String
+  #   NoEcho: true
+  SystemNameLower:
+    Type: String
+    Default: oqs
+    AllowedValues: ['oqs'] 
+  # SystemNameUpper:
+  #   Type: String
+  #   Default: OQS
+  #   AllowedValues: ['OQS'] 
+  EnvironmentNameLower:
+    Type: String
+    Default: dev
+    AllowedValues: ['dev']      
+  # EnvironmentNameUpper:
+  #   Type: String
+  #   Default: MNT
+  #   AllowedValues: ['MNT']     
+  DataBaseName:
+    Type: String
+    Default: qsh 
+    AllowedValues: ['qsh']
+
+
+# Conditions:
+#   IsStg: !Equals 
+#     - !Ref EnvironmentNameLower
+#     - stg
+#   IsNotStg: !Not 
+#     - !Equals 
+#       - !Ref EnvironmentNameLower
+#       - stg
+
+Resources:
+  RDSDBParameterGroup:
+    Type: "AWS::RDS::DBParameterGroup"
+    Properties:
+      DBParameterGroupName: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-param ####"rds-oqs-mnt-qsh01-param"
+      Description: "DB Parameter Group."          
+      Family: "aurora-postgresql11"
+      Parameters: 
+          lc_messages: "ja_JP.UTF-8"
+          log_connections: "1"
+          log_disconnections: "1"
+          "pgaudit.log": "all,-misc"
+          "pgaudit.log_catalog": "0"
+          "pgaudit.log_level": "log"
+          "pgaudit.log_parameter": "1"
+          "pgaudit.log_relation": "1"
+          "pgaudit.log_statement_once": "1"
+          "pgaudit.role": "rds_pgaudit"
+          "pg_hint_plan.enable_hint": "1"
+          "pg_stat_statements.max": "5000"
+          "pg_stat_statements.save": "1"
+          "pg_stat_statements.track": "TOP"
+          "pg_stat_statements.track_utility": "1"
+          random_page_cost: "2"
+          search_path: "\"$user\""
+          shared_preload_libraries: "pg_stat_statements,pgaudit,pg_hint_plan"
+
+  RDSDBClusterParameterGroup:
+    Type: "AWS::RDS::DBClusterParameterGroup"
+    Properties:
+      DBClusterParameterGroupName: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-csparam ####"rds-oqs-mnt-qsh01-csparam"
+      Description: "DB Cluster Parameter Group" 
+      Family: "aurora-postgresql11"
+      Parameters: 
+          datestyle: "ISO, YMD"
+          lc_messages: "ja_JP.UTF-8"
+          lc_monetary: "ja_JP.UTF-8"
+          lc_numeric: "ja_JP.UTF-8"
+          lc_time: "ja_JP.UTF-8"
+          log_connections: "1"
+          log_disconnections: "1"
+          "pgaudit.log": "all,-misc"
+          "pgaudit.log_catalog": "0"
+          "pgaudit.log_level": "log"
+          "pgaudit.log_parameter": "1"
+          "pgaudit.log_relation": "1"
+          "pgaudit.log_statement_once": "1"
+          "pgaudit.role": "rds_pgaudit"
+          "pg_hint_plan.enable_hint": "1"
+          random_page_cost: "2"
+          "rds.force_ssl": "1"
+          search_path: "\"$user\""
+          shared_preload_libraries: "pg_stat_statements,pgaudit,pg_hint_plan"
+          timezone: "Asia/Tokyo"
+
+  # RDSDBSubnetGroup:
+  #     Type: "AWS::RDS::DBSubnetGroup"
+  #     Properties:
+  #       DBSubnetGroupDescription: "DB subnet group"
+  #       DBSubnetGroupName: !Sub db-${EnvironmentNameLower}-subnetgroup ####"db-mnt-subnetgroup"
+  #       SubnetIds:
+  #         - !FindInMap [SystemEnvironmentMapping,OQSMNT,Subnet1]
+  #         - !FindInMap [SystemEnvironmentMapping,OQSMNT,Subnet2]
+  #         - !FindInMap [SystemEnvironmentMapping,OQSMNT,Subnet3] 
+
+  # RDSDBCluster:
+  #   Type: "AWS::RDS::DBCluster"
+  #   Properties:
+  #     AvailabilityZones: 
+  #       - !Sub "${AWS::Region}c"
+  #       - !Sub "${AWS::Region}a"
+  #       - !Sub "${AWS::Region}d"
+  #     BackupRetentionPeriod: 7
+  #     DatabaseName: "QSH_DB"
+  #     DBClusterIdentifier: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-cluster ####"rds-oqs-mnt-qsh01-cluster"   
+  #     DBClusterParameterGroupName: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-csparam ####"rds-oqs-mnt-qsh01-csparam"
+  #     DBSubnetGroupName: !Sub db-${EnvironmentNameLower}-subnetgroup ####"db-mnt-subnetgroup"
+  #     Engine: "aurora-postgresql"
+  #     Port: 5432
+  #     MasterUsername: "QSH_ROOT"
+  #     MasterUserPassword: !Ref MasterUserPassword ####"REPLACEME"
+  #     PreferredBackupWindow: "15:00-15:30"
+  #     PreferredMaintenanceWindow: "sat:17:00-sat:17:30"
+  #     VpcSecurityGroupIds: 
+  #       - !FindInMap [SystemEnvironmentMapping,OQSMNT,VpcSecurityGroupId]
+  #     StorageEncrypted: true
+  #     KmsKeyId: !Sub 
+  #       - 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KmsKeyId}'
+  #       - KmsKeyId: !FindInMap [ SystemEnvironmentMapping,OQSMNT,KmsKeyId ]      
+  #     EngineVersion: "11.15"
+  #     EnableIAMDatabaseAuthentication: false
+  #     EnableCloudwatchLogsExports: 
+  #       - "postgresql"
+  #     EngineMode: "provisioned"
+  #     DeletionProtection: true
+  #     EnableHttpEndpoint: false
+  #     Tags: 
+  #       - 
+  #         Key: "AutoStopAuroraMnt"
+  #         Value: "true"
+  #       - 
+  #         Key: "BillingGroup"
+  #         Value: !Ref SystemNameUpper
+  #       - 
+  #         Key: "AutoStartAuroraMnt"
+  #         Value: "true"
+  #   DependsOn: 
+  #     - RDSDBSubnetGroup
+  #     - RDSDBParameterGroup
+  #     - RDSDBClusterParameterGroup
+
+  # RDSDBInstance01:
+  #   Type: "AWS::RDS::DBInstance"
+  #   Properties:
+  #     DBInstanceIdentifier: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber} ####"rds-oqs-mnt-qsh01"
+  #     DBInstanceClass: "db.t3.medium"
+  #     Engine: "aurora-postgresql"
+  #     DBName: "QSH_DB"
+  #     PreferredBackupWindow: "15:00-15:30"
+  #     AvailabilityZone: !Sub "${AWS::Region}a"
+  #     PreferredMaintenanceWindow: "sat:16:00-sat:16:30"
+  #     MultiAZ: false
+  #     EngineVersion: "11.15"
+  #     AutoMinorVersionUpgrade: false
+  #     LicenseModel: "postgresql-license"
+  #     PubliclyAccessible: false
+  #     StorageType: "aurora"
+  #     Port: 5432
+  #     DBClusterIdentifier: !Ref RDSDBCluster
+  #     KmsKeyId: !Sub 
+  #         - arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KmsKeyId}
+  #         - KmsKeyId: !FindInMap [ SystemEnvironmentMapping, OQSMNT, KmsKeyId ]           
+  #     MonitoringInterval: 60
+  #     PromotionTier: 0
+  #     EnablePerformanceInsights: true
+  #     PerformanceInsightsKMSKeyId: !Sub 
+  #       - arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KmsKeyId}
+  #       - KmsKeyId: !FindInMap [ SystemEnvironmentMapping,OQSMNT,KmsKeyId ]      
+  #     PerformanceInsightsRetentionPeriod: 7
+  #     DBSubnetGroupName: !Sub db-${EnvironmentNameLower}-subnetgroup ####"db-mnt-subnetgroup"
+  #     VPCSecurityGroups: 
+  #       - !FindInMap [SystemEnvironmentMapping,OQSMNT,VpcSecurityGroupId]
+  #     DBParameterGroupName: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-param ####"rds-oqs-mnt-qsh01-param"    
+  #     OptionGroupName: "default:aurora-postgresql-11"
+  #     MonitoringRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/rds-monitoring-role'
+  #     EnableCloudwatchLogsExports: 
+  #       - "postgresql"
+  #   DependsOn: 
+  #    - RDSDBSubnetGroup
+  #    - RDSDBParameterGroup
+  #    - RDSDBClusterParameterGroup
+  #   #  - RDSDBCluster
+        
+  # RDSDBInstance02: 
+  #   Type: "AWS::RDS::DBInstance"
+  #   Condition: IsStg  
+  #   Properties:
+  #     DBInstanceIdentifier: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${ReadInstanceNumber} ####"rds-oqs-mnt-qsh02"    
+  #     DBInstanceClass: "db.t3.medium"
+  #     Engine: "aurora-postgresql"
+  #     DBName: "QSH_DB"
+  #     PreferredBackupWindow: "15:00-15:30"
+  #     AvailabilityZone: !Sub "${AWS::Region}c"
+  #     PreferredMaintenanceWindow: "sat:16:00-sat:16:30"
+  #     MultiAZ: false
+  #     EngineVersion: "11.15"
+  #     AutoMinorVersionUpgrade: false
+  #     LicenseModel: "postgresql-license"
+  #     PubliclyAccessible: false
+  #     StorageType: "aurora"
+  #     Port: 5432
+  #     DBClusterIdentifier: !Ref RDSDBCluster
+  #     KmsKeyId: !Sub
+  #       - 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KmsKeyId}'
+  #       - KmsKeyId: !FindInMap [SystemEnvironmentMapping,OQSMNT,KmsKeyId]   
+  #     MonitoringInterval: 60
+  #     PromotionTier: 0
+  #     EnablePerformanceInsights: true
+  #     PerformanceInsightsKMSKeyId: !Sub 
+  #       - 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KmsKeyId}'
+  #       - KmsKeyId: !FindInMap [ SystemEnvironmentMapping, OQSMNT, KmsKeyId ]
+  #     PerformanceInsightsRetentionPeriod: 7
+  #     DBSubnetGroupName: !Sub 'db-${EnvironmentNameLower}-subnetgroup' ####"db-mnt-subnetgroup" 
+  #     VPCSecurityGroups: 
+  #       - !FindInMap [SystemEnvironmentMapping,OQSMNT,VpcSecurityGroupId]
+  #     DBParameterGroupName: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-param ####"rds-oqs-mnt-qsh01-param" 
+  #     OptionGroupName: "default:aurora-postgresql-11"
+  #     MonitoringRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/rds-monitoring-role'
+  #     EnableCloudwatchLogsExports: 
+  #       - "postgresql"
+  #   DependsOn: 
+  #      - RDSDBSubnetGroup
+  #      - RDSDBParameterGroup
+  #      - RDSDBClusterParameterGroup
+  #     #  - RDSDBCluster
+
+  # ApplicationAutoScalingScalableTarget: 
+  #   Type: "AWS::ApplicationAutoScaling::ScalableTarget"
+  #   Condition: IsStg 
+  #   Properties:
+  #     MaxCapacity: !Ref MaxCapacity ## 2
+  #     MinCapacity: !Ref MinCapacity ## 1
+  #     ResourceId: !Sub cluster:rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-cluster ####"cluster:rds-oqs-mnt-log01-cluster"
+  #     RoleARN: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/rds.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_RDSCluster"
+  #     ScalableDimension: "rds:cluster:ReadReplicaCount"
+  #     ServiceNamespace: "rds"
+  #     SuspendedState: 
+  #       DynamicScalingInSuspended: false
+  #       DynamicScalingOutSuspended: false
+  #       ScheduledScalingSuspended: false
+
+
+  # RDSEventSubscription01:
+  #   Type: "AWS::RDS::EventSubscription"
+  #   Properties:
+  #     SourceType: "db-cluster"
+  #     SnsTopicArn: !Sub 
+  #       - "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${SnsTopicName}"   ##"SNS-OQS-MNT-RDS-EVENTS"
+  #       - SnsTopicName: !FindInMap [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, SnsTopicName ]            
+  #     SourceIds:
+  #       - !Ref RDSDBCluster
+  #     Enabled: true
+
+  # RDSEventSubscription02:
+  #   Type: "AWS::RDS::EventSubscription"
+  #   Properties:
+  #     SourceType: "db-instance"
+  #     SnsTopicArn: !Sub 
+  #       - "arn:aws:sns:${AWS::Region}:${AWS::AccountId}:${SnsTopicName}"   ##"SNS-OQS-MNT-RDS-EVENTS"
+  #       - SnsTopicName: !FindInMap [ SystemEnvironmentMapping,!Ref SystemEnvironmentName, SnsTopicName ]   
+  #     SourceIds: !If 
+  #       - IsNotStg
+  #       - !Ref RDSDBInstance01    
+  #       - 
+  #         - !Ref RDSDBInstance01        
+  #         - !Ref RDSDBInstance02    
+  #     EventCategories: 
+  #       - "availability"
+  #       - "failure"
+  #       - "notification"
+  #     Enabled: true

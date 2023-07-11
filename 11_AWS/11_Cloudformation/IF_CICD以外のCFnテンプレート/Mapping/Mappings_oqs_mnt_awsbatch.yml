@@ -1,0 +1,18 @@
+Mappings:
+  AwsBatchMapping:
+    ###OQS-MNT
+    OPT:
+      SubnetIds: 
+        - 'subnet-03d4f8995fb86a5e5' #OPT1
+        - 'subnet-0aa47c5cb98dea0ec' #OPT2
+        - 'subnet-089fbe13625cd7195' #OPT3
+      SecurityGroupIds:
+        - 'sg-0279ba6cc3a47c26b' #OPT1
+      
+    BAT:
+      SubnetIds: 
+        - 'subnet-03d4f8995fb86a5e5' #BAT1
+        - 'subnet-0aa47c5cb98dea0ec' #BAT2
+        - 'subnet-089fbe13625cd7195' #BAT3
+      SecurityGroupIds:
+        - 'sg-0d822dd57c09e91fe' 

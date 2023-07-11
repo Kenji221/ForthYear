@@ -1,0 +1,569 @@
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★まとめ
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+■Dockerについて
+　- Docker compose / Docker run /　その他（cp, logs）
+  - Docker image作成　（inspect / CMD / ENTRYPOINT / COPY / RUN）
+  - Docker log の出力方法（標準出力）
+
+■Nginx
+　- Nginxモジュールの考え方
+  - Nginxのログの出し方について　/ フォーマット
+  - Nginxの依存関係について
+  - Nginx 性能、Events Parameterについて
+    -Limit req / multi_accept/ worker_rlimit_nofile/ 
+               Worker Connections
+ 
+■Network
+　-Reverse proxyとフォワードプロキシについて
+
+■OS（Linux）
+　- ファイルディスクリプタや、OSの基本設定について
+　- awk の基本設定について
+
+■Locust
+ - RPS \ SPR \ TPSの投げ方やパーセンタイルの計算方法について
+ 学ぶことができました。
+
+■AWS
+●Athena 
+　-テーブル / DBの作成方法行数確認方法
+　-クエリの書き方について
+
+
+
+
+●●●●出来なかった事●●●●
+■Nginx
+　- CN情報を確認する方法とは？
+　- Proxy redirect / x-forwarded-forとは
+  - BodyとHeaderの性能調整方法について
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0906-0907
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+
+
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+＝＝　アクションアイテム
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+■ログの出力
+①ECS Execution Roleに下記があるか確認
+https://stackoverflow.com/questions/58471103/ecs-fargate-nginx-container-not-showing-errors-in-cloudwatch-logs
+②
+# Forward request logs to Docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+  && ln -sf /dev/stderr /var/log/nginx/error.log
+EXPOSE 80
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
+
+③以下を読む
+https://dev.classmethod.jp/articles/how-to-confirm-environment-variable-on-fargate-nginx-container/
+
+
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+＝＝　Dockerについて
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+
+■Dockercomposeとは？
+①DockerRunを一覧化したような構成の物である。
+Docker run　コマンドを押さなくても動かせるようになる。
+メリット：複数のDockerコンテナを動かすことを可能にする
+
+②Dockercomposeの動かし方とは？
+docker-compose build
+
+
+■Dockerのボリュームについて
+①Dockerはコンテナが落ちてしまうと、Dockerのボリューム自体もなくなってしまう。
+そこでホストOSのボリュームとコンテナのボリュームをマウントする事が可能。
+※詳細はcode一覧にて確認
+
+■Docker cpとは？
+Dockerのコンテナ内での特定のパスに対して任意のパスに移行する方法
+
+■Dockerのloggingとは何か？
+https://nginx.org/download/nginx-1.23.1.tar.gz
+
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+＝＝　Nginxについて
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+■Reverse proxyについて
+verify depth の考え方について
+A depth of 0 means that self-signed client certificates are accepted only, the default depth of 1 means the client certificate can be self-signed or has to be signed by a CA which is directly known to the server (i.e. the CA's certificate is under SSLCACertificatePath), etc. A depth of 2 means that certificates signed by a (single level of) intermediate CA are accepted i.e. by an intermediate CA, whose CA certificate is signed by a CA directly known to the server.
+
+■Nginxモジュールの考え方
+①withが無くても必要なモジュールがある？
+
+
+■Nginxのフォワードプロキシの拡張モジュールの必要性
+https://blog.motikan2010.com/entry/2020/03/18/HTTPS%E9%80%9A%E4%BF%A1%E3%82%92Nginx%E3%81%A7%E3%83%95%E3%82%A9%E3%83%AF%E3%83%BC%E3%83%89%E3%83%97%E3%83%AD%E3%82%AD%E3%82%B7
+
+■NginxとNginxPlusの違い
+https://www.nginx.co.jp/blog/what-is-nginx/
+Nginxの商用版がNginxPlus
+
+■フォワードプロキシとリバースプロキシの違い
+https://qiita.com/zawawahoge/items/a931de1464ccaa228551
+A⇒B⇒Cの通信を行う際、
+フォワード：AはCを明示的に指定して、Bからのアクセスを要求する
+リバース：AはCを直接的に指定していない
+
+■Proxy redirectとは
+
+■x-forwarded-forとは
+
+
+■Nginxのログの出し方について
+⓪ログの種類について
+　-Error Logs
+  -Access logs
+
+①Nginxのログの設定方法について
+　Config ファイルにて設定を行う
+　　ディレクトリにログファイルの変数を入れることによって
+　　その特定のディレクトリに対するログを記録する事が出来る。
+　　
+②Log format とは何か
+　出力するアクセスログのログのフォーマットを出力するものとなっている
+
+ log format XXX
+
+ access log format XXX
+
+
+その他
+　ー404エラーについては正常なものなので必ずしもエラーログにはき出されるわけではない
+
+
+■Nginxの依存関係について
+外からなかに変数の継承を行っていく
+
+
+log_format main
+    '$remote_addr - $remote_user [$time_local] '
+    '"$request" $status $body_bytes_sent '
+    '"$http_referer" "$http_user_agent" '
+    '"$request_time" "$upstream_response_time" '
+    '"$upstream_addr"';
+
+■CN情報を確認する方法とは？
+
+
+
+
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+＝＝　ECSについて
+＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝＝
+■ECS on Fargateのログの出力方法について
+→docker log にて出力されるものが　ECSにて同じことが行われる
+→タスク毎に出力される
+→Performanceのログも出力されている
+
+■Fargateは複数コンテナを出せるのか？
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0908
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+■TODO
+OK　1.Dockerfile生成（山本さん相談）
+OK　2. 2kbの文字列を生成
+3. Cloudwatchlogsの検討
+　　ーVPCFlowLogs
+　　ーCloudwatchlogs insights
+4. 20220906のまとめ（ipad）
+●その他
+5. 山本さんのPythoコードについて学習
+
+■学んだこと
+1. Dockerfile生成（山本さん相談）
+(i)ECSのIAMポリシー権限
+タスク実行ロール：起動されるECSコンテナエージェントで使用されるIAMロール	
+AWS管理ポリシーにてECSコンテナエージェントの機能は実現されていると考えられ、変更は不要と考えられる
+タスクロール：コンテナで使用されるIAMロール	コンテナが他AWSサービスと連携する際に変更が必要
+
+(ii)CMDとENTRYPOINTの違い   
+　CMDとENTRYPOINTは共にコンテナ実行時に実行されるコマンドである。
+　CMD:割り振った値に対して引数を与えることができる。ENTRYPOINTを上書きする事が可能
+　ENTRYPOINT：固定的に実行するコマンドとなっている
+
+※CMDを複数実行する方法
+　ルートでシェルスクリプトを作成し、Dockerfileにシェルスクリプトを読み込ませる
+
+（iii）psをインストールする方法
+（iv）シェルスクリプトでの＆の意味
+
+
+(iv)ECS on Fargate 複数コンテナを立てる
+
+https://www.twilio.com/blog/how-to-run-a-flask-application-jpとは
+
+
+
+３．CloudwatchLogsの検討
+1. VPCフローログとは？
+　ネットワークインターフェイスとの間で行き来する IP トラフィックに関する情報をキャプチャする機能です。
+　キャプチャしたフローログは、Amazon CloudWatch Logs に出力あるいは Amazon S3 に格納することができます。
+   ★ENIが特定できる場合は、不要なトラフィックをキャプチャしないようにENIに対してVPC フローログを設定します。
+
+
+以下のIPトラフィックは、VPC フローログでキャプチャされません。
+　　Amazon DNS サーバーに接続したときにインスタンスによって生成されるトラフィック。
+　　Amazon Windows ライセンスのアクティベーション用に Windows インスタンスによって生成されたトラフィック。
+　　インスタンスメタデータ用に 169.254.169.254 との間を行き来するトラフィック。
+　　　Amazon Time Sync Service の 169.254.169.123 との間でやり取りされるトラフィック。
+　　DHCP トラフィック。
+　　デフォルト VPC ルーターの予約済み IP アドレスへのトラフィック。
+　　エンドポイントのネットワークインターフェイスと Network Load Balancer のネットワークインターフェイスの間のトラフィック。
+
+
+2. VPCFlowlogの有効化方法
+  （i）https://qiita.com/mksamba/items/d8fe465dd31183822af9
+
+3. 
+①VPCFlowlogsの見方
+　（i）.gzファイルで保存される
+　　　→zipで保存されている
+　（ii）.gzの回答方法
+　　　→https://xtech.nikkei.com/it/article/COLUMN/20060228/231198/
+　　　　→LinuxCommands一覧を参照
+　（iii）${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}
+      →上記がデフォルトとなっている
+　　　　　　2 321103485566 eni-04b58640d026a2a27            162.142.125.191 10.1.0.5 8035 10014 6 1 44 1662603763 1662603764 ACCEPT OK
+　　　　　　　　　　　　　 <postvnext-asia-poc-proxy-EIP>
+
+②Cloudwatch logs insights
+(i)what 
+CloudWatch Logs Insights では、Amazon CloudWatch Logs のログデータをインタラクティブに検索して分析できます。クエリを実行することで、
+運用上の問題に効率的かつ効果的に対応できます。
+(ii)how 
+ /log group を指定して filter をかけていく
+ 　→filter @message like /devproxy/
+ 　　→devproxyの文字が含まれているメッセージを残すことができる。
+
+③Nginxログ
+ 別エクセル参照
+
+
+④NginxのアクセスログDeepDive
+
+
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0909
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+■今日やる事
+①Nginxログ（dev環境）の精査
+②VPCフローログの再精査
+
+■学んだこと
+①Nginxログ（dev環境）の精査
+　（i）先頭文字の削除の仕方
+　　　→Linuxコマンドにも記載
+
+②VPCフローログの再精査
+  (i)CloudwatchlogsだとENIごとに表示される
+  (ii)dig 名前解決名（今回だとALBの名前で）ELBのIPアドレスがワカル
+  (iii)ユニックス時間
+  　UNIX時間（ユニックスじかん）またはUNIX時刻（ユニックスじこく、UNIX time（ユニックスタイム）、
+  　POSIX time（ポジックスタイム））とはコンピューターシステム上での時刻表現の一種。協定世界時 (UTC) での1970年1月1日午前0時0分0秒（UNIXエポック）から形式的な経過秒数として表される。
+
+（iv）cloudwatch logs insights 
+  →timestampで時間指定する方法
+　　→Cloudwatchlogs insightsの右上に時間指定をする箇所がある
+
+ (v) Locustの見方について
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0912
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+■今日やる事
+①Cloudwatchlogs insightsの有効化方法とinsights とは？
+　-Container のログの見方について
+　-ECS on ec2の帯域幅について
+②Gitにイメージの実行
+③今までやってきた事のまとめ
+OK（i）Dockerのログの出力
+ - ECS Execution Roleに下記があるか確認
+    https://stackoverflow.com/questions/58471103/ecs-fargate-nginx-container-not-showing-errors-in-cloudwatch-logs
+    https://dev.classmethod.jp/articles/how-to-confirm-environment-variable-on-fargate-nginx-container/
+OK（ii）DockerComposeについて
+OK（iii）Dockerコマンドまとめ　-cp / -logging
+OK (iv)リバプロとフォワードの違いについて
+OK (v)Proxy redirectとはx-forwarded-forとは
+OK (vi)Nginxのログの設定方法について
+　Config ファイルにて設定を行う
+　　ディレクトリにログファイルの変数を入れることによって
+　　その特定のディレクトリに対するログを記録する事が出来る。
+その他
+　ー404エラーについては正常なものなので必ずしもエラーログにはき出されるわけではない
+
+ (vii)CN情報を確認する方法とは
+ (viii)ECS on Fargateのログの出力方法について
+ (ix)Fargateは複数コンテナを出せるのか？
+ (x)ECSのIAMポリシー権限
+ (xi)CMDとENTRYPOINTの違い 
+ (xii)psをインストールする方法
+（xiii）シェルスクリプトでの＆の意味
+ (xiv)Locustの見方について/使い方について
+（xv）cloudwatch logsのディメンションとは
+https://dev.classmethod.jp/articles/amazon-cloudwatch-logs-announces-dimension-support-for-metric-filters/
+
+
+■ECSの性能メトリクス
+Cluster のCPU使用率
+　　                                  (Total CPU units used by tasks in cluster) x 100
+Cluster CPU utilization =  --------------------------------------------------------------
+                           (Total CPU units registered by container instances in cluster)
+
+NLBのスティッキーセッション
+ECSのクラスタ＾ー
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0914
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+①Locustについて
+②Athenaについて
+3. Nginxについて
+
+①Locustについて
+　-Spawn rate: describes how many users will increase in one second
+  -RPS:
+
+2. Athenaについて
+ SELECT <Column> From <Database>.<table>　　　# Determines the range of the data 
+ WHERE <条件> AND/OR <条件>                   # Gives the condition for a  
+ Limit 数                      
+
+
+
+3.Nginxについて
+ -keepalive timeout とは何か
+   Keep-Aliveは、WEBサーバーとクライアント（ウェブブラウザ）の通信時にHTTP通信を切断せずに、
+   HTTP通信を送受信する仕組みです。WEBサーバーでは同一サーバーに画像、Javaスクリプトファイル、
+   CSSがあり、HTTP通信があるたびにTCP接続を確立・切断を繰り返すと転送率が悪くなるので、Keep-Aliveの設定を有効にすると設定した
+   時間まではTCP接続をタイムアウトしないようにします
+
+  -keepalive_requestsとは
+   1つの接続で何回のリクエストを許可されるリクエストの数を設定です(Apache のMaxKeepAliveRequests に相当します。)
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0915
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+1. Locustの使い方について
+2. Nginxについて
+　-Limit reqとは
+　  The ngx_http_limit_req_module module (0.7.21) is used to limit the request processing rate per a defined key, 
+    in particular, the processing rate of requests coming from a single IP address. The limitation is done using the “leaky bucket” method
+    
+    デフォルト値：-
+
+　-multi_acceptとは
+    accept as many connections as possible, may flood worker connections if set too low -- for testing environment
+　  multi_acceptが無効になっている場合、ワーカープロセスは一度に1つの新しい接続を受け入れます。
+    それ以外の場合、ワーカープロセスは一度にすべての新しい接続を受け入れます。　
+
+   デフォルト値：off
+　 
+   -client_body_timeout 10;
+
+   -worker_rlimit_nofile 100000;
+    https://qiita.com/mikene_koko/items/85fbe6a342f89bf53e89
+
+     Nginxのworker_connectionsの1workerプロセスにおける、ファイルディスクリプタ の上限値  
+     つまり、 ファイルを識別する仕組み です。
+     また、ファイルを識別する仕組みにはOS毎に上限がある。
+  
+  -Worker Connectionsとは
+　　１プロセスあたりに同時に実行する事が出来る接続数
+
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0915
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+■Nginx
+use epoll;
+　コネクションの処理方法を記述します。
+　Linuxカーネル2.6以上の場合はepoll、BSDの場合kqueueとするのが良い様です。　
+　特に指定しなかった場合は自動で選択される様です。
+
+■NLB logs
+ActiveFlowCount
+　クライアントからターゲットへの同時フロー (または接続) の合計数。このメトリクスには、
+　SYN_SENT 状態と ESTABLISHED 状態の接続が含まれます。TCP 接続はロードバランサーで終了しないため、
+　ターゲットへの TCP 接続を開いているクライアントは単一のフローとしてカウントされます。
+
+TCP_Client_Reset_Count
+　クライアントからターゲットに送信されたリセット (RST) パケットの合計数。
+　これらのリセットは、クライアントによって生成され、ロードバランサーによって転送されます。
+
+
+NewFlowCount
+　期間内にクライアントからターゲットに確立された新しいフロー (または接続) の合計数。
+
+TCP_Client_Reset_Count
+　ターゲットからクライアントに送信されたリセット (RST) パケットの合計数。
+　これらのリセットは、ターゲットによって生成され、ロードバランサーによって転送されます。
+https://study-infra.com/nginx-tuning/
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0920
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+■Nginx
+（i）CPUに対するWorkerConnectionについて
+　　ーworkerrlimit / 4にて割り当てを行う事
+　　ーリバプロを行う際には各コネクションが２倍になる事を考慮しなくてはいけない。
+
+
+■NLB
+ーNLBに静的なIPアドレスを振る方法
+https://dev.classmethod.jp/articles/elb-network-load-balancer-static-ip-adress/
+dig <alb-名前解決>で見つけることができる。
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0921
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+① ECSのイメージの修正
+② ECSのタスクのCPUクォータとは？
+ - ECS has been a task base quotas. However, after October, it will become a cpu base quotas
+   you will have the decision whether to opt in or opt out(※) the quotas
+
+ - AWS Fargate customers can consume 16 v cpu and approximately  4x the memory compared by before. 
+ - ECSのクォータを変更することによってより大きいCPUサイズを利用する事が出来る。
+
+(※)
+ -opt in:a user will take an affirmative action to offer their consent.
+ -opt out: a user takes action to withdraw their consent
+
+
+③ 小さなモデルで最大rpsを増やす
+　　-Locustが毎回取りに行く秒間ごとに何
+
+　　-WorkerConnectionsから一タスク当たりに何rpsが可能かを調べる
+　　　　12rec　　　
+　
+　　-Keepaliveを大きくする場合にどういうリクエストタイムにする必要があるか
+
+　　-top / psが使えない
+　　　　→apt updateからの apt instal procps
+      
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0922
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+- Ootani-san 1 on 1 meeting 
+
+-テスト準備
+ ■環境調整
+　 -3秒に一度の間隔でLocustを投げる
+　 -ECSの台数を350台で試行
+   -Locust 200台
+    
+ ■テスト調整
+ 　-性能
+　　 -Log streamを削除する方法
+　　　　aws logs describe-log-streams --log-group-name NAME_OF_LOG_GROUP --output text | awk '{print $7}' |
+ 　　-AthenaでUpstreamの時間差を測定する
+　　　
+ 　-費用
+ 　　-ECS当たりにかかる費用
+　　 -LB
+      -NLB
+        一時間当たりに使用する料金が基本料金となっている（基本料）
+        一時間当たりに使用しているNLCUとなっている。
+       -NLCU
+         新しい接続またはフロー: 1 秒あたりの新たに確立された接続またはフローの数。多くのテクノロジー (HTTP、WebSockets など) では、効率を高めるために Transmission Control Protocol (TCP) 接続を再利用します。新しい接続数は、通常、リクエストまたはメッセージ数よりも少なくなります。
+アクティブな接続またはフロー: 1 分ごとにサンプリングされたピーク時の同時接続またはフローの数。
+処理バイト: ロードバランサーによって処理されたバイト数 (GB 単位)。
+     -DynamoDB
+     -Subnet
+     -
+
+
+■ShellScript
+awkとは？
+ -プログラミング言語となっており、
+
+-write on ECS
+
+-write on Nginxについて
+ -event
+  -worker_rlimit_nofile
+  -worker_connections
+  -multi_auto
+
+ -http
+  -Location
+   -server
+    -Other parameters
+  
+■正規表現
+regexp_replace
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0926
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+Proxy テスト準備
+ ■テスト対応
+　 -以下、TPSを測定する
+    32,000
+
+
+●Athena 
+　-テーブル行数確認方法
+    select count(*) from table
+
+■プロジェクト観点での立ち回り
+　ーGDC　/ AWS ドイツメンバー
+　ーVnextプロジェクトでの経験
+　　ー砂原さんが作成した者の共通点と乖離
+　　ーまとめ会議
+■今後
+ー報告内容の構成をパワーポイント
+　→月曜日
+ー目次のパワーポイント（モック）
+　ー上期に向けた成果
+　ー下期に向けた展開
+■Worksheet	
+　ー来週までに記入する事
+　－エクセル
+　　ーパワーポイントでつくった内容を
+
+■ShellScript
+awkとは？
+ -プログラミング言語となっており、
+
+https://docs.amazonaws.cn/en_us/AmazonECS/latest/userguide/ecs-modifying-longer-id-settings.html
+
+
+
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+★★★★0928
+★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
+1. Dockerのプロセッサー入れ替え作業
+   -ARM
+   -IAアーキのバイナリとは？
+     Intel Architectureが作成した
+
+   -ARMでトランスコード実行
+   -ARMプラットフォームで、IAアプリをそのまま実行できるようです
+
+2. 500mb のファイル作成
+　- 1,000,000byte = 1,000 kb = 1 MB = 0.08GB
+
+fallocate(linux command)
+
+curl option 
+
+3. route 53のルーティングオプション
+
+
+
+

@@ -1,0 +1,668 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-MNT-IAM_202211.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Network
+# Version: 1.0
+# Author: Fujitsu - ichikawa
+############################
+AWSTemplateFormatVersion: 2010-09-09
+
+# Transform:
+#   Name: 'AWS::Include'
+#   Parameters:
+#     Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  SystemNameUpper:
+    Type: String
+    Default: 'example: IRK'
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'example: MT2'
+
+
+Resources:
+  # :param :全て拒否ルールにて作成
+  # ### 初回実行時のみ作成もしくはシステム固有のポリシー ###
+  # ### IAMP APL-ADM-AssumeRole IAM Policy ###
+  IAMPAPLADMAssumeRole:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ADM-AssumeRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP APL-FullAccess IAM Policy ###
+  IAMPAPLFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-FullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP APL-Operation IAM Policy ###
+  IAMPAPLOperation:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-Operation
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP APL-ReadOnlyAccess IAM Policy ###
+  IAMPAPLReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP INF-ADM-AssumeRole IAM Policy ###
+  IAMPINFADMAssumeRole:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ADM-AssumeRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP INF-FullAccess IAM Policy ###
+  IAMPINFFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-FullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP CMN-AWSLambdaBasicExecution IAM Policy ###
+  IAMPCMNAWSLambdaBasicExecution:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-AWSLambdaBasicExecution
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP CMN-AWSLambdaENIManagementAccess IAM Policy ###
+  IAMPCMNAWSLambdaENIManagementAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-AWSLambdaENIManagementAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP CMN-KinesisRecords IAM Policy ###
+  IAMPCMNKinesisRecords:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-KinesisRecords
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP CMN-OQS-ZBX IAM Policy ###
+  IAMPCMNOQSZBX:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-OQS-ZBX
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT1-VPCFlowLogs IAM Policy ###
+  IAMPMT1VPCFlowLogs:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-MT1-VPCFlowLogs
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-copy-irk-build-source-bucket-mt2-to-osaka IAM Policy ###
+  IAMPMT2copyirkbuildsourcebucketmt2toosaka:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-copy-irk-build-source-bucket-mt2-to-osaka
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-copy-s3-irk-mt2-cfn01-to-osaka IAM Policy ###
+  IAMPMT2copys3irkmt2cfn01toosaka:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-cfn01-to-osaka
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-copy-s3-irk-mt2-ecs-userdata-file01-to-osaka IAM Policy ###
+  IAMPMT2copys3irkmt2ecsuserdatafile01toosaka:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-ecs-userdata-file01-to-osaka
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-copy-s3-irk-mt2-ird-backup01-to-osaka IAM Policy ###
+  IAMPMT2copys3irkmt2irdbackup01toosaka:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-ird-backup01-to-osaka
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+#  # ### IAMP HSK MT2-APContainerAction-Elasticsearch IAM Policy ###
+  IAMPHSKMT2APContainerActionElasticsearch:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: IAMP-HSK-MT2-APContainerAction-Elasticsearch
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### 各環境毎に作成しそうなポリシー ###
+  # ### IAMP MT2-APContainerAction-Cognito IAM Policy ###
+  IAMPMT2APContainerActionCognito:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-Cognito
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-APContainerAction-DynamoDB IAM Policy ###
+  IAMPMT2APContainerActionDynamoDB:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-APContainerAction-DynamoDB-MSA42401 IAM Policy ###
+  IAMPMT2APContainerActionDynamoDBMSA42401:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB-MSA42401-A
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-AssociateKmsKey IAM Policy ###
+  IAMPMT2AssociateKmsKey:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AssociateKmsKey
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-AWSBAT-BatJob IAM Policy ###
+  IAMPMT2AWSBATBatJob:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-AWSBAT-BatJob-Temp IAM Policy ###
+  IAMPMT2AWSBATBatJobTemp:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob-Temp
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-AWSBAT-Instance IAM Policy ###
+  IAMPMT2AWSBATInstance:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-Instance
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-AWSBAT-IrdBKJob IAM Policy ###
+  IAMPMT2AWSBATIrdBKJob:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-IrdBKJob
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-AWSLambdaBasicExecution IAM Policy ###
+  IAMPMT2AWSLambdaBasicExecution:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaBasicExecution
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-AWSLambdaENIManagementAccess IAM Policy ###
+  IAMPMT2AWSLambdaENIManagementAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaENIManagementAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-BatchJob-RunnableStatusCheckrole IAM Policy ###
+  IAMPMT2BatchJobRunnableStatusCheckrole:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BatchJob-RunnableStatusCheckrole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-BATCodeBuild IAM Policy ###
+  IAMPMT2BATCodeBuild:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodeBuild
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-BATCodeBuild-VPC IAM Policy ###
+  IAMPMT2BATCodeBuildVPC:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodeBuild-VPC
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-BATCodePipeline IAM Policy ###
+  IAMPMT2BATCodePipeline:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodePipeline
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-BATInvoke IAM Policy ###
+  IAMPMT2BATInvoke:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATInvoke
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-BKS IAM Policy ###
+  IAMPMT2BKS:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BKS
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-CWE-StepInvoke IAM Policy ###
+  IAMPMT2CWEStepInvoke:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-CWE-StepInvoke
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-DynamoDBOperation IAM Policy ###
+  IAMPMT2DynamoDBOperation:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-DynamoDBOperation
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-ECS-S3-GetObject IAM Policy ###
+  IAMPMT2ECSS3GetObject:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECS-S3-GetObject
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-ECSAutoOperate IAM Policy ###
+  IAMPMT2ECSAutoOperate:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECSAutoOperate
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-ECSInstanceDraining IAM Policy ###
+  IAMPMT2ECSInstanceDraining:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECSInstanceDraining
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-Glue-KMSDecrypt IAM Policy ###
+  IAMPMT2GlueKMSDecrypt:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Glue-KMSDecrypt
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-GlueJob IAM Policy ###
+  IAMPMT2GlueJob:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-GlueJob
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-Lambda-EC2AutoBackup IAM Policy ###
+  IAMPMT2LambdaEC2AutoBackup:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Lambda-EC2AutoBackup
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-Lambda-EC2AutoOperate IAM Policy ###
+  IAMPMT2LambdaEC2AutoOperate:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Lambda-EC2AutoOperate
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-LMD-S3-ObjectDelete IAM Policy ###
+  IAMPMT2LMDS3ObjectDelete:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-LMD-S3-ObjectDelete
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-PermissionsPolicyForCWL IAM Policy ###
+  IAMPMT2PermissionsPolicyForCWL:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-PermissionsPolicyForCWL
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-RDSStartAuth IAM Policy ###
+  IAMPMT2RDSStartAuth:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-RDSStartAuth
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-RDSStopAuth IAM Policy ###
+  IAMPMT2RDSStopAuth:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-RDSStopAuth
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-Step IAM Policy ###
+  IAMPMT2Step:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Step
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBCodeBuild IAM Policy ###
+  IAMPMT2WEBCodeBuild:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBCodeBuild02 IAM Policy ###
+  IAMPMT2WEBCodeBuild02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBCodeBuild-VPC IAM Policy ###
+  IAMPMT2WEBCodeBuildVPC:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild-VPC
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBCodeBuild-VPC02 IAM Policy ###
+  IAMPMT2WEBCodeBuildVPC02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild-VPC02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBCodeDeploy IAM Policy ###
+  IAMPMT2WEBCodeDeploy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeDeploy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBCodeDeploy02 IAM Policy ###
+  IAMPMT2WEBCodeDeploy02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeDeploy02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBCodePipeline IAM Policy ###
+  IAMPMT2WEBCodePipeline:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBCodePipeline02 IAM Policy ###
+  IAMPMT2WEBCodePipeline02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-WEBTaskAction IAM Policy ###
+  IAMPMT2WEBTaskAction:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBTaskAction
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-ECS IAM Policy ###
+  IAMPMT2ECS:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECS
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-Firehose-DeliveryWAFLogs IAM Policy ###
+  IAMPMT2FirehoseDeliveryWAFLogs:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Firehose-DeliveryWAFLogs
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### IAMP MT2-ECS02 IAM Policy ###
+  IAMPMT2ECS02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECS02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+
+ 

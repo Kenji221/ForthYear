@@ -1,0 +1,147 @@
+
+# ------------------------------------------------------------------------------------------------
+# generate ssl certificate
+# ------------------------------------------------------------------------------------------------
+openssl genrsa 2048 > server.key
+openssl req -new -key server.key > server.csr
+openssl x509 -days 36500 -req -signkey server.key < server.csr > server.crt
+
+
+# ------------------------------------------------------------------------------------------------
+# generate ssl certificate and authentication with docker 
+# ------------------------------------------------------------------------------------------------
+
+https://al-batross.net/2022/03/07/nginx-client-certificates/
+
+# サーバー認証に使用するファイルの保存場所を作成する
+
+mkdir /etc/nginx/server_certificates
+cd /etc/nginx/server_certificates
+
+# (Certification Authority)鍵を作成する
+
+$ openssl genrsa -out server.key 4096
+Generating RSA private key, 4096 bit long modulus (2 primes)
+................................++++
+..++++
+e is 65537 (0x010001)
+Enter pass phrase for server.key:
+Verifying - Enter pass phrase for server.key:
+
+# CA(Certification Authority)証明書を作成する
+$ openssl req -new -x509 -days 365 -key server.key -out server.crt
+Enter pass phrase for server.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:JP
+State or Province Name (full name) [Some-State]:Tokyo
+Locality Name (eg, city) []:
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Fujitsu
+Organizational Unit Name (eg, section) []:Fujitsu
+Common Name (e.g. server FQDN or YOUR name) []:postvnext
+Email Address []:
+
+# パスワードファイルを作成する
+CA鍵のパスワードをNginxに渡すためパスワードファイル/etc/nginx/server_certificates/ssl_pass_file.txtを作成する。
+p4ssw0rd
+
+# NginXの設定
+# 設定ファイル/etc/nginx/conf.d/default.confに以下を追記する
+
+ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+server {
+    listen 443 ssl default_server;
+
+	## HTTPS化
+    ssl_certificate "/etc/nginx/server_certificates/server.crt";
+    ssl_certificate_key "/etc/nginx/server_certificates/server.key";
+    ssl_session_cache shared:SSL:1m;
+    ssl_session_timeout  10m;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers HIGH:SEED:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!RSAPSK:!aDH:!aECDH:!EDH-DSS-DES-CBC3-SHA:!KRB5-DES-CBC3-SHA:!SRP;
+    ssl_prefer_server_ciphers on;
+	# パスワードファイルを読み込む
+    ssl_password_file   /etc/nginx/server_certificates/ssl_pass_file.txt;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+# クライアント認証
+# クライアント認証に使用するファイルの保存場所を作成する
+
+mkdir /etc/nginx/client_certificates
+cd /etc/nginx/client_certificates
+CA(Certification Authority)鍵を作成する
+
+$ openssl genrsa -out ca.key 4096
+Generating RSA private key, 4096 bit long modulus (2 primes)
+.........................................................................++++
+......++++
+e is 65537 (0x010001)
+Enter pass phrase for ca.key:
+Verifying - Enter pass phrase for ca.key:
+CA(Certification Authority)証明書を作成する
+
+$ openssl req -new -x509 -days 365 -key ca.key -out ca.crt
+Enter pass phrase for ca.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:JP
+State or Province Name (full name) [Some-State]:Tokyo
+Locality Name (eg, city) []:Shibuya-ku
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Example, Inc.
+Organizational Unit Name (eg, section) []:Development section
+Common Name (e.g. server FQDN or YOUR name) []:
+Email Address []:
+
+
+# クライアント証明書を作成する
+$ openssl genrsa -out user.key 4096
+Generating RSA private key, 4096 bit long modulus (2 primes)
+......................................................................................................................++++
+.........................................................................................................................................................................................................++++
+e is 65537 (0x010001)
+Enter pass phrase for user.key:
+Verifying - Enter pass phrase for user.key:
+クライアント証明書に署名する
+
+$ openssl req -new -key user.key -out user.csr
+Enter pass phrase for user.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:JP
+State or Province Name (full name) [Some-State]:Tokyo
+Locality Name (eg, city) []:Shibuya
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:Example, Inc.
+Organizational Unit Name (eg, section) []:Customer Support
+Common Name (e.g. server FQDN or YOUR name) []:
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:
+CSR(Certificate Signing Request)に署名する
+
+
+$ openssl x509 -req -days 365 -in user.csr -CA ca.crt -CAkey ca.key -set_serial 01 -out user.crt
+Signature ok
+subject=C = JP, ST = Tokyo, L = Shibuya, O = "Example, Inc.", OU = Customer Support
+Getting CA Private Key
+Enter pass phrase for ca.key:

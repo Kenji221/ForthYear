@@ -1,0 +1,68 @@
+#############################################################
+# Copyright 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-Lambda.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for Lambda 
+# Version: 1.0
+# Author: Fujitsu - ichikawa
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  #  ## user form  ##
+  #  :param SystemNameUpper: ['OQS',IRK','TKK','YZK']システム名称(大文字)
+  #  :param EnvironmentNameUpper: ['MNT','DEV','STG','PRO','MT1','MT2'] 環境名(大文字)
+  #  :param BucketName01: ['-']　バケット名
+  #  :param S3Key: ['-']
+
+
+  SystemNameUpper:
+    Type: String
+    Default: 'OQS' 
+    AllowedValues: ['OQS',IRK','TKK','YZK']
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'MNT' 
+    AllowedValues: ['MNT','DEV','STG','PRO','MT1','MT2'] 
+  BucketName01:
+    Type: String
+    Default: 's3-oqs-cmn-mybucket'
+    Description: 'The bucket where the code is stored'
+  S3Key:
+    Type: String
+    Default: 'myfolder/codefailename.zip'
+    Description: 's3 pass where the code is stored'
+  
+Resources:
+  LambdaEC2AutoBackup:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Description: "AMI create and copy"
+      Environment:
+        Variables: 
+          SRC_REGION: !Ref AWS::Region
+          DEST_REGION: "ap-northeast-3"
+          TAG_KEY: "AutoBackup"
+          TAG_VAL: !Ref EnvironmentNameUpper
+          TZ: "Asia/Tokyo"
+          gene_cnt: 2
+      FunctionName: !Sub "LMD-${SystemNameUpper}-${EnvironmentNameUpper}-EC2AutoBackup"
+      Handler: "lambda_function.lambda_handler"
+      Architectures: 
+      - "x86_64"
+      Code: 
+        S3Bucket: !Ref BucketName01
+        S3Key: !Ref S3Key
+      MemorySize: 128
+      Role: !Sub "arn:aws:iam::${AWS::AccountId}:role/IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-EC2AutoBackup"
+      Runtime: "python3.7"
+      Timeout: 240
+      TracingConfig: 
+        Mode: "PassThrough"
+      EphemeralStorage: 
+        Size: 512
+      Tags: 
+       - Key: "VPCLambda"
+         Value: "false"
+       - Key: "BillingGroup"
+         Value: !Sub "${SystemNameUpper}-${EnvironmentNameUpper}"

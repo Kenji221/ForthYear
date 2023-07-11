@@ -1,0 +1,48 @@
+#############################################################
+# Copyright 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-CloudTrail.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for CloudTrail 
+# Version: 1.0
+# Author: Fujitsu - hou
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  #  ## user form  ##
+  #  :param SystemNameUpper: ['OQS']システム名称(大文字)
+  #  :param SystemNameLower: ['oqs'] システム名称(小文字)
+  #  :param CloudWatchLogsLogGroupName: ['example:　CloudTrail-OQS-CMN/DefaultLogGroup ']
+  #  :param CloudWatchLogsRole: ['example:　CloudTrail_CloudWatchLogs_Role']
+  #  :param KMSKeyId: ['-']
+
+
+  SystemNameUpper:
+    Type: String
+    Default: 'OQS' 
+  SystemNameLower:
+    Type: String
+    Default: 'oqs'   
+  CloudWatchLogsLogGroupName:
+    Type: String
+    Default: '-'       
+  CloudWatchLogsRole: 
+    Type: String
+    Default: '-'
+  KMSKeyId:
+    Type: String
+    Default: '-'
+
+Resources:
+  CloudTrail:
+    Type: "AWS::CloudTrail::Trail"
+    Properties:
+      TrailName: !Sub 'CLT-${SystemNameUpper}-CMN-LOG01' 
+      S3BucketName: !Sub 's3-${SystemNameLower}-cmn-clt01' 
+      IncludeGlobalServiceEvents: true
+      IsMultiRegionTrail: true
+      EnableLogFileValidation: true
+      CloudWatchLogsLogGroupArn: !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${CloudWatchLogsLogGroupName}:*'   
+      CloudWatchLogsRoleArn:  !Sub 'arn:aws:iam::${AWS::AccountId}:role/${CloudWatchLogsRole}'  
+      KMSKeyId: !Sub 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KMSKeyId}' 
+      IsLogging: true

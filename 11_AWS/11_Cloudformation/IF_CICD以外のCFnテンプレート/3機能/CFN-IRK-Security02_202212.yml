@@ -1,0 +1,120 @@
+#############################################################
+# Copyright 2022 FUJITSU LIMITED
+# FileName: CFN-IRK-Security02.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for Security 
+# Version: 1.0
+# Author: Fujitsu - hou
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+Parameters:
+  #  ## user form  ##
+  #  :param SystemNameUpper: ['IRK'] システム名称(大文字) 
+  #  :param EnvironmentNameUpper: ['MNT']  環境名(大文字)
+  #  :param WebALBName: ['example: ALB-IRK-MNT-WEB01/xxxxxxxxxxx]  
+  #  :param APIId: ['example: uctbg6vlqh']
+  #  :param RuleId: ['example: 206d5a66-3203-4bf1-8e12-2b90a0b6befe'] 
+  #  :param CreateWAFRegional: ['Conditionsを設定したため、単体実施可能']
+  #  :param CreateSecurityHub: ['Conditionsを設定したため、単体実施可能']
+  #  :param CreateGuardDuty: ['Conditionsを設定したため、単体実施可能']
+
+  SystemNameUpper:
+    Type: String
+    Default: 'IRK' 
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'MNT'     
+  WebALBName:  
+    Type: String
+    Default: 'ALB-IRK-MNT-WEB01/xxxxxxxxxxx'    
+  APIId:
+    Type: String
+    Default: '-'    
+  RuleId: 
+    Type: String
+    Default: '-'
+  CreateWAFRegional: 
+    Type: String
+    Default: 'WAFRegional'
+  CreateSecurityHub: 
+    Type: String
+    Default: 'SecurityHub'
+  CreateGuardDuty: 
+    Type: String
+    Default: 'GuardDuty'
+
+Conditions:    
+  CreateWAFRegional: !Equals
+    - !Ref CreateWAFRegional
+    - WAFRegional 
+  CreateSecurityHub: !Equals
+    - !Ref CreateSecurityHub
+    - SecurityHub    
+  CreateGuardDuty: !Equals
+    - !Ref CreateGuardDuty
+    - GuardDuty          
+
+Resources:
+#-------------------WAF----------------------#
+
+  ALBWAFRegionalWebACL:
+    Type: "AWS::WAFRegional::WebACL"
+    Condition: CreateWAFRegional
+    Properties:
+      Name: !Sub 'WAF-${SystemNameUpper}-${EnvironmentNameUpper}-ALB01' 
+      MetricName: !Sub 'WAFMETRIC${SystemNameUpper}-${EnvironmentNameUpper}ALB01' 
+      DefaultAction: 
+        Type: "ALLOW"
+      Rules: 
+        - 
+          Action:
+            Type: BLOCK
+          Priority: 1
+          RuleId: !Ref  RuleId    
+
+  ALBWAFRegionalWebACLAssociation01:
+    Type: "AWS::WAFRegional::WebACLAssociation"
+    Condition: CreateWAFRegional
+    Properties:
+      ResourceArn: !Sub 'arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${WebALBName}'
+      WebACLId: !Ref ALBWAFRegionalWebACL
+
+    
+  APIWAFRegionalWebACL:
+    Type: "AWS::WAFRegional::WebACL"
+    Condition: CreateWAFRegional
+    Properties:
+      Name: !Sub 'WAF-${SystemNameUpper}-${EnvironmentNameUpper}-APIGW01'  
+      MetricName: !Sub 'WAFMETRIC${SystemNameUpper}-${EnvironmentNameUpper}APIGW01'
+      DefaultAction: 
+        Type: "ALLOW"
+      Rules: 
+        - 
+          Action:
+            Type: BLOCK
+          Priority: 1
+          RuleId: !Ref  RuleId   
+
+  APIWAFRegionalWebACLAssociation01:
+    Type: "AWS::WAFRegional::WebACLAssociation"
+    Condition: CreateWAFRegional
+    Properties:
+      ResourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIId}/*' 
+      WebACLId: !Ref APIWAFRegionalWebACL
+
+
+#------------------SecurityHub---------------#
+
+  SecurityHubHub:
+    Type: "AWS::SecurityHub::Hub"
+    Condition: CreateSecurityHub
+
+
+##------------------GuardDuty------------------#
+
+  GuardDuty:
+    Type: AWS::GuardDuty::Detector
+    Condition: CreateGuardDuty
+    Properties:
+      Enable: true
+

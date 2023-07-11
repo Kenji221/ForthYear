@@ -1,0 +1,145 @@
+Mappings:
+  SystemEnvironmentMapping:
+    TKKDEV:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: tkk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed'
+      NamespaceId: ns-ry7ad7yslgpndsyx
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-" 
+      ALBWSPRXY01Arn: 'arn:aws:elasticloadbalancing:ap-northeast-1:012752345683:loadbalancer/app/ALB-TKK-DEV-WEB01/1d1ee20491e19fb2'
+
+    TKKSTG:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: STG
+      SystemNameLower: tkk
+      EnvironmentNameLower: stg
+      VpcId: vpc-02438362be49444f0
+      Subnet: 
+        - "subnet-047c898e058b6a16c"
+        - "subnet-02e2efdac98663495"
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: '61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed'
+      NamespaceId: ns-ry7ad7yslgpndsyx
+      VpcEndpointId01: "vpce-05f7a4e3335617de7"
+      VpcEndpointId02: "vpce-034912d6126d1183e"      
+      ALBWSPRXY01Arn: '-'
+
+    TKKMNT:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: tkk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-00f6c8dfa96416b5f"
+        - "subnet-0733f39d7dc72ca89"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'ca061e31-5d40-4ed7-9699-3fe67059dfec'
+      NamespaceId: ns-awmnw55r3rvnuyjz
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"
+      ALBWSPRXY01Arn: '-'
+
+    YZKDEV:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: yzk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed'
+      NamespaceId: ns-ry7ad7yslgpndsyx
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-" 
+      ALBWSPRXY01Arn: '-'
+
+    YZKSTG:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: STG
+      SystemNameLower: yzk
+      EnvironmentNameLower: stg
+      VpcId: vpc-01e2d26b07f654cd6
+      Subnet: 
+        - "subnet-078222f9bd33ff0c8"
+        - "subnet-0814b2d7c7a1da156"
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: '5665c543-1665-482b-a9b8-d1256dcf68fe'
+      NamespaceId: ns-wak2porfvv6uxg45
+      VpcEndpointId01: "vpce-0a6e3021691529620"
+      VpcEndpointId02: "vpce-037372e8509fae6a6" 
+      ALBWSPRXY01Arn: '-'
+
+    YZKMNT:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: yzk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-00f6c8dfa96416b5f"
+        - "subnet-0733f39d7dc72ca89"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'ca061e31-5d40-4ed7-9699-3fe67059dfec'
+      NamespaceId: ns-awmnw55r3rvnuyjz    
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"      
+      ALBWSPRXY01Arn: '-'
+
+    IRKDEV:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: irk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed'
+      NamespaceId: ns-ry7ad7yslgpndsyx
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-"     
+      ALBWSPRXY01Arn: '-'
+
+    IRKSTG:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: STG
+      SystemNameLower: irk
+      EnvironmentNameLower: stg
+      VpcId: vpc-0af6cedd1d668b053
+      Subnet: 
+        - "subnet-0f7384437964e5634"
+        - "subnet-08bc3f510266bcbe8"
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: 'ca061e31-5d40-4ed7-9699-3fe67059dfec'
+      NamespaceId: ns-awmnw55r3rvnuyjz
+      VpcEndpointId01: "vpce-05aa856e0980051c3"
+      VpcEndpointId02: "vpce-024ed93126676e45d" 
+      ALBWSPRXY01Arn: '-'
+
+    IRKMNT:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: irk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-00f6c8dfa96416b5f"
+        - "subnet-0733f39d7dc72ca89"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'ca061e31-5d40-4ed7-9699-3fe67059dfec'
+      NamespaceId: ns-awmnw55r3rvnuyjz
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"  
+      ALBWSPRXY01Arn: '-'

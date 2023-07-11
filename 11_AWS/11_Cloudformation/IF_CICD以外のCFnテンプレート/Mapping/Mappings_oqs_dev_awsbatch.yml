@@ -1,0 +1,35 @@
+Mappings:
+  AwsBatchMapping:
+    ###OQS-MNT
+    # OPT:
+    #   SubnetIds: 
+    #     - 'subnet-03d4f8995fb86a5e5' #OPT1
+    #     - 'subnet-0aa47c5cb98dea0ec' #OPT2
+    #     - 'subnet-089fbe13625cd7195' #OPT3
+    #   SecurityGroupIds:
+    #     - 'sg-0279ba6cc3a47c26b' #OPT1
+      
+    # BAT:
+    #   SubnetIds: 
+    #     - 'subnet-03d4f8995fb86a5e5' #BAT1
+    #     - 'subnet-0aa47c5cb98dea0ec' #BAT2
+    #     - 'subnet-089fbe13625cd7195' #BAT3
+    #   SecurityGroupIds:
+    #     - 'sg-0d822dd57c09e91fe' 
+    
+    ###OQS-DEV
+    OPT:
+      SubnetIds: 
+        - 'subnet-0d8c456061841b4ff' #OPT1
+        - 'subnet-0390edd793008280a' #OPT2
+        - 'subnet-0c504c9242f28d89b' #OPT3
+      SecurityGroupIds:
+        - 'sg-0279ba6cc3a47c26b' 
+      
+    BAT:
+      SubnetIds: 
+        - 'subnet-077acc959ee29ce78' #BAT1
+        - 'subnet-08706995f169b31e3' #BAT2
+        - 'subnet-002794a0e3d514ae7' #BAT3
+      SecurityGroupIds:
+        - 'sg-0461dc37f6c906842' 

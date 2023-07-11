@@ -1,0 +1,150 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-IRK-MNT-AWSBatch.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT AWS Batch
+# Version: 1.0
+# Author: Fujitsu - tokuzumi
+############################
+AWSTemplateFormatVersion: "2010-09-09"
+Transform:
+  Name: 'AWS::Include'
+  Parameters:
+    Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  #  ## user form  ##
+  #  :param SystemNameUpper: システム名称(大文字)
+  #  :param EnvironmentNameUpper2: 環境名(mntやmt2)
+  #  :param ComputeEnvironmentNumber: AWS Batchの号機
+  #  :param MaxvCpus: AWS Batchの最大vCPU数
+  #  :param InstanceTypes: AWS Batchのインスタンスタイプ(csv形式で指定)
+  #  :param VolumeSize: AWS BatchのEBSボリュームのサイズ
+  #  :param UserData: AWS Batchのユーザデータ
+  #  :param ServiceRoleName: サービスロール名
+  #  ## user form  ##
+
+  MappingFilePATH:
+    Type: String
+    Default: 's3://s3-irk-st2-cfn01/Mappings_irk_st2_awsbatch.yml'
+  SystemNameUpper:
+    Type: String
+    Default: 'IRK'
+  EnvironmentNameUpper1:
+    Type: String
+    Default: 'STG'
+  EnvironmentNameLower1:
+    Type: String
+    Default: 'stg'
+  EnvironmentNameUpper2:
+    Type: String
+    Default: 'ST2'
+  EnvironmentNameLower2:
+    Type: String
+    Default: 'st2'
+  ComputeEnvironmentNumber:
+    Type: String
+    Default: 'example: 01'
+  MaxvCpus:
+    Type: String
+    Default: 'example: 16'
+  InstanceTypes:
+    Type: CommaDelimitedList
+    Default: 'example: r5.large,r5.xlarge'
+  ImageId:
+    Type: String
+    Default: 'example: ami-xxxxxx or -'
+  VolumeSize:
+    Type: String
+    Default: '100'
+###### add st2###############
+  Devicename:
+    Type: String
+    Default: '/dev/xvdz'
+#############################
+  UserData:
+    Type: String
+    Default: '- or base64-encoded text'
+    Description: 'set manually after choise "-"'
+  ServiceRoleName:
+    Type: String
+    Default: 'aws-service-role/batch.amazonaws.com/AWSServiceRoleForBatch'
+  SGID:
+    Type: String
+    Default: 'example: sg-xxxx'
+Conditions:
+  #  ## user form  ##
+  #  :Condition isBKjobCompute: AWS Batchが１号機(RDSのバックアップ用)かどうか
+  #  :Condition UsedManagedAMI: ユーザ管理AMIを使用するか
+  #  :Condition UsedUserData: ユーザデータを使用するか
+  #  :Condition isDev: 開発環境かどうか
+  #  ## user form  ##    
+
+    isBKjobCompute: !Equals [ !Ref ComputeEnvironmentNumber , "01" ]
+    UsedManagedAMI: !Not [ !Equals [ !Ref ImageId , "-" ] ]
+    UsedUserData: !Not [ !Equals [ !Ref UserData , "-" ] ]
+    isDev: !Equals [ !Ref EnvironmentNameUpper2 , "DEV"]
+
+Resources:
+    EC2LaunchTemplate:
+        Type: "AWS::EC2::LaunchTemplate"
+        Properties:
+            LaunchTemplateName: !Sub "LT-${SystemNameUpper}-${EnvironmentNameUpper2}-VM-${ComputeEnvironmentNumber}"
+            LaunchTemplateData: 
+                UserData: !If 
+                  - UsedUserData
+                  - !Ref UserData
+                  - !Ref "AWS::NoValue"
+                BlockDeviceMappings: 
+                  - 
+                    DeviceName: !Ref Devicename
+                    Ebs: 
+                        Encrypted: true
+                        DeleteOnTermination: true
+                        VolumeSize: !Ref VolumeSize
+                        VolumeType: "gp2"
+                EbsOptimized: true
+                Monitoring: 
+                    Enabled: true
+    BatchComputeEnvironment:
+        Type: "AWS::Batch::ComputeEnvironment"
+        DependsOn: EC2LaunchTemplate
+        Properties:
+            ComputeEnvironmentName: !Sub "BJ-${SystemNameUpper}-${EnvironmentNameUpper2}-VM-${ComputeEnvironmentNumber}"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/${ServiceRoleName}"
+            ComputeResources: 
+              Type: "EC2"
+              MinvCpus: 0
+              MaxvCpus: !Ref MaxvCpus
+              DesiredvCpus: 0
+              InstanceTypes: !Ref InstanceTypes
+              ImageId: !If 
+                - UsedManagedAMI
+                - !Ref ImageId
+                - !Ref "AWS::NoValue"
+              Subnets: !If 
+                - isBKjobCompute
+                - !FindInMap [ AwsBatchMapping, OPT, SubnetIds]
+                - !FindInMap [ AwsBatchMapping, BAT, SubnetIds]
+              SecurityGroupIds: 
+                - !Ref SGID
+#              SecurityGroupIds: !If 
+#                - isBKjobCompute
+#                - !FindInMap [ AwsBatchMapping, OPT, SecurityGroupIds]
+#               #####   Specified by parameter
+#               - !FindInMap [ AwsBatchMapping, BAT, SecurityGroupIds]
+              Ec2KeyPair: !Sub "key-or-${EnvironmentNameLower1}"
+              InstanceRole: !If 
+                - isDev
+                - "ecsInstanceRole"
+                - !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-${SystemNameUpper}-${EnvironmentNameUpper2}-AWSBAT-Instance"
+              Tags: 
+                  Name: !Sub "BJ-${SystemNameUpper}-${EnvironmentNameUpper2}-VM-${ComputeEnvironmentNumber}"
+                  BillingGroup: !Sub "${SystemNameUpper}-${EnvironmentNameUpper2}"
+              LaunchTemplate: 
+#                  LaunchTemplateName: !Sub "LT-${SystemNameUpper}-${EnvironmentNameUpper2}-VM-${ComputeEnvironmentNumber}"
+                  LaunchTemplateId: !Ref EC2LaunchTemplate
+                  Version: "$Default"
+              AllocationStrategy: "BEST_FIT_PROGRESSIVE"

@@ -1,0 +1,518 @@
+#############################################################
+# Copyright 2019 FUJITSU LIMITED
+# FileName: CLF-CICD-WEBECS-Template.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for WEBECS CI/CD
+# Version: 1.0
+# Author: Fujitsu - hou
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+Transform:
+  Name: 'AWS::Include'
+  Parameters:
+    Location: !Sub 's3://${BucketName02}/output_Mappings_WEBECS.yml'
+
+Parameters:
+  #  ## user form  ##
+  #  :param ProjectNumber: [Example:'99999']
+  #  :param NLBNumber: ['001','002','003','004','005','006','007','008','009']
+  #  :param Port: [Example:'15000']
+  #  :param SystemEnvironmentName: ['TKKDEV','TKKMNT','TKKSTG','IRKDEV','IRKMNT','IRKSTG','YZKDEV','YZKMNT','YZKSTG','OQSDEV','OQSMNT','OQSSTG']
+  #  :param ExecutionRoleName: ['IAMR-TKK-DEV-WEBTaskAction01','IAMR-TKK-STG-WEBTaskAction','IAMR-IRK-MNT-WEBTaskAction','IAMR-IRK-MNT-WEBTaskAction02','IAMR-IRK-STG-WEBTaskAction','IAMR-YZK-STG-WEBTaskAction','IAMR-YZK-STG-WEBTaskAction02','IAMR-OQS-DEV-WEBTaskAction01','IAMR-OQS-DEV-WEBTaskAction02','IAMR-OQS-MNT-WEBTaskAction01','IAMR-OQS-MNT-WEBTaskAction02','IAMR-OQS-STG-WEBTaskAction01','IAMR-OQS-STG-WEBTaskAction02']
+  #  :param TaskRoleName:  ['IAMR-TKK-DEV-WEBContainerAction01','IAMR-TKK-STG-APContainerAction','IAMR-IRK-MNT-APContainerAction','IAMR-YZK-MNT-APContainerAction','IAMR-YZK-MNT-APContainerAction02','IAMR-IRK-STG-APContainerAction','IAMR-YZK-STG-APContainerAction','IAMR-YZK-STG-APContainerAction02','IAMR-OQS-DEV-WEBContainerAction01','IAMR-OQS-DEV-WEBContainerAction02','IAMR-OQS-MNT-WEBContainerAction01','IAMR-OQS-MNT-WEBContainerAction02','IAMR-OQS-MNT-WEBContainerAction03','IAMR-OQS-STG-WEBContainerAction01','IAMR-OQS-STG-WEBContainerAction02','IAMR-OQS-STG-WEBContainerAction03']
+  #  :param ClusterNumber: ['01','02']
+  #  :param DesiredCount: EcsService Desired 
+  #  :param MaxCapacity: ScalableTarget MAX   
+  #  :param MinCapacity: ScalableTarget Min   
+  #  :param TargetValue: ScalingPolicy 70
+  #  :param BucketName01: ['tkk-build-source-bucket-dev1','irk-build-source-bucket-mnt','tkk-build-source-bucket-stg','build-source-bucket-dev','build-source-bucket-mnt','build-source-bucket-stg']
+  #  :param BuildServiceRoleName: ['IAMR-TKK-DEV-WEBCodeBuild01','IAMR-TKK-STG-WEBCodeBuild','IAMR-IRK-MNT-WEBCodeBuild','IAMR-IRK-MNT-WEBCodeBuild02','IAMR-IRK-STG-WEBCodeBuild','IAMR-YZK-STG-WEBCodeBuild','IAMR-YZK-STG-WEBCodeBuild02','IAMR-OQS-DEV-WEBCodeBuild01','IAMR-OQS-MNT-WEBCodeBuild01','IAMR-OQS-STG-WEBCodeBuild01']
+  #  :param CodeBuildSecurityGroupId: ['sg-0d3c60bf08f23206d','sg-0e842b94094c8d0d7','sg-053189344799184b4','sg-0e1ac9d9d234066ed','sg-012bdcdf9f2279f2d','sg-061e256a9d483e944','sg-036642b8d8240b67a','sg-082cbe7623eca6c48','sg-0f81aaaae2649dff2']
+  #  :param DeployServiceRoleName: ['IAMR-TKK-STG-WEBCodeDeploy','IAMR-IRK-MNT-WEBCodeDeploy','IAMR-IRK-MNT-WEBCodeDeploy02','IAMR-IRK-STG-WEBCodeDeploy','IAMR-YZK-STG-WEBCodeDeploy','IAMR-YZK-STG-WEBCodeDeploy02','IAMR-OQS-MNT-WEBCodeDeploy01','IAMR-OQS-STG-WEBCodeDeploy01']
+  #  :param PipelineServiceRoleName:  ['IAMR-TKK-DEV-WEBCodePipeline01','IAMR-TKK-STG-WEBCodePipeline','IAMR-IRK-MNT-WEBCodePipeline','IAMR-IRK-MNT-WEBCodePipeline02','IAMR-IRK-STG-WEBCodePipeline','IAMR-YZK-STG-WEBCodePipeline','IAMR-YZK-STG-WEBCodePipeline02','IAMR-OQS-DEV-WEBCodePipeline01','IAMR-OQS-MNT-WEBCodePipeline01','IAMR-OQS-STG-WEBCodePipeline01']
+  #  :param BucketName02: ['s3-tkk-dev-cfn01','s3-irk-mnt-cfn01','s3-tkk-stg-cfn01','s3-oqs-dev-clf01','s3-oqs-mnt-clf01','s3-oqs-stg-clf01']
+
+  ProjectNumber:
+    Type: Number
+    Description: 'Example:99999'
+  NLBNumber:
+    Type: Number
+    Default: '001'
+    AllowedValues: ['001','002','003','004','005','006','007','008','009']
+  Port:
+    Type: Number
+  SystemEnvironmentName: 
+    Type: String
+    Default: 'TKKDEV'
+    AllowedValues: ['TKKDEV','TKKMNT','TKKSTG','IRKDEV','IRKMNT','IRKSTG','YZKDEV','YZKMNT','YZKSTG','OQSDEV','OQSMNT','OQSSTG']
+  ExecutionRoleName: 
+    Type: String
+    Default: 'IAMR-TKK-DEV-WEBTaskAction01'
+    AllowedValues: ['IAMR-TKK-DEV-WEBTaskAction01','IAMR-TKK-STG-WEBTaskAction','IAMR-IRK-MNT-WEBTaskAction','IAMR-IRK-MNT-WEBTaskAction02','IAMR-IRK-STG-WEBTaskAction','IAMR-YZK-STG-WEBTaskAction','IAMR-YZK-STG-WEBTaskAction02','IAMR-OQS-DEV-WEBTaskAction01','IAMR-OQS-DEV-WEBTaskAction02','IAMR-OQS-MNT-WEBTaskAction01','IAMR-OQS-MNT-WEBTaskAction02','IAMR-OQS-STG-WEBTaskAction01','IAMR-OQS-STG-WEBTaskAction02']
+  TaskRoleName: 
+    Type: String
+    Default: 'IAMR-TKK-DEV-WEBContainerAction01'
+    AllowedValues: ['IAMR-TKK-DEV-WEBContainerAction01','IAMR-TKK-STG-APContainerAction','IAMR-IRK-MNT-APContainerAction','IAMR-YZK-MNT-APContainerAction','IAMR-YZK-MNT-APContainerAction02','IAMR-IRK-STG-APContainerAction','IAMR-YZK-STG-APContainerAction','IAMR-YZK-STG-APContainerAction02','IAMR-OQS-DEV-WEBContainerAction01','IAMR-OQS-DEV-WEBContainerAction02','IAMR-OQS-MNT-WEBContainerAction01','IAMR-OQS-MNT-WEBContainerAction02','IAMR-OQS-MNT-WEBContainerAction03','IAMR-OQS-STG-WEBContainerAction01','IAMR-OQS-STG-WEBContainerAction02','IAMR-OQS-STG-WEBContainerAction03']
+  ClusterNumber:
+    Type: Number 
+    Default: '01'
+    AllowedValues: ['01','02']
+  DesiredCount:
+    Type: Number
+    Default: 0
+  MaxCapacity:
+    Type: Number
+    Default: 0
+  MinCapacity:
+    Type: Number
+    Default: 0
+  TargetValue:
+    Type: Number
+    Default: 70
+  BucketName01: 
+    Type: String
+    Default: "tkk-build-source-bucket-dev1"
+    AllowedValues: ['tkk-build-source-bucket-dev1','irk-build-source-bucket-mnt','tkk-build-source-bucket-stg','build-source-bucket-dev','build-source-bucket-mnt','build-source-bucket-stg']
+  BuildServiceRoleName: 
+    Type: String
+    Default: 'IAMR-TKK-DEV-WEBCodeBuild01'
+    AllowedValues: ['IAMR-TKK-DEV-WEBCodeBuild01','IAMR-TKK-STG-WEBCodeBuild','IAMR-IRK-MNT-WEBCodeBuild','IAMR-IRK-MNT-WEBCodeBuild02','IAMR-IRK-STG-WEBCodeBuild','IAMR-YZK-STG-WEBCodeBuild','IAMR-YZK-STG-WEBCodeBuild02','IAMR-OQS-DEV-WEBCodeBuild01','IAMR-OQS-MNT-WEBCodeBuild01','IAMR-OQS-STG-WEBCodeBuild01']
+  CodeBuildSecurityGroupId:
+    Type: String
+    Default: "sg-0d3c60bf08f23206d"
+    AllowedValues: ['sg-0d3c60bf08f23206d','sg-0e842b94094c8d0d7','sg-053189344799184b4','sg-0e1ac9d9d234066ed','sg-012bdcdf9f2279f2d','sg-061e256a9d483e944','sg-036642b8d8240b67a','sg-082cbe7623eca6c48','sg-0f81aaaae2649dff2']
+  DeployServiceRoleName: 
+    Type: String
+    Default: 'IAMR-TKK-DEV-WEBCodeDeploy01'
+    AllowedValues: ['IAMR-TKK-DEV-WEBCodeDeploy01','IAMR-TKK-STG-WEBCodeDeploy','IAMR-IRK-MNT-WEBCodeDeploy','IAMR-IRK-MNT-WEBCodeDeploy02','IAMR-IRK-STG-WEBCodeDeploy','IAMR-YZK-STG-WEBCodeDeploy','IAMR-YZK-STG-WEBCodeDeploy02','IAMR-OQS-MNT-WEBCodeDeploy01','IAMR-OQS-STG-WEBCodeDeploy01']
+  PipelineServiceRoleName: 
+    Type: String
+    Default: 'IAMR-TKK-DEV-WEBCodePipeline01'
+    AllowedValues: ['IAMR-TKK-DEV-WEBCodePipeline01','IAMR-TKK-STG-WEBCodePipeline','IAMR-IRK-MNT-WEBCodePipeline','IAMR-IRK-MNT-WEBCodePipeline02','IAMR-IRK-STG-WEBCodePipeline','IAMR-YZK-STG-WEBCodePipeline','IAMR-YZK-STG-WEBCodePipeline02','IAMR-OQS-DEV-WEBCodePipeline01','IAMR-OQS-MNT-WEBCodePipeline01','IAMR-OQS-STG-WEBCodePipeline01']
+  BucketName02: 
+    Type: String
+    Default: 's3-tkk-dev-cfn01'
+    AllowedValues: ['s3-tkk-dev-cfn01','s3-irk-mnt-cfn01','s3-tkk-stg-cfn01','s3-oqs-dev-clf01','s3-oqs-mnt-clf01','s3-oqs-stg-clf01']
+
+  # ScaleInCooldown:
+  #   Type: Number
+  # ScaleOutCooldown:
+  #   Type: Number
+
+
+Resources:  
+  TargetGroup01:
+   Type: AWS::ElasticLoadBalancingV2::TargetGroup
+   Properties: 
+    HealthCheckPath: !Sub '/msa${ProjectNumber}/healthcheck.html' #/test001/healthcheck.html
+    HealthCheckProtocol: HTTP
+    Name: !Sub 
+      - 'NLB-${SystemNameUpper}-${EnvironmentNameUpper}-${NLBNumber}-MSA${ProjectNumber}-TG01' ##NLB-MOS-DEV-001-TEST01-TG01
+      - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+        EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+    Port: !Ref Port #15000
+    Protocol: TCP
+    TargetType: instance
+    VpcId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,VpcId]
+    #!Ref VPCID vpc-04d90ddcfd80744dd
+
+  TargetGroup02:
+   Type: AWS::ElasticLoadBalancingV2::TargetGroup
+   Properties:
+    HealthCheckPath: !Sub '/msa${ProjectNumber}/healthcheck.html' #/test01/healthcheck.html
+    HealthCheckProtocol: HTTP 
+    Name: !Sub 
+      - 'NLB-${SystemNameUpper}-${EnvironmentNameUpper}-${NLBNumber}-MSA${ProjectNumber}-TG02' ##NLB-MOS-DEV-001-TEST01-TG02
+      - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+        EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+    Port: !Ref Port #15000
+    Protocol: TCP
+    TargetType: instance
+    VpcId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,VpcId]  # vpc-04d90ddcfd80744dd
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      DefaultActions: 
+        - TargetGroupArn: !Ref TargetGroup01
+          Type: forward
+      LoadBalancerArn: !FindInMap [NLBArnMapping,!Ref SystemEnvironmentName,!Ref NLBNumber]
+      Port: !Ref Port #15000
+      Protocol: TCP
+      
+  Repository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-${EnvironmentNameLower}'  # "tkk-msa40105-dev"
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      LifecyclePolicy: 
+        LifecyclePolicyText: |
+          {
+            "rules":[
+              {
+                "rulePriority": 1,
+                "description": "Keep two images, expire all others",
+                "selection":{
+                    "tagStatus":"any",
+                    "countType":"imageCountMoreThan",
+                    "countNumber": 2
+                },
+                "action":{
+                    "type":"expire"
+                }
+              }
+            ]
+          }
+        
+      # RepositoryPolicyText: 
+      #   - Version: "2012-10-17"
+      #     Statement: 
+      #     - Sid: "ecr-deny-default"
+      #       Effect: "Deny"
+      #       Principal: 
+      #         AWS: 
+      #         - "arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEB"
+      #         - "arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEBCodeBuild01"
+      #         - "arn:aws:iam::012752345683:role/service-role/IAMR-TKK-DEV-WEBCodePipeline01"
+      #         - "arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEBTaskAction01"
+      #       Action: "ecr:*"
+      #       Condition: 
+      #         StringNotEquals: 
+      #           aws:sourceVpce: 
+      #           - "vpce-0a25e664f7a1c3db5"
+      #           - "vpce-061ec5be40f10d7b7"
+      #           aws:PrincipalTag/ecrAuth: "true"
+      #     - Sid: "AllAllow"
+      #       Effect: "Allow"
+      #       Principal: 
+      #         AWS: 
+      #         - "arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEB"
+      #         - "arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEBCodeBuild01"
+      #         - "arn:aws:iam::012752345683:role/service-role/IAMR-TKK-DEV-WEBCodePipeline01"
+      #         - "arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEBTaskAction01"
+      #       Action: "ecr:*"
+
+  Taskdefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      Family: !Sub 
+      - '${SystemNameLower}-msa${ProjectNumber}-task-${EnvironmentNameLower}' #mos-test01-task-dev
+      - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+        EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      ContainerDefinitions:
+        - MemoryReservation: 300
+          Image: !Sub 
+            - '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${SystemNameLower}-msa${ProjectNumber}-${EnvironmentNameLower}:latest' ##'012752345683.dkr.ecr.${AWS::Region}.amazonaws.com/mos-test01-dev:latest'
+            - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+              EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub 
+                - 'MSA${ProjectNumber}-${SystemNameUpper}-${EnvironmentNameUpper}' #MSA01-MOS-DEV
+                - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                  EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+              awslogs-region: !Sub '${AWS::Region}'
+          Name: !Sub 
+            - '${SystemNameLower}-msa${ProjectNumber}' #mos-test01
+            - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 0
+              Protocol: tcp
+      ExecutionRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ExecutionRoleName}'   ##'arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEBTaskAction01'
+      NetworkMode: bridge
+      TaskRoleArn: !Ref  TaskRoleName
+      RequiresCompatibilities: 
+        - 'EC2'
+
+  # PrivateNamespace:
+  #     Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+  #     Properties:
+  #       Name: !Sub 
+  #         - '${SystemNameLower}-msa${ProjectNumber}${EnvironmentNameLower}' # mos-test01-dev
+  #         - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+  #           EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+  #       Vpc: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,VpcId]
+      # vpc-04d90ddcfd80744dd
+
+  DiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties: 
+      DnsConfig:
+        NamespaceId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,NamespaceId]  # !Ref PrivateNamespace
+        RoutingPolicy: MULTIVALUE
+        DnsRecords:
+          - TTL: 60
+            Type: SRV
+      HealthCheckCustomConfig: 
+        FailureThreshold: 1
+      Name: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}' #mos-test01-service-dev
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn:  Listener
+    Properties: 
+      Cluster: !Sub #provisional settings
+        - 'ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}' ##ECS-TKK-DEV-WEB01
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      DeploymentController: 
+        Type: CODE_DEPLOY
+      DesiredCount: !Ref DesiredCount #0
+      LaunchType: EC2
+      LoadBalancers: 
+        - ContainerName: !Sub 
+          - '${SystemNameLower}-msa${ProjectNumber}' #mos-test01
+          - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          ContainerPort: 8080
+          TargetGroupArn: !Ref TargetGroup01
+      PlacementStrategies: 
+        - Field: attribute:ecs.availability-zone
+          Type: spread
+        - Field: instanceId
+          Type: spread
+      SchedulingStrategy: REPLICA
+      ServiceRegistries: 
+        - ContainerName: !Sub 
+          - '${SystemNameLower}-msa${ProjectNumber}' #mos-test01
+          - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          ContainerPort: 8080
+          RegistryArn: !GetAtt DiscoveryService.Arn
+      ServiceName: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}' #mos-test01-service-dev
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      TaskDefinition: !Ref Taskdefinition
+
+
+  ScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    DependsOn: Service
+    Properties:     
+      MaxCapacity: !Ref MaxCapacity
+      MinCapacity: !Ref MinCapacity
+      ResourceId: !Sub 
+        - 'service/ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}/${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}'  ##service/ECS-TKK-DEV-BAT${ClusterNumber}/tkk-msa40203-service-dev1
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      RoleARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService' ##arn:aws:iam::012752345683:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+    
+
+  ScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties: 
+      PolicyName: !Sub 
+        - 'AS-${SystemNameUpper}-${EnvironmentNameUpper}-MSA${ProjectNumber}' #AS-MOS-DEV-TEST01
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ScalableTarget
+      TargetTrackingScalingPolicyConfiguration: 
+        TargetValue: !Ref TargetValue #70
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+        # ScaleInCooldown: Integer
+        # ScaleOutCooldown: Integer
+
+  CodeBuild:
+    Type: AWS::CodeBuild::Project
+    DependsOn: Service
+    Properties: 
+      Name: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-codebuild-project-${EnvironmentNameLower}' #mos-test01-codebuild-project-dev
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      Artifacts: 
+        Type: NO_ARTIFACTS
+      Environment: 
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        PrivilegedMode: true
+        Type: LINUX_CONTAINER
+      ServiceRole: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${BuildServiceRoleName}' ##'arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEBCodeBuild01'
+      Source:
+        Type: S3
+        Location: !Sub 
+          - '${BucketName01}/${SystemNameUpper}-MSA${ProjectNumber}.zip' ##tkk-build-source-bucket-dev1/MOS-TEST01.zip
+          - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]        
+      VpcConfig: 
+        SecurityGroupIds: 
+          - !Ref CodeBuildSecurityGroupId
+        Subnets: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,Subnet]
+        VpcId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,VpcId]
+      LogsConfig: 
+          CloudWatchLogs: 
+            Status: ENABLED
+          S3Logs: 
+            Status: DISABLED 
+
+  CodeDeployApp:
+    Type: AWS::CodeDeploy::Application
+    Properties: 
+      ApplicationName: !Sub 
+        - 'AppECS-ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}-${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}'       ##AppECS-ECS-MOS-DEV-WEB01-mos-test01-service-dev
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      ComputePlatform: ECS
+
+  CodeDeployGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    DependsOn: CodeBuild
+    Properties: 
+      DeploymentGroupName: !Sub 
+        - 'DgpECS-ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}-${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}' ##DgpECS-ECS-MOS-DEV-WEB01-mos-test01-service-dev
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      ApplicationName: !Ref CodeDeployApp
+      AutoRollbackConfiguration: 
+          Enabled: true
+          Events: 
+            - DEPLOYMENT_FAILURE   
+      BlueGreenDeploymentConfiguration: 
+        DeploymentReadyOption: 
+          ActionOnTimeout: CONTINUE_DEPLOYMENT
+        TerminateBlueInstancesOnDeploymentSuccess: 
+          Action: TERMINATE
+          TerminationWaitTimeInMinutes: 5
+      DeploymentStyle: 
+        DeploymentOption: WITH_TRAFFIC_CONTROL
+        DeploymentType: BLUE_GREEN
+      ECSServices: 
+        - ClusterName: !Sub 
+            - 'ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}' ##ECS-TKK-DEV-BAT${ClusterNumber}
+            - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+              EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          ServiceName: !Sub 
+            - '${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}' #mos-test01-service-dev
+            - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+              EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      LoadBalancerInfo: 
+          TargetGroupPairInfoList: 
+            - ProdTrafficRoute: 
+                  ListenerArns: 
+                    - !Ref Listener
+              TargetGroups: 
+                - Name: !Sub 
+                    - 'NLB-${SystemNameUpper}-${EnvironmentNameUpper}-${NLBNumber}-MSA${ProjectNumber}-TG01' ##NLB-MOS-DEV-001-TEST01-TG01
+                    - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                      EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+                - Name: !Sub 
+                    - 'NLB-${SystemNameUpper}-${EnvironmentNameUpper}-${NLBNumber}-MSA${ProjectNumber}-TG02' ##NLB-MOS-DEV-001-TEST01-TG02
+                    - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                      EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      ServiceRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${DeployServiceRoleName}'   #'arn:aws:iam::012752345683:role/IAMR-TKK-DEV-WEBCodeDeploy01'
+
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    DependsOn: CodeDeployGroup
+    Properties: 
+      Name: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-pipeline-${EnvironmentNameLower}' # mos-test01-pipeline-dev
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/${PipelineServiceRoleName}'
+      ArtifactStore: 
+        Location: !Ref BucketName01
+        Type: S3
+      Stages: 
+        - 
+          Name: Source
+          Actions: 
+            -  
+              Name: Source
+              Namespace: SourceVariables
+              ActionTypeId: 
+                Category: Source
+                Owner: AWS
+                Provider: S3
+                Version: 1
+              OutputArtifacts: 
+                - Name: SourceArtifact
+              Configuration: 
+                S3Bucket: !Ref BucketName01
+                S3ObjectKey: !Sub 
+                  - '${SystemNameUpper}-MSA${ProjectNumber}.zip' 
+                  - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                PollForSourceChanges: true
+        - 
+          Name: Build
+          Actions: 
+            -   
+              Name: Build
+              Namespace: BuildVariables
+              ActionTypeId: 
+                  Category: Build
+                  Owner: AWS
+                  Provider: CodeBuild
+                  Version: 1
+              Configuration: 
+                ProjectName: !Sub 
+                  - '${SystemNameLower}-msa${ProjectNumber}-codebuild-project-${EnvironmentNameLower}'  #mos-test01-codebuild-project-dev
+                  - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+                    EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+              InputArtifacts: 
+                - Name: SourceArtifact
+              OutputArtifacts: 
+                - Name: BuildArtifact
+              Region: !Sub '${AWS::Region}'
+        -
+          Name: Deploy
+          Actions: 
+            - 
+              Name: Deploy
+              Namespace: DeployVariables
+              ActionTypeId: 
+                  Category: Deploy
+                  Owner: AWS
+                  Provider: CodeDeployToECS
+                  Version: 1
+              Configuration: 
+                ApplicationName: !Sub 
+                  - 'AppECS-ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}-${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}'  ##AppECS-ECS-MOS-DEV-WEB01-mos-test01-service-dev
+                  - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                    EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+                    SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+                    EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+                DeploymentGroupName: !Sub 
+                  - 'DgpECS-ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEBT${ClusterNumber}-${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}'  ##DgpECS-ECS-MOS-DEV-WEB01-mos-test01-service-dev     
+                  - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                    EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+                    SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+                    EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+                AppSpecTemplateArtifact: BuildArtifact
+                AppSpecTemplatePath: appspec.yaml
+                TaskDefinitionTemplatePath: taskdef.json
+                TaskDefinitionTemplateArtifact: BuildArtifact
+                Image1ArtifactName: BuildArtifact
+                Image1ContainerName: IMAGE1_NAME
+              InputArtifacts: 
+                - Name: BuildArtifact
+              Region: !Sub '${AWS::Region}'
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties: 
+      KmsKeyId: !Sub 
+        - 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KmsKeyId}' ##arn:aws:kms:${AWS::Region}:012752345683:key/61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed
+        - KmsKeyId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,KmsKeyId]
+      LogGroupName: !Sub 
+        - 'MSA${ProjectNumber}-${SystemNameUpper}-${EnvironmentNameUpper}' #TEST01-MOS-DEV
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      RetentionInDays: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,LogGroupRetentionInDays]

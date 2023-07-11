@@ -1,0 +1,707 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-MNT-IAM_202211.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Network
+# Version: 1.0
+# Author: Fujitsu - ichikawa
+############################
+AWSTemplateFormatVersion: 2010-09-09
+
+# Transform:
+#   Name: 'AWS::Include'
+#   Parameters:
+#     Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  SystemNameUpper:
+    Type: String
+    Default: 'example: IRK'
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'example: MT2'
+
+
+Resources:
+#  # ### IAMR HSK MT2 APContainerActions IAM Role ###
+  IAMRHSKMT2APContainerAction:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: IAMR-HSK-MT2-APContainerAction
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-HSK-MT2-APContainerAction-Elasticsearch
+  # ### IAMR MT1-VPCFlowLogs IAM Role ###
+  IAMRMT1VPCFlowLogs:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-MT1-VPCFlowLogs
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - vpc-flow-logs.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-MT1-VPCFlowLogs
+  # ### IAMR MT2-APContainerAction IAM Role ###
+  IAMRMT2APContainerAction:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-Cognito
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  # ### IAMR MT2-APContainerAction-MSA42401 IAM Role ###
+  IAMRMT2APContainerActionMSA42401:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-MSA42401-A
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-Cognito
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB-MSA42401-A
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  # ### IAMR MT2-ASGLifeCycleHook IAM Role ###
+  IAMRMT2ASGLifeCycleHook:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ASGLifeCycleHook
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - autoscaling.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole
+  # ### IAMR MT2-AWSBAT-BatJob IAM Role ###
+  IAMRMT2AWSBATBatJob:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob-Temp
+  # ### IAMR MT2-AWSBAT-Instance IAM Role ###
+  IAMRMT2AWSBATInstance:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-Instance
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-Instance
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECS-S3-GetObject
+  # ### IAMR MT2-AWSBAT-IrdBKJob IAM Role ###
+  IAMRMT2AWSBATIrdBKJob:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-IrdBKJob
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-IrdBKJob
+  # ### IAMR MT2-BAT IAM Role ###
+  IAMRMT2BAT:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BAT
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-DynamoDBOperation
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECS
+  # ### IAMR MT2-BatchJob-RunnableStatusCheckrole IAM Role ###
+  IAMRMT2BatchJobRunnableStatusCheckrole:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BatchJob-RunnableStatusCheckrole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaBasicExecution
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BatchJob-RunnableStatusCheckrole
+  # ### IAMR MT2-BATCodeBuild IAM Role ###
+  IAMRMT2BATCodeBuild:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodeBuild
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodeBuild
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodeBuild-VPC
+  # ### IAMR MT2-BATCodePipeline IAM Role ###
+  IAMRMT2BATCodePipeline:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodePipeline
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodePipeline
+  # ### IAMR MT2-BKS IAM Role ###
+  IAMRMT2BKS:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BKS
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BKS
+  # ### IAMR MT2-copy-irk-build-source-bucket-mt2-to-osaka IAM Role ###
+  # IAMRMT2copyirkbuildsourcebucketmt2toosaka:
+  #   Type: 'AWS::IAM::Role'
+  #   Properties: 
+  #     RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-copy-irk-build-source-bucket-mt2-to-osaka
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service:
+  #               - s3.amazonaws.com
+  #           Action:
+  #             - 'sts:AssumeRole'
+  #     ManagedPolicyArns:
+  #       - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-copy-irk-build-source-bucket-mt2-to-osaka
+  # ### IAMR MT2-copy-s3-irk-mt2-cfn01-to-osaka IAM Role ###
+  # IAMRMT2copys3irkmt2cfn01toosaka:
+  #   Type: 'AWS::IAM::Role'
+  #   Properties: 
+  #     RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-cfn01-to-osaka
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service:
+  #               - s3.amazonaws.com
+  #           Action:
+  #             - 'sts:AssumeRole'
+  #     ManagedPolicyArns:
+  #       - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-cfn01-to-osaka
+  # ### IAMR MT2-copy-s3-irk-mt2-ecs-userdata-file01-to-osaka IAM Role ###
+  # IAMRMT2copys3irkmt2ecsuserdatafile01toosaka:
+  #   Type: 'AWS::IAM::Role'
+  #   Properties: 
+  #     RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-ecs-userdata-file01-to-osaka
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service:
+  #               - s3.amazonaws.com
+  #           Action:
+  #             - 'sts:AssumeRole'
+  #     ManagedPolicyArns:
+  #       - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-ecs-userdata-file01-to-osaka
+  # ### IAMR MT2-copy-s3-irk-mt2-ird-backup01-to-osaka IAM Role ###
+  # IAMRMT2copys3irkmt2irdbackup01toosaka:
+  #   Type: 'AWS::IAM::Role'
+  #   Properties: 
+  #     RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-ird-backup01-to-osaka
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service:
+  #               - s3.amazonaws.com
+  #           Action:
+  #             - 'sts:AssumeRole'
+  #     ManagedPolicyArns:
+  #       - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-copy-s3-irk-mt2-ird-backup01-to-osaka
+  # ### IAMR MT2-CWE-BATInvoke IAM Role ###
+  IAMRMT2CWEBATInvoke:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-CWE-BATInvoke
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATInvoke
+  # ### IAMR MT2-CWE-StepInvoke IAM Role ###
+  IAMRMT2CWEStepInvoke:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-CWE-StepInvoke
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-CWE-StepInvoke
+  # ### IAMR MT2-CWLtoKinesisRole IAM Role ###
+  IAMRMT2CWLtoKinesisRole:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-CWLtoKinesisRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logs.ap-northeast-1.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-PermissionsPolicyForCWL
+  # ### IAMR MT2-ECSAutoOperate IAM Role ###
+  IAMRMT2ECSAutoOperate:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ECSAutoOperate
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaBasicExecution
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECSAutoOperate
+  # ### IAMR MT2-ECSInstanceDraining IAM Role ###
+  IAMRMT2ECSInstanceDraining:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ECSInstanceDraining
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECSInstanceDraining
+  # ### IAMR MT2-GLUECRAWLER IAM Role ###
+  IAMRMT2GLUECRAWLER:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-GLUECRAWLER
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - glue.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Glue-KMSDecrypt
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AssociateKmsKey
+        - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+  # ### IAMR MT2-GLUEJOB IAM Role ###
+  IAMRMT2GLUEJOB:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-GLUEJOB
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - glue.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Glue-KMSDecrypt
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-GlueJob
+  # ### IAMR  IAM Role ###
+  IAMRMT2KinesisWAFLog:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-Kinesis-WAFLog
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - firehose.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Firehose-DeliveryWAFLogs
+  # ### IAMR MT2-Lambda-EC2AutoBackup IAM Role ###
+  IAMRMT2LambdaEC2AutoBackup:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-Lambda-EC2AutoBackup
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Lambda-EC2AutoBackup
+  # ### IAMR MT2-Lambda-EC2AutoOperate IAM Role ###
+  IAMRMT2LambdaEC2AutoOperate:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-Lambda-EC2AutoOperate
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Lambda-EC2AutoOperate
+  # ### IAMR MT2-RDSStart IAM Role ###
+  IAMRMT2RDSStart:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-RDSStart
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-RDSStartAuth
+  # ### IAMR MT2-RDSStop IAM Role ###
+  IAMRMT2RDSStop:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-RDSStop
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-RDSStopAuth
+  # ### IAMR MT2-S3-ObjectDelete IAM Role ###
+  IAMRMT2S3ObjectDelete:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-S3-ObjectDelete
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaENIManagementAccess
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-LMD-S3-ObjectDelete
+  # ### IAMR MT2-Step IAM Role ###
+  IAMRMT2Step:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-Step
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Step
+  # ### IAMR MT2-WEB IAM Role ###
+  IAMRMT2WEB:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEB
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-DynamoDBOperation
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECS
+  # ### IAMR MT2-WEB02 IAM Role ###
+  IAMRMT2WEB02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEB02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECS02
+  # ### IAMR MT2-WEBCodeBuild IAM Role ###
+  IAMRMT2WEBCodeBuild:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild-VPC
+  # ### IAMR MT2-WEBCodeBuild02 IAM Role ###
+  IAMRMT2WEBCodeBuild02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild-VPC
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild
+  # ### IAMR MT2-WEBCodeDeploy IAM Role ###
+  IAMRMT2WEBCodeDeploy:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeDeploy
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codedeploy.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeDeploy
+  # ### IAMR MT2-WEBCodeDeploy02 IAM Role ###
+  IAMRMT2WEBCodeDeploy02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeDeploy02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codedeploy.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeDeploy
+  # ### IAMR MT2-WEBCodePipeline IAM Role ###
+  IAMRMT2WEBCodePipeline:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline
+  # ### IAMR MT2-WEBCodePipeline02 IAM Role ###
+  IAMRMT2WEBCodePipeline02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline
+  # ### IAMR MT2-WEBTaskAction IAM Role ###
+  IAMRMT2WEBTaskAction:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBTaskAction
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBTaskAction
+  # ### IAMR MT2-WEBTaskAction02 IAM Role ###
+  IAMRMT2WEBTaskAction02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBTaskAction02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBTaskAction
+
+  # ### BAT InstanceProfile ### 
+  # BATInstanceProfile: 
+  #   Type: "AWS::IAM::InstanceProfile"
+  #   Properties: 
+  #     Roles: 
+  #       - !Ref IAMRABAT

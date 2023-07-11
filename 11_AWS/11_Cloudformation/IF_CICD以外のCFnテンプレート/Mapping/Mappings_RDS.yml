@@ -1,0 +1,18 @@
+Mappings:
+  SystemEnvironmentMapping:
+    OQSMNT: 
+      VpcId: "vpc-00e76fb71e22cbe6f"
+      VpcSecurityGroupId: "sg-0c3acfe46acc82ce1"
+      Subnet1: subnet-0f9c10353986900d7
+      Subnet2: subnet-0089f0ef7a3fc92cf
+      Subnet3: subnet-0401a2c5ca75688d1
+      KmsKeyId: "9d216efa-c8f2-4074-b1bb-51256883eb3a"  
+      SnsTopicName: SNS-OQS-MNT-RDS-EVENTS
+
+    QQQMT1: 
+      VpcId: "vpc-0be9432e7a2e19fb3"
+      VpcSecurityGroupId: "sg-010ce8f1563958b7e"
+      Subnet1: subnet-086c292fe1f1cc936
+      Subnet2: subnet-093c179667c37e321
+      Subnet3: subnet-0a2d3139901033cae
+      KmsKeyId: "db11850f-7aa9-487b-9b2c-1583cf47cc44"  

@@ -1,0 +1,33 @@
+#############################################################
+# Copyright 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-LogGroup.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for LogGroup 
+# Version: 1.0
+# Author: Fujitsu - hou
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  #  ## user form  ##
+  #  :param KmsKeyId: ['-']
+  #  :param LogGroupName: ['-']
+  #  :param LogGroupRetentionInDays: ['30''1827']
+
+  KmsKeyId: 
+    Type: String
+    Description: '-'
+  LogGroupName: 
+    Type: String
+    Default: '-'  
+  LogGroupRetentionInDays:
+    Type: Number
+    Default: "30"
+
+Resources:  
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: !Ref KmsKeyId     
+      LogGroupName: !Ref LogGroupName
+      RetentionInDays: !Ref LogGroupRetentionInDays

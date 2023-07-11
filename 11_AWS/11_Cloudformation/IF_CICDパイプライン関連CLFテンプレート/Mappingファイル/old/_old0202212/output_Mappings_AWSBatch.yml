@@ -1,0 +1,220 @@
+Mappings:
+  SystemEnvironmentMapping:
+    TKKDEV:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: tkk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-TKK-DEV-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-TKK-DEV-BATCodeBuild01"
+      AwsBatInstanceRoleName: "IAMR-TKK-DEV-AWSBAT-Instance"
+      SecurityGroupId: "sg-0d3c60bf08f23206d"
+      KmsKeyId: "61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed"
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-"
+
+    TKKMNT:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: tkk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-0733f39d7dc72ca89"
+        - "subnet-00f6c8dfa96416b5f"
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-IRK-MNT-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-IRK-MNT-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MNT-AWSBAT-Instance"
+      SecurityGroupId: "sg-053189344799184b4"
+      KmsKeyId: "ca061e31-5d40-4ed7-9699-3fe67059dfec"
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"
+
+    TKKSTG:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: STG
+      SystemNameLower: tkk
+      EnvironmentNameLower: stg
+      VpcId: vpc-02438362be49444f0
+      Subnet: 
+        - "subnet-02e2efdac98663495"
+        - "subnet-047c898e058b6a16c"
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "service-role/IAMR-TKK-STG-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-TKK-STG-BATCodeBuild01"
+      AwsBatInstanceRoleName: "IAMR-IRK-MNT-AWSBAT-Instance"   
+      SecurityGroupId: "sg-0e842b94094c8d0d7"
+      KmsKeyId: "61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed"
+      VpcEndpointId01: "vpce-05f7a4e3335617de7"
+      VpcEndpointId02: "vpce-034912d6126d1183e"
+
+
+    IRKDEV:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: irk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-IRK-DEV-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-TKK-DEV-BATCodeBuild01"
+      AwsBatInstanceRoleName: "IAMR-TKK-DEV-AWSBAT-Instance"
+      SecurityGroupId: "sg-0d3c60bf08f23206d"
+      KmsKeyId: "61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed"
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-"
+
+    IRKMNT:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: irk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-0733f39d7dc72ca89"
+        - "subnet-00f6c8dfa96416b5f"
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-IRK-MNT-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-IRK-MNT-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MNT-AWSBAT-Instance"      
+      SecurityGroupId: "sg-053189344799184b4"
+      KmsKeyId: "ca061e31-5d40-4ed7-9699-3fe67059dfec"
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"
+
+    IRKSTG:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: STG
+      SystemNameLower: irk
+      EnvironmentNameLower: stg
+      VpcId: vpc-0af6cedd1d668b053
+      Subnet: 
+        - "subnet-0f7384437964e5634"
+        - "subnet-08bc3f510266bcbe8"
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "service-role/IAMR-IRK-STG-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-STG-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-STG-AWSBAT-Instance"       
+      SecurityGroupId: "sg-0e1ac9d9d234066ed"
+      KmsKeyId: "ca061e31-5d40-4ed7-9699-3fe67059dfec"
+      VpcEndpointId01: "vpce-05aa856e0980051c3"
+      VpcEndpointId02: "vpce-024ed93126676e45d"
+
+    YZKDEV:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: yzk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-YZK-DEV-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-TKK-DEV-BATCodeBuild01"
+      AwsBatInstanceRoleName: "IAMR-TKK-DEV-AWSBAT-Instance"
+      SecurityGroupId: "sg-0d3c60bf08f23206d"
+      KmsKeyId: "61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed"
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-"
+
+    YZKMNT:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: yzk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-0733f39d7dc72ca89"
+        - "subnet-00f6c8dfa96416b5f"
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-IRK-MNT-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-MNT-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MNT-AWSBAT-Instance"    
+      SecurityGroupId: "sg-053189344799184b4"
+      KmsKeyId: "ca061e31-5d40-4ed7-9699-3fe67059dfec"
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"
+     
+    YZKSTG:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: STG
+      SystemNameLower: yzk
+      EnvironmentNameLower: stg
+      VpcId: vpc-01e2d26b07f654cd6
+      Subnet: 
+        - "subnet-0814b2d7c7a1da156"
+        - "subnet-078222f9bd33ff0c8"
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "service-role/IAMR-YZK-STG-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-YZK-STG-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-YZK-STG-AWSBAT-Instance"
+      SecurityGroupId: "sg-012bdcdf9f2279f2d"
+      KmsKeyId: "5665c543-1665-482b-a9b8-d1256dcf68fe"
+      VpcEndpointId01: "vpce-0a6e3021691529620"
+      VpcEndpointId02: "vpce-037372e8509fae6a6"
+
+    OQSDEV:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: DEV
+      SystemNameLower: oqs
+      EnvironmentNameLower: dev
+      VpcId: vpc-09515f30187fb29d0
+      Subnet: 
+        - "subnet-0d8c456061841b4ff"
+        - "subnet-0390edd793008280a"
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-OQS-DEV-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-DEV-BATCodeBuild01"
+      AwsBatInstanceRoleName: "-"      
+      SecurityGroupId: "sg-036642b8d8240b67a"
+      KmsKeyId: "b12a4d04-333b-4f3f-a549-8f92af81b975"
+      VpcEndpointId01: "vpce-0a790c9ee6fd80d64"
+      VpcEndpointId02: "vpce-08651c8ac877a14b7"
+
+
+    OQSMNT:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MNT
+      SystemNameLower: oqs
+      EnvironmentNameLower: mnt
+      VpcId: vpc-039efc81bad2fea3d
+      Subnet: 
+        - "subnet-0d3b5aa3ceda3351f"
+        - "subnet-0138730d2daa557b0"
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-OQS-MNT-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-MNT-BATCodeBuild01"  
+      AwsBatInstanceRoleName: "-"   
+      SecurityGroupId: "sg-082cbe7623eca6c48"
+      KmsKeyId: "b12a4d04-333b-4f3f-a549-8f92af81b975"
+      VpcEndpointId01: "vpce-0257e895f4759b48b"
+      VpcEndpointId02: "vpce-0c0e77ee8956bc475"
+
+
+    OQSSTG:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: STG
+      SystemNameLower: oqs
+      EnvironmentNameLower: stg
+      VpcId: vpc-0917d0ac264bd09a0
+      Subnet: 
+        - "subnet-0ef5548c4bf661711"
+        - "subnet-0ab2cd91350d4af9a"
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "service-role/IAMR-OQS-STG-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-STG-BATCodeBuild01"
+      AwsBatInstanceRoleName: "-"  
+      SecurityGroupId: "sg-0f81aaaae2649dff2"
+      KmsKeyId: "b12a4d04-333b-4f3f-a549-8f92af81b975"
+      VpcEndpointId01: "vpce-04e1c515749ffa274"
+      VpcEndpointId02: "vpce-06f16caa4b8d21683"

@@ -1,0 +1,303 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Metadata:
+    Generator: "former2"
+Description: ""
+Resources:
+    BatchComputeEnvironment:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-MNT-VM-EFS-TO-S303"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/batch.amazonaws.com/AWSServiceRoleForBatch"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 320
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "r5.2xlarge"
+                  - "r5.4xlarge"
+                  - "r5.8xlarge"
+                ImageId: "ami-0662725a491ab7b0c"
+                Subnets: 
+                  - "subnet-0790cf783b98306ee"
+                  - "subnet-0eb4a81c97a8ff3c7"
+                  - "subnet-0589c6058b58e0737"
+                SecurityGroupIds: 
+                  - "sg-006dcaa662c656031"
+                Ec2KeyPair: "key-or-mnt"
+                InstanceRole: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-IRK-MNT-AWSBAT-Instance"
+                Tags: 
+                    BillingGroup: "YZK-MNT"
+                    Name: "BJ-IRK-MNT-VM-EFS-TO-S303"
+                LaunchTemplate: 
+                    LaunchTemplateName: "LT-IRK-MNT-VM-EFS-TO-S303"
+                    Version: "$Latest"
+                AllocationStrategy: "BEST_FIT_PROGRESSIVE"
+
+    BatchComputeEnvironment2:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-PRO-VM-EFS-TO-S301"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/IAMR-IRK-PRO-AWSBAT-Service"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 256
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "optimal"
+                ImageId: "ami-01b1db28c446c369b"
+                Subnets: 
+                  - "subnet-0fc04786b14e74ed9"
+                  - "subnet-046c2c1830b8d6fa3"
+                  - "subnet-0a3c7174a3c9395e9"
+                SecurityGroupIds: 
+                  - "sg-062e1339a6093602f"
+                Ec2KeyPair: "key-or-pro"
+                InstanceRole: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-IRK-PRO-AWSBAT-Instance"
+                Tags: 
+                    BillingGroup: "IRK-PRO"
+                    Name: "BJ-IRK-PRO-VM-EFS-TO-S301"
+                LaunchTemplate: 
+                    LaunchTemplateId: "lt-0f274fa27aa6bb2f2"
+                    Version: "$Default"
+                AllocationStrategy: "BEST_FIT"
+
+    BatchComputeEnvironment3:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-MNT-VM-CMN01"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/IAMR-IRK-MNT-AWSBAT-Service"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 8
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "optimal"
+                Subnets: 
+                  - "subnet-00f6c8dfa96416b5f"
+                  - "subnet-0ecb2139cb37f76d2"
+                  - "subnet-0733f39d7dc72ca89"
+                SecurityGroupIds: 
+                  - "sg-05f2ccc2d079753ad"
+                Ec2KeyPair: "key-or-mnt"
+                InstanceRole: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-IRK-MNT-AWSBAT-Instance"
+                Tags: {}
+                LaunchTemplate: 
+                    LaunchTemplateName: "RDSBKStorageMnt01"
+                AllocationStrategy: "BEST_FIT"
+
+    BatchComputeEnvironment4:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-MNT-VM-Infra-test"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/batch.amazonaws.com/AWSServiceRoleForBatch"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 8
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "optimal"
+                Subnets: 
+                  - "subnet-0abb8aa2bbe995033"
+                SecurityGroupIds: 
+                  - "sg-01a409ed4e48218ff"
+                Ec2KeyPair: "key-or-mnt"
+                InstanceRole: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-IRK-MNT-AWSBAT-Instance"
+                Tags: {}
+                LaunchTemplate: 
+                    LaunchTemplateName: "RDSBKStorageMnt01"
+                    Version: "$Default"
+                AllocationStrategy: "BEST_FIT_PROGRESSIVE"
+
+    BatchComputeEnvironment5:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-STG-VM-IRDBK01"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/IAMR-IRK-STG-AWSBAT-Service"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 8
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "optimal"
+                Subnets: 
+                  - "subnet-0abb8aa2bbe995033"
+                  - "subnet-08bc3f510266bcbe8"
+                  - "subnet-0f7384437964e5634"
+                SecurityGroupIds: 
+                  - "sg-01a409ed4e48218ff"
+                Ec2KeyPair: "key-or-stg"
+                InstanceRole: "IAMR-IRK-STG-AWSBAT-Instance"
+                Tags: {}
+                BidPercentage: 0
+                LaunchTemplate: 
+                    LaunchTemplateName: "RDSBKStorageStg01"
+                AllocationStrategy: "BEST_FIT"
+
+    BatchComputeEnvironment6:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-STG-VM-EFS-TO-S301"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/IAMR-IRK-STG-AWSBAT-Service"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 256
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "optimal"
+                ImageId: "ami-0df41a6aecff72b1e"
+                Subnets: 
+                  - "subnet-0bfec0c6d05dc3633"
+                  - "subnet-020eeadbe642055db"
+                  - "subnet-0bc5b4b02386e10cb"
+                SecurityGroupIds: 
+                  - "sg-0ad8a512ac9b104e9"
+                Ec2KeyPair: "key-or-stg"
+                InstanceRole: "IAMR-IRK-STG-AWSBAT-Instance"
+                Tags: 
+                    BillingGroup: "IRK-STG"
+                    Name: "BJ-IRK-STG-VM-EFS-TO-S301"
+                BidPercentage: 0
+                LaunchTemplate: 
+                    LaunchTemplateName: "LT-IRK-STG-VM-EFS-TO-S301"
+                    Version: "$Default"
+                AllocationStrategy: "BEST_FIT"
+
+    BatchComputeEnvironment7:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-MNT-VM-EFS-TO-S302"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/aws-service-role/batch.amazonaws.com/AWSServiceRoleForBatch"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 16
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "optimal"
+                ImageId: "ami-0c5499b0481fc00dc"
+                Subnets: 
+                  - "subnet-0790cf783b98306ee"
+                  - "subnet-0589c6058b58e0737"
+                  - "subnet-0eb4a81c97a8ff3c7"
+                SecurityGroupIds: 
+                  - "sg-03171d738d1a2cca1"
+                Ec2KeyPair: "key-or-mnt"
+                InstanceRole: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-IRK-MNT-AWSBAT-Instance"
+                Tags: 
+                    BillingGroup: "YZK02-MNT"
+                    Name: "BJ-IRK-MNT-VM-EFS-TO-S302"
+                LaunchTemplate: 
+                    LaunchTemplateName: "LT-IRK-MNT-VM-EFS-TO-S302"
+                    Version: "$Default"
+                AllocationStrategy: "BEST_FIT_PROGRESSIVE"
+
+    BatchComputeEnvironment8:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-MNT-VM-EFS-TO-S301"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/IAMR-IRK-MNT-AWSBAT-Service"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 256
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "optimal"
+                ImageId: "ami-0b60021a0eb6e1d56"
+                Subnets: 
+                  - "subnet-0790cf783b98306ee"
+                  - "subnet-0eb4a81c97a8ff3c7"
+                  - "subnet-0589c6058b58e0737"
+                SecurityGroupIds: 
+                  - "sg-027c18a763d81d1e6"
+                Ec2KeyPair: "key-or-mnt"
+                InstanceRole: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-IRK-MNT-AWSBAT-Instance"
+                Tags: 
+                    BillingGroup: "IRK-MNT"
+                LaunchTemplate: 
+                    LaunchTemplateName: "LT-IRK-MNT-VM-EFS-TO-S301"
+                    Version: "$Default"
+                AllocationStrategy: "BEST_FIT"
+
+    BatchComputeEnvironment9:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-PRO-VM-IRDBK01"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/IAMR-IRK-PRO-AWSBAT-Service"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 8
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "optimal"
+                Subnets: 
+                  - "subnet-0bb61f3a82cdf5e4d"
+                  - "subnet-0fd459683bcfd6098"
+                  - "subnet-07f7125d72994f920"
+                SecurityGroupIds: 
+                  - "sg-0949440157ce0f372"
+                Ec2KeyPair: "key-or-pro"
+                InstanceRole: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-IRK-PRO-AWSBAT-Instance"
+                Tags: {}
+                LaunchTemplate: 
+                    LaunchTemplateName: "RDSBKStoragePro01"
+                AllocationStrategy: "BEST_FIT"
+
+    BatchComputeEnvironment10:
+        Type: "AWS::Batch::ComputeEnvironment"
+        Properties:
+            ComputeEnvironmentName: "BJ-IRK-MNT-VM-EFS-TO-S301-IRK-TEST"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/IAMR-IRK-MNT-AWSBAT-Service"
+            ComputeResources: 
+                Type: "EC2"
+                MinvCpus: 0
+                MaxvCpus: 576
+                DesiredvCpus: 0
+                InstanceTypes: 
+                  - "r5.2xlarge"
+                  - "r5.large"
+                  - "r5.xlarge"
+                  - "r5.4xlarge"
+                ImageId: "ami-0b60021a0eb6e1d56"
+                Subnets: 
+                  - "subnet-0790cf783b98306ee"
+                  - "subnet-0eb4a81c97a8ff3c7"
+                  - "subnet-0589c6058b58e0737"
+                SecurityGroupIds: 
+                  - "sg-027c18a763d81d1e6"
+                Ec2KeyPair: "key-or-mnt"
+                InstanceRole: !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-IRK-MNT-AWSBAT-Instance"
+                Tags: 
+                    BillingGroup: "IRK-MNT"
+                LaunchTemplate: 
+                    LaunchTemplateName: "LT-IRK-MNT-VM-EFS-TO-S301"
+                    Version: "$Default"
+                AllocationStrategy: "BEST_FIT_PROGRESSIVE"
+

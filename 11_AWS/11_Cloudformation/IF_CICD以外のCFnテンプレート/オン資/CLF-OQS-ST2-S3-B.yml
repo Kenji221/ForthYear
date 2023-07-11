@@ -1,0 +1,534 @@
+#############################################################
+# Copyright 2022 FUJITSU LIMITED
+# FileName: CLF-SKG-S3.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for S3
+# Version: 1.0
+# Author: Fujitsu - ariga
+#############################################################
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This CloudFormation template to create S3 Bucket
+
+Parameters:
+  SystemNameLower:
+    Type: String
+    Default: 'oqs'
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'ST2'
+  EnvironmentNameLower:
+    Type: String
+    Default: 'st2'
+  SmallType:
+    Type: String
+    Default: b
+    AllowedValues: [a,b]
+  S3AWSManagedKeyID:
+    Type: String
+    Default: 'arn:aws:kms:ap-northeast-1:936323190821:key/dbbe0758-49eb-42cd-8b9e-8ec8e770c235'
+    AllowedValues: ['arn:aws:kms:ap-northeast-1:936323190821:key/dbbe0758-49eb-42cd-8b9e-8ec8e770c235']
+  S3EndPointId:
+    Type: String
+    Default: 'vpce-07f20794aa3a95e91'
+    AllowedValues: ['vpce-07f20794aa3a95e91']
+  ServerLogS3BucketNameTokyo:
+    Type: String
+    Default: 's3-oqs-cmn-server-access-log01'
+    AllowedValues: ['s3-oqs-cmn-server-access-log01']
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Environment Configuration"
+        Parameters:
+          - SystemNameLower
+          - EnvironmentNameUpper
+          - EnvironmentNameLower
+          - SmallType
+          - S3AWSManagedKeyID
+          - S3EndPointId
+          - ServerLogS3BucketNameTokyo
+
+Resources:        
+  Application:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${SystemNameLower}-${EnvironmentNameLower}-${SmallType}
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+        - Key: "Encryption check"
+          Value: "Bucket encryption"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: "True"
+        BlockPublicPolicy: "True"
+        IgnorePublicAcls: "True"
+        RestrictPublicBuckets: "True"
+      # AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: !Ref S3AWSManagedKeyID
+      LoggingConfiguration:
+        DestinationBucketName: !Sub "${ServerLogS3BucketNameTokyo}"
+        LogFilePrefix: !Sub "${SystemNameLower}-${EnvironmentNameLower}-${SmallType}/${SystemNameLower}-${EnvironmentNameLower}-${SmallType}-"
+
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub S3LIF-RR-s3-${SystemNameLower}-${EnvironmentNameLower}-${SmallType}_01
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 14
+            ExpiredObjectDeleteMarker: "True"
+          - Id: !Sub S3LIF-RR-s3-${SystemNameLower}-${EnvironmentNameLower}-${SmallType}_02
+            Status: Enabled
+            Prefix: daily/
+            ExpirationInDays: 7
+
+  ApplicationPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Application
+      PolicyDocument: !Sub
+        -  |-
+            {
+                "Version": "2012-10-17",
+                "Id": "specific-VPCE-OR-User-only",
+                "Statement": [
+                    {
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": [
+                            "${BucketArn}",
+                            "${BucketArn}/*"
+                        ],
+                        "Condition": {
+                            "StringNotEquals": {
+                                "aws:PrincipalTag/s3Auth": "true",
+                                "aws:PrincipalTag/s3Auth-trustedadvisor-env": "all",
+                                "aws:sourceVpce": "${S3EndPointId}",
+                                "aws:PrincipalTag/s3Auth-config-env": "all",
+                                "aws:PrincipalTag/s3Auth-replication-env": "${EnvironmentNameUpper}"
+                            }
+                        }
+                    }
+                ]
+            }
+        - BucketArn: !GetAtt Application.Arn
+
+  Accountmanagement1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement01-${SmallType}
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Sub ${ServerLogS3BucketNameTokyo}
+        LogFilePrefix: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement01-${SmallType}/s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement01-${SmallType}-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: "True"
+        BlockPublicPolicy: "True"
+        IgnorePublicAcls: "True"
+        RestrictPublicBuckets: "True"
+      # AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: !Ref S3AWSManagedKeyID
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub S3LIF-RR-s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement0-${SmallType}_01
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+
+  Accountmanagement1Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Accountmanagement1
+      PolicyDocument: !Sub
+        - |-
+          {
+              "Version": "2012-10-17",
+              "Id": "specific-VPCE-OR-User-only",
+              "Statement": [
+                  {
+                      "Effect": "Deny",
+                      "Principal": "*",
+                      "Action": "s3:*",
+                      "Resource": [
+                                    "${BucketArn}",
+                                    "${BucketArn}/*"
+                      ],
+                      "Condition": {
+                          "StringNotEquals": {
+                              "aws:sourceVpce": "${S3EndPointId}",
+                              "aws:PrincipalTag/s3Auth-trustedadvisor-env": "all",
+                              "aws:PrincipalTag/s3Auth-config-env": "all",
+                              "aws:PrincipalTag/s3Auth-replication-env": "${EnvironmentNameUpper}",
+                              "aws:PrincipalTag/s3Auth": "true"
+                          }
+                      }
+                  }
+              ]
+          }
+        - BucketArn: !GetAtt Accountmanagement1.Arn
+
+  Accountmanagement2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement02-${SmallType}
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Sub ${ServerLogS3BucketNameTokyo}
+        LogFilePrefix: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement02-${SmallType}/s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement02-${SmallType}-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: "True"
+        BlockPublicPolicy: "True"
+        IgnorePublicAcls: "True"
+        RestrictPublicBuckets: "True"
+      # AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: !Ref S3AWSManagedKeyID
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub S3LIF-RR-s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement02-${SmallType}_01
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+
+  Accountmanagement2Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Accountmanagement2
+      PolicyDocument: !Sub
+        - |-
+            {
+                "Version": "2012-10-17",
+                "Id": "specific-VPCE-OR-User-only",
+                "Statement": [
+                    {
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": [
+                            "${BucketArn}",
+                            "${BucketArn}/*"
+                        ],
+                        "Condition": {
+                            "StringNotEquals": {
+                                "aws:PrincipalTag/s3Auth-config-env": "all",
+                                "aws:PrincipalTag/s3Auth": "true",
+                                "aws:sourceVpce": "${S3EndPointId}",
+                                "aws:PrincipalTag/s3Auth-replication-env": "${EnvironmentNameUpper}",
+                                "aws:PrincipalTag/s3Auth-trustedadvisor-env": "all"
+                            }
+                        }
+                    }
+                ]
+            }
+        - BucketArn: !GetAtt Accountmanagement2.Arn
+
+  Accountmanagement3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement03-${SmallType}
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Sub ${ServerLogS3BucketNameTokyo}
+        LogFilePrefix: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement03-${SmallType}/s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement03-${SmallType}-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: "True"
+        BlockPublicPolicy: "True"
+        IgnorePublicAcls: "True"
+        RestrictPublicBuckets: "True"
+      # AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: !Ref S3AWSManagedKeyID
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub S3LIF-RR-s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement03-${SmallType}_01
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+
+  Accountmanagement3Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Accountmanagement3
+      PolicyDocument: !Sub
+        - |-
+            {
+                "Version": "2012-10-17",
+                "Id": "specific-VPCE-OR-User-only",
+                "Statement": [
+                    {
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": [
+                            "${BucketArn}",
+                            "${BucketArn}/*"
+                        ],
+                        "Condition": {
+                            "StringNotEquals": {
+                                "aws:PrincipalTag/s3Auth-config-env": "all",
+                                "aws:PrincipalTag/s3Auth": "true",
+                                "aws:sourceVpce": "${S3EndPointId}",
+                                "aws:PrincipalTag/s3Auth-replication-env": "${EnvironmentNameUpper}",
+                                "aws:PrincipalTag/s3Auth-trustedadvisor-env": "all"
+                            }
+                        }
+                    }
+                ]
+            }
+        - BucketArn: !GetAtt Accountmanagement3.Arn
+
+  Accountmanagement4:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement04-${SmallType}
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Sub ${ServerLogS3BucketNameTokyo}
+        LogFilePrefix: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement04-${SmallType}/s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement04-${SmallType}-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: "True"
+        BlockPublicPolicy: "True"
+        IgnorePublicAcls: "True"
+        RestrictPublicBuckets: "True"
+      # AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: !Ref S3AWSManagedKeyID
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub S3LIF-RR-s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement04-${SmallType}_01
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+
+  Accountmanagement4Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Accountmanagement4
+      PolicyDocument: !Sub
+        - |-
+            {
+                "Version": "2012-10-17",
+                "Id": "specific-VPCE-OR-User-only",
+                "Statement": [
+                    {
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": [
+                            "${BucketArn}",
+                            "${BucketArn}/*"
+                        ],
+                        "Condition": {
+                            "StringNotEquals": {
+                                "aws:PrincipalTag/s3Auth-config-env": "all",
+                                "aws:PrincipalTag/s3Auth": "true",
+                                "aws:sourceVpce": "${S3EndPointId}",
+                                "aws:PrincipalTag/s3Auth-replication-env": "${EnvironmentNameUpper}",
+                                "aws:PrincipalTag/s3Auth-trustedadvisor-env": "all"
+                            }
+                        }
+                    }
+                ]
+            }
+        - BucketArn: !GetAtt Accountmanagement4.Arn
+
+  Accountmanagement5:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement05-${SmallType}
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Sub ${ServerLogS3BucketNameTokyo}
+        LogFilePrefix: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement05-${SmallType}/s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement05-${SmallType}-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: "True"
+        BlockPublicPolicy: "True"
+        IgnorePublicAcls: "True"
+        RestrictPublicBuckets: "True"
+      # AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: !Ref S3AWSManagedKeyID
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub S3LIF-RR-s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement05-${SmallType}_01
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+
+  Accountmanagement5Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Accountmanagement5
+      PolicyDocument: !Sub
+        - |-
+            {
+                "Version": "2012-10-17",
+                "Id": "specific-VPCE-OR-User-only",
+                "Statement": [
+                    {
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": [
+                            "${BucketArn}",
+                            "${BucketArn}/*"
+                        ],
+                        "Condition": {
+                            "StringNotEquals": {
+                                "aws:PrincipalTag/s3Auth-config-env": "all",
+                                "aws:PrincipalTag/s3Auth": "true",
+                                "aws:sourceVpce": "${S3EndPointId}",
+                                "aws:PrincipalTag/s3Auth-replication-env": "${EnvironmentNameUpper}",
+                                "aws:PrincipalTag/s3Auth-trustedadvisor-env": "all"
+                            }
+                        }
+                    }
+                ]
+            }
+        - BucketArn: !GetAtt Accountmanagement5.Arn
+
+  Accountmanagement6:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement06-${SmallType}
+      VersioningConfiguration:
+        Status: Enabled
+      LoggingConfiguration:
+        DestinationBucketName: !Sub ${ServerLogS3BucketNameTokyo}
+        LogFilePrefix: !Sub s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement06-${SmallType}/s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement06-${SmallType}-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: "True"
+        BlockPublicPolicy: "True"
+        IgnorePublicAcls: "True"
+        RestrictPublicBuckets: "True"
+      # AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: !Ref S3AWSManagedKeyID
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub S3LIF-RR-s3-${SystemNameLower}-${EnvironmentNameLower}-accountmanagement06-${SmallType}_01
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+
+  Accountmanagement6Policy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Accountmanagement6
+      PolicyDocument: !Sub
+        - |-
+            {
+                "Version": "2012-10-17",
+                "Id": "specific-VPCE-OR-User-only",
+                "Statement": [
+                    {
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": [
+                            "${BucketArn}",
+                            "${BucketArn}/*"
+                        ],
+                        "Condition": {
+                            "StringNotEquals": {
+                                "aws:PrincipalTag/s3Auth-config-env": "all",
+                                "aws:PrincipalTag/s3Auth": "true",
+                                "aws:sourceVpce": "${S3EndPointId}",
+                                "aws:PrincipalTag/s3Auth-replication-env": "${EnvironmentNameUpper}",
+                                "aws:PrincipalTag/s3Auth-trustedadvisor-env": "all"
+                            }
+                        }
+                    }
+                ]
+            }
+        - BucketArn: !GetAtt Accountmanagement6.Arn
+
+  Test:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${SystemNameLower}-${EnvironmentNameLower}-test-${SmallType}
+      LoggingConfiguration:
+        DestinationBucketName: !Sub ${ServerLogS3BucketNameTokyo}
+        LogFilePrefix: !Sub ${SystemNameLower}-${EnvironmentNameLower}-test-${SmallType}/${SystemNameLower}-${EnvironmentNameLower}-test-${SmallType}-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: "True"
+        BlockPublicPolicy: "True"
+        IgnorePublicAcls: "True"
+        RestrictPublicBuckets: "True"
+      # AccessControl: LogDeliveryWrite
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: !Ref S3AWSManagedKeyID
+      LifecycleConfiguration:
+        Rules:
+          - Id: !Sub S3LIF-RR-${SystemNameLower}-${EnvironmentNameLower}-test-${SmallType}_01
+            Status: Enabled
+            ExpirationInDays: 14
+            NoncurrentVersionExpirationInDays: 1
+
+  TestPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Test
+      PolicyDocument: !Sub
+        - |-
+            {
+                "Version": "2012-10-17",
+                "Id": "specific-VPCE-OR-User-only",
+                "Statement": [
+                    {
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": [
+                            "${BucketArn}",
+                            "${BucketArn}/*"
+                        ],
+                        "Condition": {
+                            "StringNotEquals": {
+                                "aws:PrincipalTag/s3Auth-config-env": "all",
+                                "aws:PrincipalTag/s3Auth": "true",
+                                "aws:sourceVpce": "${S3EndPointId}",
+                                "aws:PrincipalTag/s3Auth-replication-env": "${EnvironmentNameUpper}",
+                                "aws:PrincipalTag/s3Auth-trustedadvisor-env": "all"
+                            }
+                        }
+                    }
+                ]
+            }
+        - BucketArn: !GetAtt Test.Arn
+
+
+

@@ -1,0 +1,437 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This CloudFormation template to create CloudWatchlogs
+
+Resources:
+  loggroup1:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BAT-IRK-MT2-BAT01_cloudwatch-agent
+      RetentionInDays: 30
+  loggroup2:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BAT-IRK-MT2-BAT01_ecs-agent
+      RetentionInDays: 30
+    DependsOn: loggroup1
+  loggroup3:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BAT-IRK-MT2-BAT01_ecs-init
+      RetentionInDays: 30
+    DependsOn: loggroup2
+  loggroup4:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BAT-IRK-MT2-BAT01_messages
+      RetentionInDays: 30
+    DependsOn: loggroup3
+  loggroup5:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BAT-IRK-MT2-BAT01_secure
+      RetentionInDays: 30
+    DependsOn: loggroup4
+  loggroup6:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S302_cloudwatch-agent
+      RetentionInDays: 30
+    DependsOn: loggroup5
+  loggroup7:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S302_ecs-agent
+      RetentionInDays: 30
+    DependsOn: loggroup6
+  loggroup8:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S302_ecs-init
+      RetentionInDays: 30
+    DependsOn: loggroup7
+  loggroup9:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S302_messages
+      RetentionInDays: 30
+    DependsOn: loggroup8
+  loggroup10:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S302_secure
+      RetentionInDays: 30
+    DependsOn: loggroup9
+  loggroup11:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S303_cloudwatch-agent
+      RetentionInDays: 30
+    DependsOn: loggroup10
+  loggroup12:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S303_ecs-agent
+      RetentionInDays: 30
+    DependsOn: loggroup11
+  loggroup13:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S303_ecs-init
+      RetentionInDays: 30
+    DependsOn: loggroup12
+  loggroup14:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S303_messages
+      RetentionInDays: 30
+    DependsOn: loggroup13
+  loggroup15:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-BJ-IRK-MT2-VM-EFS-TO-S303_secure
+      RetentionInDays: 30
+    DependsOn: loggroup14
+  loggroup16:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_audit.log
+      RetentionInDays: 30
+    DependsOn: loggroup15
+  loggroup17:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_cloudwatch-agent
+      RetentionInDays: 30
+    DependsOn: loggroup16
+  loggroup18:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_ds_agent
+      RetentionInDays: 30
+    DependsOn: loggroup17
+  loggroup19:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_ds_am
+      RetentionInDays: 30
+    DependsOn: loggroup18
+  loggroup20:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_dsa_mpnp
+      RetentionInDays: 30
+    DependsOn: loggroup19
+  loggroup21:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_efs-utils_mount
+      RetentionInDays: 30
+    DependsOn: loggroup20
+  loggroup22:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_efs-utils_mount-watchdog
+      RetentionInDays: 30
+    DependsOn: loggroup21
+  loggroup23:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_messages
+      RetentionInDays: 30
+    DependsOn: loggroup22
+  loggroup24:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_secure
+      RetentionInDays: 30
+    DependsOn: loggroup23
+  loggroup25:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS01_zabbix_agentd
+      RetentionInDays: 30
+    DependsOn: loggroup24
+  loggroup26:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-EC2-IRK-MT2-BKS02_zabbix_agentd
+      RetentionInDays: 30
+    DependsOn: loggroup25
+  loggroup27:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_audit.log
+      RetentionInDays: 30
+    DependsOn: loggroup26
+  loggroup28:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_cloudwatch-agent
+      RetentionInDays: 30
+    DependsOn: loggroup27
+  loggroup29:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_cron
+      RetentionInDays: 30
+    DependsOn: loggroup28
+  loggroup30:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_ds_agent
+      RetentionInDays: 30
+    DependsOn: loggroup29
+  loggroup31:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_ds_am
+      RetentionInDays: 30
+    DependsOn: loggroup30
+  loggroup32:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_dsa_mpnp
+      RetentionInDays: 30
+    DependsOn: loggroup31
+  loggroup33:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_ecs-agent
+      RetentionInDays: 30
+    DependsOn: loggroup32
+  loggroup34:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_ecs-init
+      RetentionInDays: 30
+    DependsOn: loggroup33
+  loggroup35:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_efs-utils_mount
+      RetentionInDays: 30
+    DependsOn: loggroup34
+  loggroup36:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_efs-utils_mount-watchdog
+      RetentionInDays: 30
+    DependsOn: loggroup35
+  loggroup37:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_messages
+      RetentionInDays: 30
+    DependsOn: loggroup36
+  loggroup38:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-BAT01_secure
+      RetentionInDays: 30
+    DependsOn: loggroup37
+  loggroup39:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_audit.log
+      RetentionInDays: 30
+    DependsOn: loggroup38
+  loggroup40:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_cloudwatch-agent
+      RetentionInDays: 30
+    DependsOn: loggroup39
+  loggroup41:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_cron
+      RetentionInDays: 30
+    DependsOn: loggroup40
+  loggroup42:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_ds_agent
+      RetentionInDays: 30
+    DependsOn: loggroup41
+  loggroup43:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_ds_am
+      RetentionInDays: 30
+    DependsOn: loggroup42
+  loggroup44:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_dsa_mpnp
+      RetentionInDays: 30
+    DependsOn: loggroup43
+  loggroup45:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_ecs-agent
+      RetentionInDays: 30
+    DependsOn: loggroup44
+  loggroup46:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_ecs-init
+      RetentionInDays: 30
+    DependsOn: loggroup45
+  loggroup47:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_efs-utils_mount
+      RetentionInDays: 30
+    DependsOn: loggroup46
+  loggroup48:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_efs-utils_mount-watchdog
+      RetentionInDays: 30
+    DependsOn: loggroup47
+  loggroup49:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_messages
+      RetentionInDays: 30
+    DependsOn: loggroup48
+  loggroup50:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB01_secure
+      RetentionInDays: 30
+    DependsOn: loggroup49
+  loggroup51:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_audit.log
+      RetentionInDays: 30
+    DependsOn: loggroup50
+  loggroup52:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_cloudwatch-agent
+      RetentionInDays: 30
+    DependsOn: loggroup51
+  loggroup53:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_cron
+      RetentionInDays: 30
+    DependsOn: loggroup52
+  loggroup54:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_ds_agent
+      RetentionInDays: 30
+    DependsOn: loggroup53
+  loggroup55:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_ds_am
+      RetentionInDays: 30
+    DependsOn: loggroup54
+  loggroup56:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_dsa_mpnp
+      RetentionInDays: 30
+    DependsOn: loggroup55
+  loggroup57:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_ecs-agent
+      RetentionInDays: 30
+    DependsOn: loggroup56
+  loggroup58:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_ecs-init
+      RetentionInDays: 30
+    DependsOn: loggroup57
+  loggroup59:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_efs-utils_mount
+      RetentionInDays: 30
+    DependsOn: loggroup58
+  loggroup60:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_efs-utils_mount-watchdog
+      RetentionInDays: 30
+    DependsOn: loggroup59
+  loggroup61:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_messages
+      RetentionInDays: 30
+    DependsOn: loggroup60
+  loggroup62:
+    Type: AWS::Logs::LogGroup
+    Properties: 
+      KmsKeyId: arn:aws:kms:ap-northeast-1:457550092927:key/8fe3e3b2-889b-49b9-afed-5c42a43021d4
+      LogGroupName: CWL-ECS-IRK-MT2-WEB02_secure
+      RetentionInDays: 30
+    DependsOn: loggroup61

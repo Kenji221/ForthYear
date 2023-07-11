@@ -1,0 +1,514 @@
+#############################################################
+# Copyright 2019 FUJITSU LIMITED
+# FileName: CLF-CICD-OQS-ALB-NginxECS-Template.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for NginxECS CI/CD
+# Version: 1.0
+# Author: Fujitsu - hou
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+Transform:
+  Name: 'AWS::Include'
+  Parameters:
+    Location: !Sub 's3://${BucketName02}/output_Mappings_OQS_ALB_NginxECS.yml'
+
+
+Parameters:
+  #  ## user form  ##
+  #  :param ProjectNumber: [Example:'5']
+  #  :param ProjectNameUpper : [NGINX]
+  #  :param ProjectNameUpper : [nginx]  
+  #  :param Port: [Example:'443']
+  #  :param SystemEnvironmentName: ['OQSDEV','OQSMNT','OQSSTG']
+  #  :param ExecutionRoleName: ['IAMR-OQS-DEV-WEBTaskAction01','IAMR-OQS-DEV-WEBTaskAction02','IAMR-OQS-MNT-WEBTaskAction01','IAMR-OQS-MNT-WEBTaskAction02','IAMR-OQS-STG-WEBTaskAction01','IAMR-OQS-STG-WEBTaskAction02']
+  #  :param ClusterNumber: ['01','02']
+  #  :param DesiredCount: EcsService Desired 
+  #  :param MaxCapacity: ScalableTarget MAX   
+  #  :param MinCapacity: ScalableTarget Min   
+  #  :param TargetValue: ScalingPolicy 70
+  #  :param BucketName01: ['build-source-bucket-mnt','build-source-bucket-stg']
+  #  :param BuildServiceRoleName: ['IAMR-OQS-DEV-WEBCodeBuild01','IAMR-OQS-MNT-WEBCodeBuild01','IAMR-OQS-STG-WEBCodeBuild01']
+  #  :param CodeBuildSecurityGroupId: ['sg-036642b8d8240b67a','sg-082cbe7623eca6c48','sg-0f81aaaae2649dff2']
+  #  :param DeployServiceRoleName: ['-','IAMR-OQS-DEV-WEBCodeDeploy02','IAMR-OQS-MNT-WEBCodeDeploy01','IAMR-OQS-STG-WEBCodeDeploy01']
+  #  :param PipelineServiceRoleName:  ['IAMR-OQS-DEV-WEBCodePipeline01','IAMR-OQS-MNT-WEBCodePipeline01','IAMR-OQS-STG-WEBCodePipeline01']
+  #  :param BucketName02: ['s3-oqs-dev-clf01','s3-oqs-mnt-clf01','s3-oqs-stg-clf01']
+  #  :WebInstanceRoleName: ['IAMR-OQS-DEV-WEB','IAMR-OQS-MNT-WEB','IAMR-OQS-MNT-WEB02','IAMR-OQS-STG-WEB','IAMR-OQS-STG-WEB02',]
+  #  :CertificateArn:  ['-']
+  ProjectNumber:
+    Type: Number
+    Description: 'Example:05'
+  ProjectNameUpper:
+    Type: String
+    Description: 'NGINX'    
+  ProjectNameLower:
+    Type: String
+    Description: 'nginx'
+  Port: 
+    Type: Number
+    Description: 443
+  SystemEnvironmentName: 
+    Type: String
+    Default: 'OQSDEV'
+    AllowedValues: ['OQSDEV','OQSMNT','OQSSTG']
+  ExecutionRoleName: 
+    Type: String
+    Default: 'IAMR-OQS-DEV-WEBTaskAction01'
+    AllowedValues: ['IAMR-OQS-DEV-WEBTaskAction01','IAMR-OQS-DEV-WEBTaskAction02','IAMR-OQS-MNT-WEBTaskAction01','IAMR-OQS-MNT-WEBTaskAction02','IAMR-OQS-STG-WEBTaskAction01','IAMR-OQS-STG-WEBTaskAction02']
+  TaskRoleName: 
+    Type: String
+    Default: 'IAMR-OQS-DEV-WEBContainerAction01'
+    AllowedValues: ['IAMR-OQS-DEV-WEBContainerAction01','IAMR-OQS-DEV-WEBContainerAction02','IAMR-OQS-MNT-WEBContainerAction01','IAMR-OQS-MNT-WEBContainerAction02','IAMR-OQS-MNT-WEBContainerAction03','IAMR-OQS-STG-WEBContainerAction01','IAMR-OQS-STG-WEBContainerAction02','IAMR-OQS-STG-WEBContainerAction03']
+  ClusterNumber:
+    Type: Number 
+    Default: '01'
+    AllowedValues: ['01','02']
+  DesiredCount:
+    Type: Number
+    Default: 0
+  MaxCapacity:
+    Type: Number
+    Default: 0
+  MinCapacity:
+    Type: Number
+    Default: 0
+  TargetValue:
+    Type: Number
+    Default: 70
+  BucketName01: 
+    Type: String
+    Default: "build-source-bucket-dev"
+    AllowedValues: ['build-source-bucket-dev','build-source-bucket-mnt','build-source-bucket-stg']
+  BuildServiceRoleName: 
+    Type: String
+    Default: 'IAMR-OQS-DEV-WEBCodeBuild01'
+    AllowedValues: ['IAMR-OQS-DEV-WEBCodeBuild01','IAMR-OQS-MNT-WEBCodeBuild01','IAMR-OQS-STG-WEBCodeBuild01']
+  CodeBuildSecurityGroupId:
+    Type: String
+    Default: "sg-036642b8d8240b67a"
+    AllowedValues: ['sg-036642b8d8240b67a','sg-082cbe7623eca6c48','sg-0f81aaaae2649dff2']
+  DeployServiceRoleName: 
+    Type: String
+    Default: 'IAMR-OQS-DEV-WEBCodeDeploy02'
+    AllowedValues: ['IAMR-OQS-DEV-WEBCodeDeploy02','IAMR-OQS-MNT-WEBCodeDeploy01','IAMR-OQS-STG-WEBCodeDeploy01']
+  PipelineServiceRoleName: 
+    Type: String
+    Default: 'IAMR-OQS-DEV-WEBCodePipeline01'
+    AllowedValues: ['IAMR-OQS-DEV-WEBCodePipeline01','IAMR-OQS-MNT-WEBCodePipeline01','IAMR-OQS-STG-WEBCodePipeline01']
+  BucketName02: 
+    Type: String
+    Default: 's3-oqs-dev-clf01'
+    AllowedValues: ['s3-oqs-dev-clf01','s3-oqs-mnt-clf01','s3-oqs-stg-clf01']
+  ALBName: 
+    Type: String
+    Default: 'ALB-OQS-DEV-WSPRXY01'
+    AllowedValues: ['ALB-OQS-DEV-WSPRXY01','ALB-OQS-MNT-WSPRXY01']
+  CertificateArn: 
+    Type: String
+    Default: 'arn:aws:acm:ap-northeast-1:936323190821:certificate/0a22bd25-7c83-4497-8b92-13fd8e03e734'
+    AllowedValues: ['arn:aws:acm:ap-northeast-1:936323190821:certificate/0a22bd25-7c83-4497-8b92-13fd8e03e734']
+
+Conditions:
+ isOqs: !Equals
+  - !FindInMap [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, EnvironmentNameLower ]
+  - oqs
+
+Resources:  
+  TargetGroup01:
+   Type: AWS::ElasticLoadBalancingV2::TargetGroup
+   Properties: 
+    HealthCheckPath: !Sub '/msa${ProjectNumber}/healthcheck.html' 
+    HealthCheckProtocol: HTTP
+    Name: !Sub '${ALBName}-${ProjectNameUpper}-${ProjectNumber}-T1' 
+    Port: !Ref Port 
+    Protocol: HTTPS
+    TargetType: instance
+    VpcId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,VpcId]
+    
+
+  TargetGroup02:
+   Type: AWS::ElasticLoadBalancingV2::TargetGroup
+   Properties:
+    HealthCheckPath: !Sub '/msa${ProjectNumber}/healthcheck.html' 
+    HealthCheckProtocol: HTTP 
+    Name: !Sub '${ALBName}-${ProjectNameUpper}-${ProjectNumber}-T2' 
+    Port: !Ref Port 
+    Protocol: HTTPS
+    TargetType: instance
+    VpcId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,VpcId]  
+
+
+  Listener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties: 
+      Port: !Ref Port     
+      Protocol: HTTPS      
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
+      DefaultActions: 
+        - TargetGroupArn: !Ref TargetGroup01
+          Type: forward
+      LoadBalancerArn: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,ALBWSPRXY01Arn]
+
+
+  Repository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Sub
+        - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-${EnvironmentNameLower}' 
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      LifecyclePolicy: 
+        LifecyclePolicyText: |
+          {
+            "rules":[
+              {
+                "rulePriority": 1,
+                "description": "Keep two images, expire all others",
+                "selection":{
+                    "tagStatus":"any",
+                    "countType":"imageCountMoreThan",
+                    "countNumber": 2
+                },
+                "action":{
+                    "type":"expire"
+                }
+              }
+            ]
+          }
+        
+      RepositoryPolicyText: 
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "specific-VPCE-OR-User-only",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "ecr:*",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:PrincipalTag/ecrAuth": "true",
+                  "aws:sourceVpce": [
+                    {
+                      "Fn::FindInMap": [SystemEnvironmentMapping,!Ref SystemEnvironmentName, VpcEndpointId01 ]
+                    },
+                    {
+                      "Fn::FindInMap": [SystemEnvironmentMapping,!Ref SystemEnvironmentName, VpcEndpointId02 ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        } 
+
+
+  Taskdefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      Family: !Sub 
+      - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-task-${EnvironmentNameLower}' 
+      - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+        EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      ContainerDefinitions:
+        - MemoryReservation: 300
+          Image: !Sub 
+            - '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-${EnvironmentNameLower}:latest' ##'936323190821.dkr.ecr.ap-northeast-1.amazonaws.com/oqs-nginx-02-mnt:latest'
+            - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+              EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub 
+                - '${ProjectNameUpper}-${ProjectNumber}-${SystemNameUpper}-${EnvironmentNameUpper}' 
+                - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                  EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+              awslogs-region: !Sub '${AWS::Region}'
+          Name: !Sub 
+            - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}' 
+            - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          PortMappings:
+            - ContainerPort: 443
+              HostPort: 0
+              Protocol: tcp
+      ExecutionRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ExecutionRoleName}'  
+      NetworkMode: bridge
+      TaskRoleArn: !Ref  TaskRoleName
+      RequiresCompatibilities: 
+        - 'EC2'
+
+  DiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties: 
+      DnsConfig:
+        NamespaceId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,NamespaceId]  
+        RoutingPolicy: MULTIVALUE
+        DnsRecords:
+          - TTL: 60
+            Type: SRV
+      HealthCheckCustomConfig: 
+        FailureThreshold: 1
+      Name: !Sub 
+        - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-service-${EnvironmentNameLower}'   
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn:  Listener
+    Properties: 
+      Cluster: !Sub 
+        - 'ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}' 
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      DeploymentController: 
+        Type: CODE_DEPLOY    
+      DesiredCount: !Ref DesiredCount 
+      LaunchType: EC2
+      LoadBalancers: 
+        - ContainerName: !Sub 
+          - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}'  
+          - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          ContainerPort: 443
+          TargetGroupArn: !Ref TargetGroup01
+      PlacementStrategies: 
+        - Field: attribute:ecs.availability-zone
+          Type: spread
+        - Field: instanceId
+          Type: spread
+      SchedulingStrategy: REPLICA
+      ServiceRegistries: 
+        - ContainerName: !Sub 
+          - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}'  
+          - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          ContainerPort: 443
+          RegistryArn: !GetAtt DiscoveryService.Arn
+      ServiceName: !Sub 
+        - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-service-${EnvironmentNameLower}'  
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      TaskDefinition: !Ref Taskdefinition
+
+
+  ScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    DependsOn: Service
+    Properties:     
+      MaxCapacity: !Ref MaxCapacity
+      MinCapacity: !Ref MinCapacity
+      ResourceId: !Sub 
+        - 'service/ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}/${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-service-${EnvironmentNameLower}'  
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      RoleARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService' 
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+    
+
+  ScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties: 
+      PolicyName: !Sub 
+        - 'ScalingPolicy-${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-service-${EnvironmentNameLower}' 
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ScalableTarget
+      TargetTrackingScalingPolicyConfiguration: 
+        TargetValue: !Ref TargetValue 
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+
+
+  CodeBuild:
+    Type: AWS::CodeBuild::Project
+    DependsOn: Service
+    Properties: 
+      Name: !Sub 
+        - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-codebuild-project-${EnvironmentNameLower}' 
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      Artifacts: 
+        Type: NO_ARTIFACTS
+      Environment: 
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        PrivilegedMode: true
+        Type: LINUX_CONTAINER
+      ServiceRole: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${BuildServiceRoleName}' 
+      Source:
+        Type: S3
+        Location: !Sub '${BucketName01}/${ProjectNameLower}-${ProjectNumber}.zip'  
+      VpcConfig: 
+        SecurityGroupIds: 
+          - !Ref CodeBuildSecurityGroupId
+        Subnets: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,Subnet]
+        VpcId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,VpcId]
+      LogsConfig: 
+          CloudWatchLogs: 
+            Status: ENABLED
+          S3Logs: 
+            Status: DISABLED
+      Tags: !If 
+        - isOqs
+        - 
+          - Key: "Name"
+            Value: "CRED_CHECK"
+        - !Ref "AWS::NoValue"
+
+  CodeDeployApp:  
+    Type: AWS::CodeDeploy::Application
+    Properties: 
+      ApplicationName: !Sub 
+        - 'AppECS-ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}-${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-service-${EnvironmentNameLower}'
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      ComputePlatform: ECS
+
+  CodeDeployGroup:
+    Type: AWS::CodeDeploy::DeploymentGroup
+    DependsOn: CodeBuild
+    Properties: 
+      DeploymentGroupName: !Sub 
+        - 'DgpECS-ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}-${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-service-${EnvironmentNameLower}' 
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      ApplicationName: !Ref CodeDeployApp
+      AutoRollbackConfiguration: 
+          Enabled: true
+          Events: 
+            - DEPLOYMENT_FAILURE   
+      BlueGreenDeploymentConfiguration: 
+        DeploymentReadyOption: 
+          ActionOnTimeout: CONTINUE_DEPLOYMENT
+        TerminateBlueInstancesOnDeploymentSuccess: 
+          Action: TERMINATE
+          TerminationWaitTimeInMinutes: 5
+      DeploymentStyle: 
+        DeploymentOption: WITH_TRAFFIC_CONTROL
+        DeploymentType: BLUE_GREEN
+      ECSServices: 
+        - ClusterName: !Sub 
+            - 'ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}' 
+            - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+              EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          ServiceName: !GetAtt Service.Name 
+      LoadBalancerInfo: 
+          TargetGroupPairInfoList: 
+            - ProdTrafficRoute: 
+                  ListenerArns: 
+                    - !Ref Listener
+              TargetGroups: 
+                - Name: !Sub '${ALBName}-${ProjectNameUpper}-${ProjectNumber}-T1'  
+                - Name: !Sub '${ALBName}-${ProjectNameUpper}-${ProjectNumber}-T2'    
+      ServiceRoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${DeployServiceRoleName}'   
+
+
+
+  Pipeline: 
+    Type: AWS::CodePipeline::Pipeline
+    Properties: 
+      Name: !Sub 
+        - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-pipeline-${EnvironmentNameLower}' 
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      RoleArn: !Sub 'arn:aws:iam::${AWS::AccountId}:role/service-role/${PipelineServiceRoleName}'
+      ArtifactStore: 
+        Location: !Ref BucketName01
+        Type: S3
+      Stages: 
+        - 
+          Name: Source
+          Actions: 
+            -  
+              Name: Source
+              Namespace: SourceVariables
+              ActionTypeId: 
+                Category: Source
+                Owner: AWS
+                Provider: S3
+                Version: 1
+              OutputArtifacts: 
+                - Name: SourceArtifact
+              Configuration: 
+                S3Bucket: !Ref BucketName01
+                S3ObjectKey: !Sub 
+                  - '${SystemNameUpper}-${ProjectNameLower}-${ProjectNumber}.zip' 
+                  - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                PollForSourceChanges: true
+        - 
+          Name: Build
+          Actions: 
+            -   
+              Name: Build
+              Namespace: BuildVariables
+              ActionTypeId: 
+                  Category: Build
+                  Owner: AWS
+                  Provider: CodeBuild
+                  Version: 1
+              Configuration: 
+                ProjectName: !Sub 
+                  - '${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-codebuild-project-${EnvironmentNameLower}' 
+                  - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+                    EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]                    
+              InputArtifacts: 
+                - Name: SourceArtifact
+              OutputArtifacts: 
+                - Name: BuildArtifact
+              Region: !Sub '${AWS::Region}'
+        -
+
+          Name: Deploy
+          Actions: 
+            - 
+              Name: Deploy
+              Namespace: DeployVariables
+              ActionTypeId: 
+                  Category: Deploy
+                  Owner: AWS
+                  Provider: CodeDeployToECS
+                  Version: 1
+              Configuration: 
+                ApplicationName: !Sub 
+                - 'AppECS-ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}-${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-service-${EnvironmentNameLower}' 
+                - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                  EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+                  SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+                  EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+                DeploymentGroupName: !Sub 
+                - 'DgpECS-ECS-${SystemNameUpper}-${EnvironmentNameUpper}-WEB${ClusterNumber}-${SystemNameLower}-${ProjectNameLower}-${ProjectNumber}-service-${EnvironmentNameLower}' 
+                - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                  EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+                  SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+                  EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]                
+                AppSpecTemplateArtifact: BuildArtifact
+                AppSpecTemplatePath: appspec.yaml
+                TaskDefinitionTemplatePath: taskdef.json
+                TaskDefinitionTemplateArtifact: BuildArtifact
+                Image1ArtifactName: BuildArtifact
+                Image1ContainerName: IMAGE1_NAME
+              InputArtifacts: 
+                - Name: BuildArtifact
+              Region: !Sub '${AWS::Region}'
+
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties: 
+      KmsKeyId: !Sub 
+        - 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KmsKeyId}' 
+        - KmsKeyId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,KmsKeyId]
+      LogGroupName: !Sub 
+        - '${ProjectNameUpper}-${ProjectNumber}-${SystemNameUpper}-${EnvironmentNameUpper}'  
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      RetentionInDays: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,LogGroupRetentionInDays]

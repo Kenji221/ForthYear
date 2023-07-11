@@ -1,0 +1,49 @@
+Mappings:
+  SystemEnvironmentMapping:
+    OQSDEV:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: DEV
+      SystemNameLower: oqs
+      EnvironmentNameLower: dev
+      VpcId: vpc-09515f30187fb29d0
+      Subnet: 
+        - "subnet-0d8c456061841b4ff"
+        - "subnet-0390edd793008280a"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-0a790c9ee6fd80d64"
+      VpcEndpointId02: "vpce-08651c8ac877a14b7"
+      ALBWSPRXY01Arn: 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/app/ALB-OQS-DEV-WSPRXY01/f79e5fea4927f60d'
+
+    OQSSTG:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: STG
+      SystemNameLower: oqs
+      EnvironmentNameLower: stg
+      VpcId: vpc-0917d0ac264bd09a0
+      Subnet: 
+        - "subnet-0ef5548c4bf661711"
+        - "subnet-0ab2cd91350d4af9a"
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-04e1c515749ffa274"
+      VpcEndpointId02: "vpce-06f16caa4b8d21683"
+      ALBWSPRXY01Arn: '-'
+
+    OQSMNT:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MNT
+      SystemNameLower: oqs
+      EnvironmentNameLower: mnt
+      VpcId: vpc-039efc81bad2fea3d
+      Subnet: 
+        - "subnet-0d3b5aa3ceda3351f"
+        - "subnet-0138730d2daa557b0"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-0257e895f4759b48b"
+      VpcEndpointId02: "vpce-0c0e77ee8956bc475"
+      ALBWSPRXY01Arn: '-'

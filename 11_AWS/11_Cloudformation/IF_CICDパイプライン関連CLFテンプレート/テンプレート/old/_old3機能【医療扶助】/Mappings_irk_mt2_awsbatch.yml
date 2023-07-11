@@ -1,0 +1,19 @@
+Mappings:
+  AwsBatchMapping:
+    OPT:
+      SubnetIds: 
+        - 'subnet-07659eaa787262322' #OPT1
+        - 'subnet-0e012d7e810d318dc' #OPT2
+        - 'subnet-083b91be35e3627dd' #OPT3
+#      #####Specified by parameter
+#      SecurityGroupIds:
+#        - 'sg-03b9653d8b71d8850' # IRD-BACKUP
+      
+    BAT:
+      SubnetIds: 
+        - 'subnet-088f31ba8073a8383' #BAT1
+        - 'subnet-02f295fb862cb6b61' #BAT2
+        - 'subnet-0f8c5d606cf72a398' #BAT3     
+#      #####Specified by parameter
+#      SecurityGroupIds:
+#        - 'sg-027c18a763d81d1e6' #BAT

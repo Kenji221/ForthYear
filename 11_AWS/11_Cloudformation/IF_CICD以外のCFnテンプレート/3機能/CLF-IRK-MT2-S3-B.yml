@@ -1,0 +1,291 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This CloudFormation template to create S3 Bucket
+
+Resources:
+  S3Bucket1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-irk-mt2-escape01-b
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-irk-cmn-server-access-log02
+        LogFilePrefix: s3-irk-mt2-escape01-b/s3-irk-mt2-escape01-b-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:457550092927:key/56e10ef6-de12-4cb0-ade3-6da09fd65433
+      Tags:
+        - Key: "Encryption Enabled"
+          Value: "true"
+        - Key: "Bucket Replication enabled"
+          Value: "false"
+        - Key: "BillingGroup"
+          Value: "IRK-MT2-B"
+        - Key: "BlackListed Actions Enabled"
+          Value: "false"
+        - Key: "Logging Enabled"
+          Value: "true"
+
+  S3Bucket2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-irk-mt2-glue-athena-output01-b
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-irk-cmn-server-access-log02
+        LogFilePrefix: s3-irk-mt2-glue-athena-output01-b/s3-irk-mt2-glue-athena-output01-b-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:457550092927:key/56e10ef6-de12-4cb0-ade3-6da09fd65433
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-irk-mt2-glue-athena-output01-b_01
+            Status: Enabled
+            ExpirationInDays: 45
+            NoncurrentVersionExpirationInDays: 1
+      Tags:
+        - Key: "Encryption Enabled"
+          Value: "true"
+        - Key: "Bucket Replication enabled"
+          Value: "false"
+        - Key: "BillingGroup"
+          Value: "IRK-MT2-B"
+        - Key: "BlackListed Actions Enabled"
+          Value: "false"
+        - Key: "Logging Enabled"
+          Value: "true"
+        
+  S3Bucket3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-irk-mt2-glue-interface-b
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-irk-cmn-server-access-log02
+        LogFilePrefix: s3-irk-mt2-glue-interface-b/s3-irk-mt2-glue-interface-b-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:457550092927:key/8ef4c1c0-8da8-4452-a567-bdd5ec7902c2
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-irk-mt2-glue-interface-b_01
+            Status: Enabled
+            ExpirationInDays: 1095
+            NoncurrentVersionExpirationInDays: 1095
+            #ExpiredObjectDeleteMarker
+      Tags:
+        - Key: "Encryption Enabled"
+          Value: "true"
+        - Key: "Bucket Replication enabled"
+          Value: "false"
+        - Key: "BillingGroup"
+          Value: "IRK-MT2-B"
+        - Key: "BlackListed Actions Enabled"
+          Value: "false"
+        - Key: "Logging Enabled"
+          Value: "true"
+
+  S3Bucket4:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-irk-mt2-glue-job-b
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-irk-cmn-server-access-log02
+        LogFilePrefix: s3-irk-mt2-glue-job-b/s3-irk-mt2-glue-job-b-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:457550092927:key/56e10ef6-de12-4cb0-ade3-6da09fd65433
+      Tags:
+        - Key: "Encryption Enabled"
+          Value: "true"
+        - Key: "Bucket Replication enabled"
+          Value: "false"
+        - Key: "BillingGroup"
+          Value: "IRK-MT2-B"
+        - Key: "BlackListed Actions Enabled"
+          Value: "false"
+        - Key: "Logging Enabled"
+          Value: "true"
+
+  S3Bucket5:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-irk-mt2-master-input-b
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-irk-cmn-server-access-log02
+        LogFilePrefix: s3-irk-mt2-master-input-b/s3-irk-mt2-master-input-b-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:457550092927:key/56e10ef6-de12-4cb0-ade3-6da09fd65433
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-irk-mt2-master-input-b_01
+            Status: Enabled
+            ExpirationInDays: 40
+            NoncurrentVersionExpirationInDays: 40
+      Tags:
+        - Key: "Encryption Enabled"
+          Value: "true"
+        - Key: "Bucket Replication enabled"
+          Value: "false"
+        - Key: "BillingGroup"
+          Value: "IRK-MT2-B"
+        - Key: "BlackListed Actions Enabled"
+          Value: "false"
+        - Key: "Logging Enabled"
+          Value: "true"
+
+  S3Bucket6:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-tkk-mt2-lambda-interface-b
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-irk-cmn-server-access-log02
+        LogFilePrefix: s3-tkk-mt2-lambda-interface-b/s3-tkk-mt2-lambda-interface-b-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+            #KMSMasterKeyID
+      Tags:
+        - Key: "Encryption Enabled"
+          Value: "true"
+        - Key: "Bucket Replication enabled"
+          Value: "false"
+        - Key: "BillingGroup"
+          Value: "IRK-MT2-B"
+        - Key: "BlackListed Actions Enabled"
+          Value: "false"
+        - Key: "Logging Enabled"
+          Value: "true"
+
+
+  S3Bucket7:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-tkk-mt2-master-input-b
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-irk-cmn-server-access-log02
+        LogFilePrefix: s3-tkk-mt2-master-input-b/s3-tkk-mt2-master-input-b-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:457550092927:key/56e10ef6-de12-4cb0-ade3-6da09fd65433
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-tkk-mt2-master-input-b_01
+            Status: Enabled
+            ExpirationInDays: 40
+            NoncurrentVersionExpirationInDays: 40
+      Tags:
+        - Key: "Encryption Enabled"
+          Value: "true"
+        - Key: "Bucket Replication enabled"
+          Value: "false"
+        - Key: "BillingGroup"
+          Value: "IRK-MT2-B"
+        - Key: "BlackListed Actions Enabled"
+          Value: "false"
+        - Key: "Logging Enabled"
+          Value: "true"
+
+  S3Bucket8:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-yzk-mt2-master-input-b
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-irk-cmn-server-access-log02
+        LogFilePrefix: s3-yzk-mt2-master-input-b/s3-yzk-mt2-master-input-b-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:457550092927:key/56e10ef6-de12-4cb0-ade3-6da09fd65433
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-yzk-mt2-master-input-b_01
+            Status: Enabled
+            ExpirationInDays: 40
+            NoncurrentVersionExpirationInDays: 40
+      Tags:
+        - Key: "Encryption Enabled"
+          Value: "true"
+        - Key: "Bucket Replication enabled"
+          Value: "false"
+        - Key: "BillingGroup"
+          Value: "IRK-MT2-B"
+        - Key: "BlackListed Actions Enabled"
+          Value: "false"
+        - Key: "Logging Enabled"
+          Value: "true"

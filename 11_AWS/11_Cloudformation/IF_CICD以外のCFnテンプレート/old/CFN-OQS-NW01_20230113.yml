@@ -1,0 +1,2310 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-MNT-NW01_20221116.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Network
+# Version: 1.0
+# Author: Fujitsu - ichikawa
+############################
+AWSTemplateFormatVersion: 2010-09-09
+
+Transform:
+  Name: 'AWS::Include'
+  Parameters:
+    Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  #  ## user form  ##
+  #  :param PeeringVPC: デプロイ済みの共通環境VPCのIDを指定
+  #  :param TGWid: デプロイ済みトランジットGWのIDを指定
+  #  :param SystemNameUpper: システム名称
+  #  :param EnvironmentNameUpper: 環境名
+  #  :param MappingFilePASS: mappingファイルS3パス
+  MappingFilePATH:
+    Type: String
+    Default: 'example: s3://'
+  #MappingFileName:
+  #  Type: String
+  #  Default: 'example: Mappings_oqs_mnt_NW.yml'
+  SystemNameUpper:
+    Type: String
+    Default: 'OQS'
+    AllowedValues: ['OQS','IRK','TKK','YZK']
+  SystemNameLower:
+    Type: String
+    Default: 'oqs'
+    AllowedValues: ['oqs','irk','tkk','yzk']
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'MNT'
+    AllowedValues: ['MNT','DEV','STG','PRO','MT1','MT2','ST1','ST2']
+  EnvironmentNameLower:
+    Type: String
+    Default: 'mnt'
+    AllowedValues: ['mnt','dev','stg','pro','mt1','mt2','st1','st2']
+  EnvironmentNameUpper2:
+    Type: String
+    Default: 'MT2'
+    AllowedValues: ['MNT','DEV','STG','PRO','MT1','MT2','ST1','ST2']
+  EnvironmentNameLower2:
+    Type: String
+    Default: 'mt2'
+    AllowedValues: ['mnt','dev','stg','pro','mt1','mt2','st1','st2']
+#  PeeringVPC:
+#    Type: String
+#    Default: 'example: vpc-123456789abcd'
+#  TGWid:
+#    Type: String
+#    Default: 'example: tgw-123456789abcd'
+
+Resources:
+  #  ##  VPC  ##
+  #  :param : VPCNW01: 保守環境のVPC、IPレンジ、ProvidedDNSを設定
+  VPCNW01:
+    Type: 'AWS::EC2::VPC'
+    Properties: 
+      CidrBlock: !FindInMap [VPC,NWadress,tokyo]
+      InstanceTenancy: default
+      EnableDnsSupport: 'true'
+      EnableDnsHostnames: 'true'
+      Tags:
+        - Key: Name
+          Value: !Sub VPC-${SystemNameUpper}-${EnvironmentNameUpper}
+  #  ##  VPC Flow Log  ##
+  #  :param : LOGVPCLOG01: VPCにフローログを設定
+  LOGIAMROLE:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [vpc-flow-logs.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+      Path: /
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-VPCFlowLogs
+  LOGVPCLOG01:
+    Type: AWS::EC2::FlowLog
+    Properties:
+      DeliverLogsPermissionArn: !GetAtt LOGIAMROLE.Arn
+      LogDestinationType: 'cloud-watch-logs'
+      LogGroupName: !Sub VPCFlowLogs-${SystemNameUpper}-${EnvironmentNameUpper}
+      ResourceId: !Ref VPCNW01
+      ResourceType: 'VPC'
+      TrafficType: ALL
+  #  ##  DHCP  ##
+  #  :param DOPT: VPC内のDHCPサーバをデプロイ
+  #  :param DHCPASSOC1: VPCとDHCPサーバを関連付け
+  DOPT:
+    Type: 'AWS::EC2::DHCPOptions'
+    Properties:
+      DomainName: ap-northeast-1.compute.internal
+      DomainNameServers:
+        - AmazonProvidedDNS
+      NtpServers:
+        - "169.254.169.123"
+  DHCPASSOC1:
+    Type: 'AWS::EC2::VPCDHCPOptionsAssociation'
+    Properties:
+      VpcId: !Ref VPCNW01
+      DhcpOptionsId: !Ref DOPT
+
+  #  ##  Subnet  ##
+  #  ###  NGW  ###
+  #  :param SUBNGW01: サブネットのデプロイ(NATGW用 - AZ-a)
+  #  :param SUBNGW02: サブネットのデプロイ(NATGW用 - AZ-c)
+  #  :param SUBNGW03: サブネットのデプロイ(NATGW用 - AZ-d)
+  SUBNGW01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,NGW,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-NGW01
+  SUBNGW02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,NGW,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-NGW02
+  SUBNGW03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,NGW,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-NGW03
+
+  #  ###  Bastion  ###
+  #  :param SUBBAS01: サブネットのデプロイ(踏み台サーバ用 - AZ-a)
+  #  :param SUBBAS02: サブネットのデプロイ(踏み台サーバ用 - AZ-c)
+  #  :param SUBBAS03: サブネットのデプロイ(踏み台サーバ用 - AZ-d)
+  SUBBAS01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,BAS,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+       - Key: Name
+         Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-BAS01
+  SUBBAS02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,BAS,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+       - Key: Name
+         Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-BAS02
+  SUBBAS03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,BAS,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+       - Key: Name
+         Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-BAS03
+
+   ###  HSM  ###
+   # :param SUBHSM01: サブネットのデプロイ(HSM用 - AZ-a)
+   # :param SUBHSM02: サブネットのデプロイ(HSM用 - AZ-c)
+   # :param SUBHSM03: サブネットのデプロイ(HSM用 - AZ-d)
+  # SUBHSM01:
+  #   Type: 'AWS::EC2::Subnet'
+  #   Properties:
+  #     CidrBlock: !FindInMap [Subnetcidr,HSM,01]
+  #     AvailabilityZone: ap-northeast-1a
+  #     VpcId: !Ref VPCNW01
+  #     Tags:
+  #      - Key: Name
+  #        Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-HSM01
+  # SUBHSM02:
+  #   Type: 'AWS::EC2::Subnet'
+  #   Properties:
+  #     CidrBlock: !FindInMap [Subnetcidr,HSM,02]
+  #     AvailabilityZone: ap-northeast-1c
+  #     VpcId: !Ref VPCNW01
+  #     Tags:
+  #      - Key: Name
+  #        Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-HSM02
+  # SUBHSM03:
+  #   Type: 'AWS::EC2::Subnet'
+  #   Properties:
+  #     CidrBlock: !FindInMap [Subnetcidr,HSM,03]
+  #     AvailabilityZone: ap-northeast-1d
+  #     VpcId: !Ref VPCNW01
+  #     Tags:
+  #      - Key: Name
+  #        Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-HSM03
+
+  #  ###  Web Front  ###
+  #  :param SUBWFR01: サブネットのデプロイ(WebコンテナのALB用 - AZ-a)
+  #  :param SUBWFR02: サブネットのデプロイ(WebコンテナのALB用 - AZ-c)
+  #  :param SUBWFR03: サブネットのデプロイ(WebコンテナのALB用 - AZ-d)
+  SUBWFR01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,WFR,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-WFR01
+  SUBWFR02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,WFR,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-WFR02
+  SUBWFR03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,WFR,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-WFR03
+
+  #  ###  AP Front  ###
+  #  :param SUBAFR01: サブネットのデプロイ(apコンテナのNLB用 - AZ-a)
+  #  :param SUBAFR02: サブネットのデプロイ(apコンテナのNLB用 - AZ-c)
+  #  :param SUBAFR03: サブネットのデプロイ(apコンテナのNLB用 - AZ-d)
+  SUBAFR01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,AFR,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-AFR01
+  SUBAFR02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,AFR,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-AFR02
+  SUBAFR03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,AFR,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-AFR03
+
+  #  ###  Web/AP Server-container  ###
+  #  :param SUBWEB01: サブネットのデプロイ(web/apコンテナ用 - AZ-a)
+  #  :param SUBWEB02: サブネットのデプロイ(web/apコンテナ用 - AZ-c)
+  #  :param SUBWEB03: サブネットのデプロイ(web/apコンテナ用 - AZ-d)
+  SUBWEB01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,WEB,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-WEB01
+  SUBWEB02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,WEB,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-WEB02
+  SUBWEB03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,WEB,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-WEB03
+
+  #  ###  DB  ###
+  #  :param SUBDB01: サブネットのデプロイ(DB用 - AZ-a)
+  #  :param SUBDB02: サブネットのデプロイ(DB用 - AZ-c)
+  #  :param SUBDB03: サブネットのデプロイ(DB用 - AZ-d)
+  SUBDB01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,DB,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-RDS01
+  SUBDB02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,DB,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-RDS02
+  SUBDB03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,DB,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-RDS03
+
+  #  ###  Batch  ###
+  #  :param SUBBAT01: サブネットのデプロイ(Batchコンテナ用 - AZ-a)
+  #  :param SUBBAT02: サブネットのデプロイ(Batchコンテナ用 - AZ-c)
+  #  :param SUBBAT03: サブネットのデプロイ(Batchコンテナ用 - AZ-d)
+  #
+  SUBBAT01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,BAT,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-BAT01
+  SUBBAT02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,BAT,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-BAT02
+  SUBBAT03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,BAT,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-BAT03
+
+  #  ###  Operation  ###
+  #  :param SUBOPT01: サブネットのデプロイ(運用管理システム、他サーバ/サービス用 - AZ-a)
+  #  :param SUBOPT02: サブネットのデプロイ(運用管理システム、他サーバ/サービス用 - AZ-c)
+  #  :param SUBOPT03: サブネットのデプロイ(運用管理システム、他サーバ/サービス用 - AZ-d)
+  #
+  SUBOPT01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,OPT,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-OPT01
+  SUBOPT02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,OPT,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-OPT02
+  SUBOPT03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,OPT,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-OPT03
+
+  #  ###  Endpoint  ###
+  #  :param SUBENDP01: サブネットのデプロイ(エンドポイント用 - AZ-a)
+  #  :param SUBENDP02: サブネットのデプロイ(エンドポイント用 - AZ-c)
+  #  :param SUBENDP03: サブネットのデプロイ(エンドポイント用 - AZ-d)
+  SUBENDP01:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,ENDP,01]
+      AvailabilityZone: ap-northeast-1a
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-ENDP01
+  SUBENDP02:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,ENDP,02]
+      AvailabilityZone: ap-northeast-1c
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-ENDP02
+  SUBENDP03:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      CidrBlock: !FindInMap [Subnetcidr,ENDP,03]
+      AvailabilityZone: ap-northeast-1d
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SUB-${SystemNameUpper}-${EnvironmentNameUpper}-ENDP03
+
+  #  ##  InternetGW  ##
+  #  :param IGW: 保守環境VPCのインターネットGWをデプロイ
+  IGW:
+    Type: 'AWS::EC2::InternetGateway'
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub IGW-${SystemNameUpper}-${EnvironmentNameUpper}
+
+  #  ##  NAT GW  ##
+  #  :param NATGW01: NAT GWをデプロイ(AZ - a)
+  #  :param NATGW02: NAT GWをデプロイ(AZ - c)
+  #  :param NATGW03: NAT GWをデプロイ(AZ - d)
+  NATGW01:
+    Type: AWS::EC2::NatGateway
+    Properties: 
+      AllocationId: !GetAtt EIPforNATGW01.AllocationId
+      SubnetId: !Ref SUBNGW01
+      Tags: 
+        - Key: Name
+          Value: !Sub NGW-${SystemNameUpper}-${EnvironmentNameUpper}-01
+#  NATGW02:
+#     Type: AWS::EC2::NatGateway
+#     Properties: 
+#       AllocationId: !GetAtt EIPforNATGW02.AllocationId
+#       SubnetId: !Ref SUBNGW01
+#       Tags: 
+#         - Key: Name
+#           Value: !Sub NGW-${SystemNameUpper}-${EnvironmentNameUpper}-02
+#   NATGW03:
+#     Type: AWS::EC2::NatGateway
+#     Properties: 
+#       AllocationId: !GetAtt EIPforNATGW03.AllocationId
+#       SubnetId: !Ref SUBNGW01
+#       Tags: 
+#         - Key: Name
+#           Value: !Sub NGW-${SystemNameUpper}-${EnvironmentNameUpper}-03
+
+  #  ##  EIP for NAT Gateway  ##
+  #  :param EIPforNATGW01: NAT GW(AZ - a)用のEIPを払い出し
+  #  :param EIPforNATGW02: NAT GW(AZ - c)用のEIPを払い出し
+  #  :param EIPforNATGW03: NAT GW(AZ - d)用のEIPを払い出し
+  EIPforNATGW01:
+    Type: "AWS::EC2::EIP"
+    Properties:
+      Domain: vpc
+  # EIPforNATGW02:
+  #   Type: "AWS::EC2::EIP"
+  #   Properties:
+  #     Domain: vpc
+  # EIPforNATGW03:
+  #   Type: "AWS::EC2::EIP"
+  #   Properties:
+  #     Domain: vpc
+
+  #  ##  VPC Peering  ##
+  #  :param PCXCMN: 共通環境VPCとのピアリング設定
+  #
+#  PCXCMN:
+#   Type: 'AWS::EC2::VPCPeeringConnection'
+#    Properties:
+#      Tags:
+#        - Key: Name
+#          Value: PR-${SystemNameUpper}-${EnvironmentNameUpper}-CMN
+#      VpcId: !Ref VPCNW01
+#      PeerVpcId: !Ref PeeringVPC
+
+  #  ##  VPC TGW Attachment  ##
+  #  :param TGWATTACHVPC01: 保守環境VPCのサブネットとトランジットGWを関連付け
+  #
+#  TGWATTACHVPC01:
+#    Type: AWS::EC2::TransitGatewayAttachment
+#    Properties:
+#      SubnetIds:
+#        - !Ref SUBBAS01
+#        - !Ref SUBBAS02
+#        - !Ref SUBBAS03
+#      Tags: 
+#        - Key: Name
+#          Value: !Sub TGW-${SystemNameUpper}-${EnvironmentNameUpper}-ACH01
+#      TransitGatewayId: !Ref TGWid
+#      VpcId: !Ref VPCNW01
+
+  #  ##  NACL  ##
+  #  :param NWACL: 保守環境VPCのNACLを設定
+  #
+  NWACL:
+    Type: 'AWS::EC2::NetworkAcl'
+    Properties:
+      VpcId: !Ref VPCNW01
+
+  #  ##  RouteTable  ##
+  #  ###  Body - VPC  ###
+  #  :param RTBVPC01: 保守環境VPCのルートテーブルをデプロイ
+  #
+  RTBVPC01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}01
+
+  #  ###  Body - NGW  ###
+  #  :param RTBNGW01: NAT GW用サブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBNGW02: NAT GW用サブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBNGW03: NAT GW用サブネット(AZ - d)のルートテーブルをデプロイ
+  #
+  RTBNGW01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-NGW01
+  RTBNGW02:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-NGW02
+  RTBNGW03:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-NGW03
+
+# ##踏み台は第二保守では必要##
+  #  ###  Body - Bastion  ###
+  #  :param RTBBAS01: 踏み台サーバ用サブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBBAS02: 踏み台サーバ用サブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBBAS03: 踏み台サーバ用サブネット(AZ - d)のルートテーブルをデプロイ
+  RTBBAS01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+       - Key: Name
+         Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-BAS01
+  RTBBAS02:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+       - Key: Name
+         Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-BAS02
+  RTBBAS03:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+       - Key: Name
+         Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-BAS03
+
+# ##HSMは第二保守では不要##
+  #  ###  Body - HSM  ###
+  #  :param RTBHSM01: HSM用サブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBHSM02: HSM用サブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBHSM03: HSM用サブネット(AZ - d)のルートテーブルをデプロイ
+  #
+  # RTBHSM01:
+  #   Type: 'AWS::EC2::RouteTable'
+  #   Properties:
+  #     VpcId: !Ref VPCNW01
+  #     Tags:
+  #      - Key: Name
+  #        Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-HSM01
+  # RTBHSM02:
+  #   Type: 'AWS::EC2::RouteTable'
+  #   Properties:
+  #     VpcId: !Ref VPCNW01
+  #     Tags:
+  #      - Key: Name
+  #        Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-HSM02
+  # RTBHSM03:
+  #   Type: 'AWS::EC2::RouteTable'
+  #   Properties:
+  #     VpcId: !Ref VPCNW01
+  #     Tags:
+  #      - Key: Name
+  #        Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-HSM03
+
+  #  ###  Body - Web Front  ###
+  #  :param RTBWFR01: webコンテナのALB用サブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBWFR02: webコンテナのALB用サブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBWFR03: webコンテナのALB用サブネット(AZ - d)のルートテーブルをデプロイ
+  #
+  RTBWFR01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-WFR01
+  RTBWFR02:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-WFR02
+  RTBWFR03:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-WFR03
+
+  #  ###  Body - AP Front  ###
+  #  :param RTBAFR01: apコンテナのNLB用サブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBAFR02: apコンテナのNLB用サブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBAFR03: apコンテナのNLB用サブネット(AZ - d)のルートテーブルをデプロイ
+  #
+  RTBAFR01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-AFR01
+  RTBAFR02:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-AFR02
+  RTBAFR03:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-AFR03
+
+  #  ###  Body - Web/AP Server-Container  ###
+  #  :param RTBWEB01: web/apコンテナ用サブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBWEB02: web/apコンテナ用サブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBWEB03: web/apコンテナ用サブネット(AZ - d)のルートテーブルをデプロイ
+  #
+  RTBWEB01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-WEB01
+  RTBWEB02:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-WEB02
+  RTBWEB03:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-WEB03
+
+  #  ###  Body - DB  ###
+  #  :param RTBDB01: DB用サブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBDB02: DB用サブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBDB03: DB用サブネット(AZ - d)のルートテーブルをデプロイ
+  #
+  RTBDB01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-RDS01
+  RTBDB02:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-RDS02
+  RTBDB03:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-RDS03
+
+  #  ###  Body - Batch  ###
+  #  :param RTBBAT01: Batchコンテナ用サブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBBAT02: Batchコンテナ用サブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBBAT03: Batchコンテナ用サブネット(AZ - d)のルートテーブルをデプロイ
+  #
+  RTBBAT01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-BAT01
+  RTBBAT02:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-BAT02
+  RTBBAT03:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-BAT03
+
+  #  ###  Body - Operation  ###
+  #  :param RTBOPT01: 運用管理システム、他サーバ/サービス用のサブネット(AZ - a)のルートテーブルをデプロイ
+  #  :param RTBOPT02: 運用管理システム、他サーバ/サービス用のサブネット(AZ - c)のルートテーブルをデプロイ
+  #  :param RTBOPT03: 運用管理システム、他サーバ/サービス用のサブネット(AZ - d)のルートテーブルをデプロイ
+  #
+  RTBOPT01:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-OPT01
+  RTBOPT02:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-OPT02
+  RTBOPT03:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub RT-${SystemNameUpper}-${EnvironmentNameUpper}-OPT03
+
+  #  ###  Routing - NGW  ###
+  #  :param ROUTEfromNGWtoIGW01: NAT GW用サブネット(AZ - a)のルートテーブルにインターネットGW向けルート追加
+  #  :param ROUTEfromNGWtoIGW02: NAT GW用サブネット(AZ - c)のルートテーブルにインターネットGW向けルート追加
+  #  :param ROUTEfromNGWtoIGW03: NAT GW用サブネット(AZ - d)のルートテーブルにインターネットGW向けルート追加
+  #
+  ROUTEfromNGWtoIGW01:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBNGW01
+      GatewayId: !Ref IGW
+    DependsOn: VPCROUTE01
+  ROUTEfromNGWtoIGW02:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBNGW02
+      GatewayId: !Ref IGW
+    DependsOn: VPCROUTE01
+  ROUTEfromNGWtoIGW03:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBNGW03
+      GatewayId: !Ref IGW
+    DependsOn: VPCROUTE01
+
+  #  ###  ★Routing - Bastion  ###
+  #  :param ROUTEfromBAStoNGW01: 踏み台サーバ用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromBAStoCMN01: 踏み台サーバ用サブネット(AZ - a)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromBAStoTGW01: 踏み台サーバ用サブネット(AZ - a)のルートテーブルにトランジットGW向けルート追加
+  #  :param ROUTEfromBAStoNGW02: 踏み台サーバ用サブネット(AZ - c)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromBAStoCMN02: 踏み台サーバ用サブネット(AZ - c)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromBAStoTGW02: 踏み台サーバ用サブネット(AZ - c)のルートテーブルにトランジットGW向けルート追加
+  #  :param ROUTEfromBAStoNGW03: 踏み台サーバ用サブネット(AZ - d)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromBAStoCMN03: 踏み台サーバ用サブネット(AZ - d)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromBAStoTGW03: 踏み台サーバ用サブネット(AZ - d)のルートテーブルにトランジットGW向けルート追加
+  #
+  ROUTEfromBAStoNGW01:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBBAS01
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromBAStoCMN01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBBAS01
+#      VpcPeeringConnectionId: !Ref PCXCMN
+#  # 一時的な設定で、DirectConnect接続後は削除予定
+#  ROUTEfromBAStoTGW01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBBAS01
+#      TransitGatewayId : !Ref TGWid
+#
+  ROUTEfromBAStoNGW02:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBBAS02
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromBAStoCMN02:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBBAS02
+#      VpcPeeringConnectionId: !Ref PCXCMN
+#  # 一時的な設定で、DirectConnect接続後は削除予定
+#  ROUTEfromBAStoTGW02:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBBAS02
+#      TransitGatewayId : !Ref TGWid
+
+  ROUTEfromBAStoNGW03:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBBAS03
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromBAStoCMN03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBBAS03
+#      VpcPeeringConnectionId: !Ref PCXCMN
+#  # 一時的な設定で、DirectConnect接続後は削除予定
+#  ROUTEfromBAStoTGW03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBBAS03
+#      TransitGatewayId : !Ref TGWid
+
+# ##HSMは第二保守では不要##
+  #  ###  Routing - HSM  ###
+  #  :param ROUTEfromHSMtoNGW01: HSM用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromHSMtoNGW02: HSM用サブネット(AZ - c)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromHSMtoNGW03: HSM用サブネット(AZ - d)のルートテーブルにNAT GW向けルート追加
+  #
+  # ROUTEfromHSMtoNGW01:
+  #   Type: 'AWS::EC2::Route'
+  #   Properties:
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     RouteTableId: !Ref RTBHSM01
+  #     NatGatewayId: !Ref NATGW01
+  # ROUTEfromHSMtoNGW02:
+  #   Type: 'AWS::EC2::Route'
+  #   Properties:
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     RouteTableId: !Ref RTBHSM02
+  #     NatGatewayId: !Ref NATGW02
+  # ROUTEfromHSMtoNGW03:
+  #   Type: 'AWS::EC2::Route'
+  #   Properties:
+  #     DestinationCidrBlock: 0.0.0.0/0
+  #     RouteTableId: !Ref RTBHSM03
+  #     NatGatewayId: !Ref NATGW03
+#
+  #  ###  ★Routing - Web Front  ###
+  #  :param ROUTEfromWFRtoNGW01: webコンテナのALB用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromWFRtoTGW01: webコンテナのALB用サブネット(AZ - a)のルートテーブルにトランジットGW向けルート追加
+  #  :param ROUTEfromWFRtoNGW02: webコンテナのALB用サブネット(AZ - c)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromWFRtoTGW02: webコンテナのALB用サブネット(AZ - c)のルートテーブルにトランジットGW向けルート追加
+  #  :param ROUTEfromWFRtoNGW03: webコンテナのALB用サブネット(AZ - d)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromWFRtoTGW03: webコンテナのALB用サブネット(AZ - d)のルートテーブルにトランジットGW向けルート追加
+  #
+#  ROUTEfromWFRtoTGW01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBWFR01
+#      TransitGatewayId : !Ref TGWid
+
+#  ROUTEfromWFRtoTGW02:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBWFR02
+#      TransitGatewayId : !Ref TGWid
+
+#  ROUTEfromWFRtoTGW03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBWFR03
+#      TransitGatewayId : !Ref TGWid
+
+  #  ###  ★Routing - AP Front  ###
+  #  :param ROUTEfromAFRtoNGW01: apコンテナのNLB用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromAFRtoTGW01: apコンテナのNLB用サブネット(AZ - a)のルートテーブルにトランジットGW向けルート追加
+  #  :param ROUTEfromAFRtoNGW02: apコンテナのNLB用サブネット(AZ - c)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromAFRtoTGW02: apコンテナのNLB用サブネット(AZ - c)のルートテーブルにトランジットGW向けルート追加
+  #  :param ROUTEfromAFRtoNGW03: apコンテナのNLB用サブネット(AZ - d)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromAFRtoTGW03: apコンテナのNLB用サブネット(AZ - d)のルートテーブルにトランジットGW向けルート追加
+  #
+
+#  ROUTEfromAFRtoTGW01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBWFR01
+#      TransitGatewayId : !Ref TGWid
+
+#  ROUTEfromAFRtoTGW02:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBWFR02
+#      TransitGatewayId : !Ref TGWid
+
+#  ROUTEfromAFRtoTGW03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBWFR03
+#      TransitGatewayId : !Ref TGWid
+
+  #  ###  ★Routing - Web/AP Server-Container  ###
+  #  :param ROUTEfromWEBtoNGW01: web/apコンテナ用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromWEBtoCMN01: web/apコンテナ用サブネット(AZ - a)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromWEBtoNGW02: web/apコンテナ用サブネット(AZ - c)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromWEBtoCMN02: web/apコンテナ用サブネット(AZ - c)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromWEBtoNGW03: web/apコンテナ用サブネット(AZ - d)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromWEBtoCMN03: web/apコンテナ用サブネット(AZ - d)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #
+
+  ROUTEfromWEBtoNGW01:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBWEB01
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromWEBtoCMN01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBWEB01
+#      VpcPeeringConnectionId: !Ref PCXCMN
+
+  ROUTEfromWEBtoNGW02:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBWEB02
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromWEBtoCMN02:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBWEB02
+#      VpcPeeringConnectionId: !Ref PCXCMN
+
+  ROUTEfromWEBtoNGW03:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBWEB03
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromWEBtoCMN03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBWEB03
+#      VpcPeeringConnectionId: !Ref PCXCMN
+
+  #  ###  ★Routing - DB  ###
+  #  :param ROUTEfromDBtoNGW01: DB用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromDBtoNGW02: DB用サブネット(AZ - c)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromDBtoNGW03: DB用サブネット(AZ - d)のルートテーブルにNAT GW向けルート追加
+  #
+
+# ###以下は不要ルールと思われる###
+#  ROUTEfromDBtoNGW01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 0.0.0.0/0
+#      RouteTableId: !Ref RTBDB01
+#      NatGatewayId: !Ref NATGW01
+#
+#  ROUTEfromDBtoNGW02:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 0.0.0.0/0
+#      RouteTableId: !Ref RTBDB02
+#      NatGatewayId: !Ref NATGW02
+#
+#  ROUTEfromDBtoNGW03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 0.0.0.0/0
+#      RouteTableId: !Ref RTBDB03
+#      NatGatewayId: !Ref NATGW03
+#
+  #  ###  ★Routing - Batch  ###
+  #  :param ROUTEfromBATtoNGW01: Batchコンテナ用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromBATtoCMN01: Batchコンテナ用サブネット(AZ - a)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromBATtoNGW02: Batchコンテナ用サブネット(AZ - c)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromBATtoCMN02: Batchコンテナ用サブネット(AZ - c)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromBATtoNGW03: Batchコンテナ用サブネット(AZ - d)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromBATtoCMN03: Batchコンテナ用サブネット(AZ - d)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #
+  ROUTEfromBATtoNGW01:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBBAT01
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromBATtoCMN01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBBAT01
+#      VpcPeeringConnectionId: !Ref PCXCMN
+
+  ROUTEfromBATtoNGW02:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBBAT02
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromBATtoCMN02:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBBAT02
+#      VpcPeeringConnectionId: !Ref PCXCMN
+
+  ROUTEfromBATtoNGW03:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBBAT03
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromBATtoCMN03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBBAT03
+#      VpcPeeringConnectionId: !Ref PCXCMN
+
+  #  ###  ★Routing - Operation  ###
+  #  :param ROUTEfromOPTtoNGW01: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromOPTtoCMN01: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromOPTtoTGW01: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルにトランジットGW向けルート追加
+  #  :param ROUTEfromOPTtoNGW02: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromOPTtoCMN02: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromOPTtoTGW02: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルにトランジットGW向けルート追加
+  #  :param ROUTEfromOPTtoNGW03: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルにNAT GW向けルート追加
+  #  :param ROUTEfromOPTtoCMN03: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルに共通環境VPCのピアリング向けルート追加
+  #  :param ROUTEfromOPTtoTGW03: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)のルートテーブルにトランジットGW向けルート追加
+  #
+  ROUTEfromOPTtoNGW01:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBOPT01
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromOPTtoCMN01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBOPT01
+#      VpcPeeringConnectionId: !Ref PCXCMN
+#  ROUTEfromOPTtoTGW01:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBOPT01
+#      TransitGatewayId : !Ref TGWid
+
+  ROUTEfromOPTtoNGW02:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBOPT02
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromOPTtoCMN02:
+#   Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBOPT02
+#      VpcPeeringConnectionId: !Ref PCXCMN
+#  ROUTEfromOPTtoTGW02:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBOPT02
+#      TransitGatewayId : !Ref TGWid
+#
+
+  ROUTEfromOPTtoNGW03:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      RouteTableId: !Ref RTBOPT03
+      NatGatewayId: !Ref NATGW01
+#  ROUTEfromOPTtoCMN03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 10.108.16.0/20
+#      RouteTableId: !Ref RTBOPT03
+#      VpcPeeringConnectionId: !Ref PCXCMN
+#  ROUTEfromOPTtoTGW03:
+#    Type: 'AWS::EC2::Route'
+#    Properties:
+#      DestinationCidrBlock: 192.168.100.0/24
+#      RouteTableId: !Ref RTBOPT03
+#      TransitGatewayId : !Ref TGWid
+
+  #  ##  Attachment  ##
+  #  ### VPC Route ###
+  #  :param VPCROUTE01: 保守環境VPCのルートテーブルを関連付け
+  #
+  VPCROUTE01:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      VpcId: !Ref VPCNW01
+      InternetGatewayId: !Ref IGW
+
+  #  ### NGW subnet Route ###
+  #  :param SUBNETROUTEforNGW01: NAT GW用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforNGW02: NAT GW用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforNGW03: NAT GW用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  SUBNETROUTEforNGW01:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBNGW01
+      SubnetId: !Ref SUBNGW01
+  SUBNETROUTEforNGW02:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBNGW02
+      SubnetId: !Ref SUBNGW01
+  SUBNETROUTEforNGW03:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBNGW03
+      SubnetId: !Ref SUBNGW01
+
+
+# ##踏み台は第二保守では不要##
+  #  ### Bastion subnet Route ###
+  #  :param SUBNETROUTEforBAS01: 踏み台サーバ用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforBAS02: 踏み台サーバ用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforBAS03: 踏み台サーバ用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  SUBNETROUTEforBAS01:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBBAS01
+      SubnetId: !Ref SUBBAS01
+  SUBNETROUTEforBAS02:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBBAS02
+      SubnetId: !Ref SUBBAS02
+  SUBNETROUTEforBAS03:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBBAS03
+      SubnetId: !Ref SUBBAS03
+
+
+# ##HSMは第二保守では不要##
+  #  ### HSM subnet Route ###
+  #  :param SUBNETROUTEforHSM01: HSM用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforHSM02: HSM用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforHSM03: HSM用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  # SUBNETROUTEforHSM01:
+  #   Type: 'AWS::EC2::SubnetRouteTableAssociation'
+  #   Properties:
+  #     RouteTableId: !Ref RTBHSM01
+  #     SubnetId: !Ref SUBHSM01
+  # SUBNETROUTEforHSM02:
+  #   Type: 'AWS::EC2::SubnetRouteTableAssociation'
+  #   Properties:
+  #     RouteTableId: !Ref RTBHSM02
+  #     SubnetId: !Ref SUBHSM02
+  # SUBNETROUTEforHSM03:
+  #   Type: 'AWS::EC2::SubnetRouteTableAssociation'
+  #   Properties:
+  #     RouteTableId: !Ref RTBHSM03
+  #     SubnetId: !Ref SUBHSM03
+
+  #  ### Web Front subnet Route ###
+  #  :param SUBNETROUTEforWFR01: webコンテナのALB用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforWFR02: webコンテナのALB用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforWFR03: webコンテナのALB用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  SUBNETROUTEforWFR01:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBWFR01
+      SubnetId: !Ref SUBWFR01
+  SUBNETROUTEforWFR02:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBWFR02
+      SubnetId: !Ref SUBWFR02
+  SUBNETROUTEforWFR03:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBWFR03
+      SubnetId: !Ref SUBWFR03
+
+  #  ### AP Front subnet Route ###
+  #  :param SUBNETROUTEforAFR01: apコンテナのNLB用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforAFR02: apコンテナのNLB用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforAFR03: apコンテナのNLB用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  SUBNETROUTEforAFR01:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBAFR01
+      SubnetId: !Ref SUBAFR01
+  SUBNETROUTEforAFR02:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBAFR02
+      SubnetId: !Ref SUBAFR02
+  SUBNETROUTEforAFR03:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBAFR03
+      SubnetId: !Ref SUBAFR03
+
+  #  ### Web/AP Server-Container subnet Route ###
+  #  :param SUBNETROUTEforWEB01: web/apコンテナ用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforWEB02: web/apコンテナ用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforWEB03: web/apコンテナ用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  SUBNETROUTEforWEB01:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBWEB01
+      SubnetId: !Ref SUBWEB01
+  SUBNETROUTEforWEB02:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBWEB02
+      SubnetId: !Ref SUBWEB02
+  SUBNETROUTEforWEB03:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBWEB03
+      SubnetId: !Ref SUBWEB03
+
+  #  ### DB subnet Route ###
+  #  :param SUBNETROUTEforDB01: DB用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforDB02: DB用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforDB03: DB用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  SUBNETROUTEforDB01:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBDB01
+      SubnetId: !Ref SUBDB01
+  SUBNETROUTEforDB02:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBDB02
+      SubnetId: !Ref SUBDB02
+  SUBNETROUTEforDB03:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBDB03
+      SubnetId: !Ref SUBDB03
+
+  #  ### Batch subnet Route ###
+  #  :param SUBNETROUTEforBAT01: Batchコンテナ用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforBAT02: Batchコンテナ用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforBAT03: Batchコンテナ用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  SUBNETROUTEforBAT01:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBBAT01
+      SubnetId: !Ref SUBBAT01
+  SUBNETROUTEforBAT02:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBBAT02
+      SubnetId: !Ref SUBBAT02
+  SUBNETROUTEforBAT03:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBBAT03
+      SubnetId: !Ref SUBBAT03
+
+  #  ### Operation subnet Route ###
+  #  :param SUBNETROUTEforOPT01: 運用管理システム、他サーバ/サービス用サブネット(AZ - a)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforOPT02: 運用管理システム、他サーバ/サービス用サブネット(AZ - c)とルートテーブルを関連付け
+  #  :param SUBNETROUTEforOPT03: 運用管理システム、他サーバ/サービス用サブネット(AZ - d)とルートテーブルを関連付け
+  #
+  SUBNETROUTEforOPT01:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBOPT01
+      SubnetId: !Ref SUBOPT01
+  SUBNETROUTEforOPT02:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBOPT02
+      SubnetId: !Ref SUBOPT02
+  SUBNETROUTEforOPT03:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      RouteTableId: !Ref RTBOPT03
+      SubnetId: !Ref SUBOPT03
+
+  #  ### ENDP-ECR-API01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpEcrApi01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECR-API01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECR-API01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECR-API01
+        
+  #  ### ENDP-ECR-DKR01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpEcrDkr01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECR-DKR01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECR-DKR01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECR-DKR01      
+
+  #  ### ENDP-ECR-LOGS01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpLogs01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-LOGS01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-LOGS01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-LOGS01  
+
+  #  ### ENDP-SNS01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpSns01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-SNS01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-SNS01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-SNS01
+
+  #  ### ENDP-API01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpApi01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-API01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-API01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-API01
+
+  #  ### ENDP-ECS-AGENT01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpEcsAgent01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS-AGENT01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS-AGENT01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS-AGENT01
+
+  #  ### ENDP-ECS-TELEMETRY01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpEcsTelemetry01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS-TELEMETRY01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS-TELEMETRY01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS-TELEMETRY01
+
+  #  ### ENDP-ECS01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpEcs01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-ECS01
+
+  #  ### ENDP-SSM01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpSsm01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-SSM01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-SSM01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-SSM01
+
+  #  ### ENDP-EC2MESSAGES01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpEC2Messages01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-EC2MESSAGES01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-EC2MESSAGES01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-EC2MESSAGES01
+
+  #  ### ENDP-EC201 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpEC201:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-EC201
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-EC201
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-EC201
+
+  #  ### ENDP-CLOUDTRAIL01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpCloudtrail01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-CLOUDTRAIL01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-CLOUDTRAIL01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-CLOUDTRAIL01
+
+  #  ### ENDP-MONITORING01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpMonitoring01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-MONITORING01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-MONITORING01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-MONITORING01
+
+  #  ### ENDP-LMD01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpLmd01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-LMD01
+      GroupName: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-LMD01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ENDP-${SystemNameUpper}-${EnvironmentNameUpper2}-LMD01
+  #  ### ALB-WEB01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforAlbBWEB01A:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-A
+      GroupName: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-A
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-A
+        
+  #  ### ALB-WSPRXY01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforAlbWSPRXY01A:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-A
+      GroupName: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-A
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-A    
+
+  #  ### ALB-WSPRXYCVPN01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforAlbWSPRXYCVPN01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXYCVPN01
+      GroupName: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXYCVPN01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXYCVPN01  
+
+  #  ### ALB-BAT01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforAlbBAT01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-BAT01
+      GroupName: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-BAT01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-BAT01
+
+  #  ### EC2-BAS01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEC2BAS01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub EC2-${SystemNameUpper}-${EnvironmentNameUpper2}-BAS01
+      GroupName: !Sub SG-EC2-${SystemNameUpper}-${EnvironmentNameUpper2}-BAS01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-EC2-${SystemNameUpper}-${EnvironmentNameUpper2}-BAS01
+
+  #  ### ECS-BAT01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforECSBAT01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ECS-${SystemNameUpper}-${EnvironmentNameUpper2}-BAT01
+      GroupName: !Sub SG-ECS-${SystemNameUpper}-${EnvironmentNameUpper2}-BAT01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ECS-${SystemNameUpper}-${EnvironmentNameUpper2}-BAT01
+
+  #  ### ECS-WEB01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforECSWEB01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ECS-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01
+      GroupName: !Sub SG-ECS-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ECS-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01
+
+  #  ### HSM-HSM01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  # SGforHSM01:
+  #   Type: 'AWS::EC2::SecurityGroup'
+  #   Properties:
+  #     GroupDescription: 'Security group for CloudHSM cluster'
+  #     GroupName: !Sub SG-HSM-${SystemNameUpper}-${EnvironmentNameUpper2}-HSM01
+  #     VpcId: !Ref VPCNW01
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub SG-HSM-${SystemNameUpper}-${EnvironmentNameUpper2}-HSM01
+
+  #  ### RDS-QSH01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforRDSQSH01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub RDS-${SystemNameUpper}-${EnvironmentNameUpper2}-QSH01
+      GroupName: !Sub SG-RDS-${SystemNameUpper}-${EnvironmentNameUpper2}-QSH01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-RDS-${SystemNameUpper}-${EnvironmentNameUpper2}-QSH01
+
+  #  ### RDS-LOG01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforRDSLOG01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub RDS-${SystemNameUpper}-${EnvironmentNameUpper2}-LOG01
+      GroupName: !Sub SG-RDS-${SystemNameUpper}-${EnvironmentNameUpper2}-LOG01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-RDS-${SystemNameUpper}-${EnvironmentNameUpper2}-LOG01
+
+  #  ### R53-DNS01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforR53DNS01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub R53-${SystemNameUpper}-${EnvironmentNameUpper2}-DNS01
+      GroupName: !Sub SG-R53-${SystemNameUpper}-${EnvironmentNameUpper2}-DNS01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-R53-${SystemNameUpper}-${EnvironmentNameUpper2}-DNS01
+
+  #  ### ELK-ES01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforELKES01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub ELK-${SystemNameUpper}-${EnvironmentNameUpper2}-ES01
+      GroupName: !Sub SG-ELK-${SystemNameUpper}-${EnvironmentNameUpper2}-ES01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-ELK-${SystemNameUpper}-${EnvironmentNameUpper2}-ES01
+
+  #  ### LMD-CWLtoELK01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforLMDCWLtoELK01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub LMD-${SystemNameUpper}-${EnvironmentNameUpper2}-CWLtoELK01
+      GroupName: !Sub SG-LMD-${SystemNameUpper}-${EnvironmentNameUpper2}-CWLtoELK01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-LMD-${SystemNameUpper}-${EnvironmentNameUpper2}-CWLtoELK01
+
+  #  ### EC2-DSA01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEC2DSA01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub EC2-${SystemNameUpper}-${EnvironmentNameUpper2}-DSA01
+      GroupName: !Sub SG-EC2-${SystemNameUpper}-${EnvironmentNameUpper2}-DSA01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-EC2-${SystemNameUpper}-${EnvironmentNameUpper2}-DSA01
+
+  #  ### BJ-RDSDMP01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforBJRDSDMP01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub BJ-${SystemNameUpper}-${EnvironmentNameUpper2}-RDSDMP01
+      GroupName: !Sub SG-BJ-${SystemNameUpper}-${EnvironmentNameUpper2}-RDSDMP01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-BJ-${SystemNameUpper}-${EnvironmentNameUpper2}-RDSDMP01
+
+  #  ### CB-BUILD01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpBUILD01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub CB-${SystemNameUpper}-${EnvironmentNameUpper2}-BUILD01
+      GroupName: !Sub SG-CB-${SystemNameUpper}-${EnvironmentNameUpper2}-BUILD01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-CB-${SystemNameUpper}-${EnvironmentNameUpper2}-BUILD01
+
+  #  ### LMD-ELKSNAPSHOT01 SecurityGroup ###
+  #  デフォルトルールにて作成
+  #
+  SGforEndpLmdELK01:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: !Sub LMD-${SystemNameUpper}-${EnvironmentNameUpper2}-ELKSNAPSHOT01
+      GroupName: !Sub SG-LMD-${SystemNameUpper}-${EnvironmentNameUpper2}-ELKSNAPSHOT01
+      VpcId: !Ref VPCNW01
+      Tags:
+        - Key: Name
+          Value: !Sub SG-LMD-${SystemNameUpper}-${EnvironmentNameUpper2}-ELKSNAPSHOT01
+
+  #  ### ecr.api VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  ecrapiVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.ecr.api'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpEcrApi01
+
+  #  ### ecr.dkr VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  ecrdkrVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.ecr.dkr'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpEcrDkr01
+
+  #  ### logs VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  logsVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.logs'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpLogs01
+
+  #  ### SNS VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  snsVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.sns'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpSns01
+
+  #  ### execute-api VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  executeapiVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.execute-api'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpApi01
+
+  #  ### ecs-agent VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  ecsagentVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.ecs-telemetry'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpEcsTelemetry01
+
+  #  ### ecs VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  ecsVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.ecs'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpEcs01
+
+  #  ### ssm VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  ssmVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.ssm'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpSsm01
+
+  #  ### ec2messages VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  ec2messagesVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.ec2messages'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpEC2Messages01
+
+  #  ### ec2 VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  ec2VPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.ec2'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpEC201
+
+  #  ### cloudtrail VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  cloudtrailVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.ec2'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpCloudtrail01
+
+  #  ### monitoring VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  monitoringVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.monitoring'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpMonitoring01
+
+  #  ### lambda VPCENDPOINT ###
+  #  ポリシーデフォルトルールにて作成
+  #
+  lambdaVPCENDPOINT:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      VpcEndpointType: Interface
+      ServiceName: 'com.amazonaws.ap-northeast-1.lambda'
+      VpcId: !Ref VPCNW01
+      SubnetIds: 
+      - !Ref SUBENDP01
+      - !Ref SUBENDP02
+      - !Ref SUBENDP03
+      SecurityGroupIds: 
+      - !Ref SGforEndpLmd01
+
+  #  ### S3 GatewayEndpoint ###
+  #  ポリシーデフォルトルールにて作成
+  S3GatewayEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: 'com.amazonaws.ap-northeast-1.s3'
+      VpcId: !Ref VPCNW01
+      RouteTableIds:
+       - !Ref RTBBAS01
+       - !Ref RTBBAS02
+       - !Ref RTBBAS03
+       - !Ref RTBBAT01
+       - !Ref RTBBAT02
+       - !Ref RTBBAT03
+       - !Ref RTBWEB01
+       - !Ref RTBWEB02
+       - !Ref RTBWEB03
+       - !Ref RTBOPT01
+       - !Ref RTBOPT02
+       - !Ref RTBOPT03
+
+  #  ### DynamoDB GatewayEndpoint ###
+  #  ポリシーデフォルトルールにて作成
+  DynamoDBGatewayEndpoint:
+    Type: 'AWS::EC2::VPCEndpoint'
+    Properties:
+      ServiceName: 'com.amazonaws.ap-northeast-1.dynamodb'
+      VpcId: !Ref VPCNW01
+      RouteTableIds:
+       - !Ref RTBBAT01
+       - !Ref RTBBAT02
+       - !Ref RTBBAT03
+       - !Ref RTBWEB01
+       - !Ref RTBWEB02
+       - !Ref RTBWEB03
+
+
+  #  ### NLB 001 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB001A:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-001-A
+      Scheme: internal
+      Type: network
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: 'access_logs.s3.enabled'
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-001-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 002 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB002A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-002-A
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-002-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 003 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB003A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-003-A
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-003-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+
+  #  ### NLB 004 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB004A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-004-A
+      Scheme: internal
+      Type: network
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-004-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 005 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB005A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-005-A
+      Scheme: internal
+      Type: network
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-005-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 006 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB006A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-006-A
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-006-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 007 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB007A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-007-A
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-007-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 008 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB008A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-008-A
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-008-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 009 ###
+  #  リスナー、ターゲットグループはパイプライン作成スタックにて個別作成
+  NLB009A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-009-A
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !Ref SUBAFR01
+        - !Ref SUBAFR02
+        - !Ref SUBAFR03
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-009-A
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### ALB WEB01 ###
+  ALBWEB01A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-A
+      Scheme: internal
+      Type: application
+      Subnets:
+       - !Ref SUBAFR01
+       - !Ref SUBAFR02
+       - !Ref SUBAFR03
+      SecurityGroups:
+       - !Ref SGforAlbBWEB01A
+      IpAddressType: ipv4
+      LoadBalancerAttributes:
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-A
+       - Key: idle_timeout.timeout_seconds
+         Value: 70
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: routing.http2.enabled
+         Value: true
+       - Key: routing.http.drop_invalid_header_fields.enabled
+         Value: false
+       - Key: routing.http.xff_client_port.enabled
+         Value: false
+       - Key: routing.http.preserve_host_header.enabled
+         Value: false
+       - Key: routing.http.xff_header_processing.mode
+         Value: append
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+       - Key: routing.http.desync_mitigation_mode
+         Value: defensive
+       - Key: waf.fail_open.enabled
+         Value: false
+       - Key: routing.http.x_amzn_tls_version_and_cipher_suite.enabled
+         Value: false
+  #  ### ALB WSPRXY01 ###
+  ALBWSPRXY01A:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-A
+      Scheme: internal
+      Type: application
+      Subnets:
+       - !Ref SUBWFR01
+       - !Ref SUBWFR02
+       - !Ref SUBWFR03
+      SecurityGroups:
+       - !Ref SGforAlbWSPRXY01A
+      IpAddressType: ipv4
+      LoadBalancerAttributes:
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-A
+       - Key: idle_timeout.timeout_seconds
+         Value: 62
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: routing.http2.enabled
+         Value: true
+       - Key: routing.http.drop_invalid_header_fields.enabled
+         Value: false
+       - Key: routing.http.xff_client_port.enabled
+         Value: false
+       - Key: routing.http.preserve_host_header.enabled
+         Value: false
+       - Key: routing.http.xff_header_processing.mode
+         Value: append
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+       - Key: routing.http.desync_mitigation_mode
+         Value: defensive
+       - Key: waf.fail_open.enabled
+         Value: false
+       - Key: routing.http.x_amzn_tls_version_and_cipher_suite.enabled
+         Value: false

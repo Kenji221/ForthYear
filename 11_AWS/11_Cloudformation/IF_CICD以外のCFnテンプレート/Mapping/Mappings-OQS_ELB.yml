@@ -1,0 +1,10 @@
+Mappings:
+  OQS:
+    MT2:
+      VPCID: "vpc-05a92eb3a01283e6d"
+      SUBAFR01: "subnet-06c81ec46d9bf156c"
+      SUBAFR02: "subnet-0aae3031c0de62b17"
+      SUBAFR03: "subnet-06978c5edfcc6b671"
+      SUBWFR01: "subnet-098a5bf5b9685e7bf"
+      SUBWFR02: "subnet-023f638e2dffe3b20"
+      SUBWFR03: "subnet-0eba2c3be5494327b"

@@ -1,0 +1,157 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-MNT-IAM_202211.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Network
+# Version: 1.0
+# Author: Fujitsu - ichikawa
+############################
+AWSTemplateFormatVersion: 2010-09-09
+
+# Transform:
+#   Name: 'AWS::Include'
+#   Parameters:
+#     Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  SystemNameUpper:
+    Type: String
+    Default: 'example: YZK'
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'example: MT2'
+
+Resources:
+  # :param :全て拒否ルールにて作成
+  # ### IAMR MT2-APContainerAction IAM Role ###
+  IAMRMT2APContainerAction:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-Cognito
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  # ### IAMR APContainerAction-MSA4101 IAM Role ###
+  IAMRMT2APContainerActionMSA41401:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-MSA41401-A
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-MSA41401-A
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-Cognito
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-S3Put
+#  # ### IAMR APContainerAction-MSA41402 IAM Role ###
+  IAMRMT2APContainerActionMSA41402:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-MSA41402-A
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB-MSA41402-A
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-Cognito
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  # ### IAMR MT2-AWSBAT-BatJob IAM Role ###
+  IAMRMT2AWSBATBatJob:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob-Temp
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob
+  # ### IAMR MT2-GLUEJOB IAM Role ###
+  IAMRMT2GLUEJOB:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-GLUEJOB
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - glue.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-GlueJob
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Glue-KMSDecrypt
+  # ### IAMR MT2-S3-ObjectCheck IAM Role ###
+  IAMRMT2S3ObjectCheck:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-S3-ObjectCheck
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-IRK-${EnvironmentNameUpper}-AWSLambdaENIManagementAccess
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-IRK-${EnvironmentNameUpper}-AWSLambdaBasicExecution
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-S3-ObjectCheck
+  # ### IAMR MT2-SFRunningCheck IAM Role ###
+  IAMRMT2SFRunningCheck:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-SFRunningCheck
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-IRK-${EnvironmentNameUpper}-AWSLambdaBasicExecution
+        - !Sub arn:aws:iam::${AWS::AccountId}:policy/IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-SFRunningCheck
+
+  # ### BAT InstanceProfile ### 
+  # BATInstanceProfile: 
+  #   Type: "AWS::IAM::InstanceProfile"
+  #   Properties: 
+  #     Roles: 
+  #       - !Ref IAMRABAT

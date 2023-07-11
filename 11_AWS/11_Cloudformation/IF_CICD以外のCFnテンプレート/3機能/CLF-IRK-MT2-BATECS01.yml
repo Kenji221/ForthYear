@@ -1,0 +1,295 @@
+#############################################################
+# Copyright 2020 FUJITSU LIMITED
+# FileName: CLF-XXX-XXX-BATECS.txt
+# FileType: txt
+# OverViews: CloudFormation Template for 3DB BAT ECS
+# Version: 1.0
+# Author: konishi
+#############################################################
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+
+  Systemname:
+    Type: String
+    Description: Specify the system to deploy
+    Default: 'IRK'
+    AllowedValues: ['TKK','IRK','YZK']
+  Environment:
+    Type: String
+    Description: Specify the environment to deploy
+    Default: 'MT2'
+    AllowedValues: ['DEV','STG','MT1','MT2','PRO']
+  VpcId:
+    Type: String
+    Description: Select a VPC that allows instances access to the Internet
+    Default: 'vpc-01313a6bdc4461f57'
+  ClusterType:
+    Type: String
+    Description: ECS Cluster Type
+    Default: 'BAT'
+    AllowedValues: ['WEB','BAT']
+  Number:
+    Type: String
+    Description: ECS Cluster Suffix Number
+    Default: '01'
+    AllowedValues: ['01','02','03','04','05']
+  KeyName:
+    Type: String
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the ECS instances
+    Default: key-or-mt1
+  SubnetId:
+    Type: CommaDelimitedList
+    Description: Select at two subnets in your selected VPC
+    Default: 'example:subnet-088f31ba8073a8383,subnet-02f295fb862cb6b61,subnet-0f8c5d606cf72a398'
+  SecurityGroup:
+    Type: String
+    Description: SecurityGroup id for the ECS instances
+    Default: 'example:sg-01d21dfd96caa7ef3'
+  DesiredCapacity:
+    Type: Number
+    Default: '1'
+    Description: Number of instances to launch in your ECS cluster.
+  MinSize:
+    Type: Number
+    Default: '1'
+    Description: Minimum number of instances that can be launched in your ECS cluster.
+  MaxSize:
+    Type: Number
+    Default: '2'
+    Description: Maximum number of instances that can be launched in your ECS cluster.
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: r5.xlarge
+    ConstraintDescription: Please choose a valid instance type.
+  AWSRegionToAMI:
+    Description: EC2 instance AMI Image
+    Type: String
+    Default: 'example:ami-0aff8a2cca2fdcc26'
+  AWSaccountID:
+    Type: String
+    Description: you need  provisioned IAM policy for AWSaccountID IAMP-[Systemname]-[Environment]-[ClusterType]ECS.
+    Default: '457550092927'
+  EbsVolumeSize:
+    Type: Number
+    Description: >
+      Optional - Specifies the Size in GBs, of the newly created Amazon
+      Elastic Block Store (Amazon EBS) volume
+    Default: '100'
+  EbsVolumeType:
+    Type: String
+    Description: Optional - Specifies the Type of (Amazon EBS) volume
+    Default: 'gp2'
+    AllowedValues:
+      - ''
+      - standard
+      - io1
+      - gp2
+      - sc1
+      - st1
+    ConstraintDescription: Must be a valid EC2 volume type.
+  DeviceName:
+    Type: String
+    Default: '/dev/xvda'
+    Description: Optional - Specifies the device mapping for the Volume
+  MinInstancesInService:
+    Type: Number
+    Default: '1'
+    Description: Minimum number of instances that should be running during updating in your ECS cluster.
+
+Resources:
+  #  ##  ECS  ##
+  #  :param : ECSCluster: ECS Cluster
+  #  :param : ECSAutoScalingGroup: EC2 AutoScaling Group
+  #  :param : ContainerInstances : EC2 AutoScaling LaunchConfiguration
+  #  :param : EC2Role: WEB ECS IAMRole
+  #  :param : AutoscalingRole
+  #  :param : EC2InstanceProfile
+  # 
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub ECS-${Systemname}-${Environment}-${ClusterType}${Number}
+      Tags:
+        -
+          Key: AutoOperate
+          Value: !Sub ${ClusterType}-${Environment}
+        -
+          Key: BillingGroup
+          Value: !Sub ${Systemname}-MT1
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier: !Ref SubnetId
+      LaunchConfigurationName: !Ref ContainerInstances
+      HealthCheckGracePeriod: 300 
+      MinSize: !Ref MinSize
+      MaxSize: !Ref MaxSize
+      DesiredCapacity: !Ref DesiredCapacity
+      TerminationPolicies: 
+        - NewestInstance
+      Tags:
+        -
+          Key: Name
+          Value: !Sub EC2-${Systemname}-${Environment}-${ClusterType}ECS${Number}
+          PropagateAtLaunch: 'true'
+        -
+          Key: AutoOperate
+          Value: !Sub ${ClusterType}-${Environment}
+          PropagateAtLaunch: 'true'
+        -
+          Key: BillingGroup
+          Value: !Sub ${Systemname}-MT1
+          PropagateAtLaunch: 'true'
+    UpdatePolicy:
+#      AutoScalingReplacingUpdate:
+#        WillReplace: 'true'
+      AutoScalingRollingUpdate:
+        MinInstancesInService: !Ref MinInstancesInService
+        PauseTime: PT10M
+  ContainerInstances:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref AWSRegionToAMI
+      SecurityGroups: [!Ref SecurityGroup]
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      KeyName: !Ref KeyName
+      BlockDeviceMappings:
+      - DeviceName: !Ref DeviceName
+        Ebs:
+         VolumeSize: !Ref EbsVolumeSize
+         VolumeType: !Ref EbsVolumeType
+#USERDATA area#################################################################################################################################
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          hostnamectl set-hostname ecs-irk-mt2-bat01
+
+          yum install aws-cli -y
+          yum install wget -y
+          wget https://s3.ap-northeast-1.amazonaws.com/amazoncloudwatch-agent-ap-northeast-1/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+          rpm -U ./amazon-cloudwatch-agent.rpm
+          sleep 15
+          aws s3 cp s3://s3-irk-mt2-ecs-userdata-file01/bat_amazon-cloudwatch-agent.json /tmp/amazon-cloudwatch-agent.json
+          cp /tmp/amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/
+          /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+
+          mkdir -p /mnt/tkk/shaho
+          mkdir -p /mnt/tkk/onshikaku
+
+          # mount -t efs -o tls,accesspoint=fsap-0677d91a0736cae9f fs-8801e0a8:/ /mnt/tkk/shaho
+          # mount -t efs -o tls,accesspoint=fsap-05eea728e51f53722 fs-8801e0a8:/ /mnt/tkk/onshikaku
+
+          sleep 10
+
+          echo ECS_CLUSTER=ECS-${Systemname}-${Environment}-${ClusterType}${Number} >> /etc/ecs/ecs.config
+          echo ECS_IMAGE_PULL_BEHAVIOR=always >> /etc/ecs/ecs.config
+          yum install -y aws-cfn-bootstrap
+          
+          ACTIVATIONURL='dsm://10.108.17.11:4120/'
+          MANAGERURL='https://10.108.17.11:4119'
+          CURLOPTIONS='--silent --tlsv1.2'
+          linuxPlatform='';
+          agentVersion='20.0.0.1681';
+          isRPM='';
+          curl $MANAGERURL/software/deploymentscript/platform/linuxdetectscriptv1/ -o /tmp/PlatformDetection $CURLOPTIONS --insecure
+          . /tmp/PlatformDetection
+          platform_detect
+          echo Downloading agent package...
+          package='agent.rpm'
+          curl $MANAGERURL/software/agent/$linuxPlatform/$agentVersion -o /tmp/$package $CURLOPTIONS --insecure
+          echo Installing agent package...
+          rpm -ihv /tmp/agent.rpm
+          sleep 15
+          /opt/ds_agent/dsa_control -r
+          /opt/ds_agent/dsa_control -a $ACTIVATIONURL "policyid:20"
+          ################################################################################################################################################
+          #EFS Failover setting
+          #sudo useradd -G wheel efs-user01
+          #echo "efs-user01 ALL=NOPASSWD: ALL" | sudo tee -a /etc/sudoers
+          #aws s3 cp s3://s3-irk-mnt-ecs-userdata-file01/EFS/EFSMountCheck.sh /home/efs-user01
+          #aws s3 cp s3://s3-irk-mnt-ecs-userdata-file01/EFS/EFSMountChange.sh /home/efs-user01
+          #aws s3 cp s3://s3-irk-mnt-ecs-userdata-file01/EFS/EFSMount_3db_MNT.env /home/efs-user01
+          #aws s3 cp s3://s3-irk-mnt-ecs-userdata-file01/EFS/EFSLogLifecycle.sh /home/efs-user01
+          #sudo mkdir -p /var/log/efs_mount_check/tkk/shaho/
+          #sudo mkdir -p /var/log/efs_mount_check/tkk/onshikaku/
+          #sudo chown efs-user01.efs-user01 /home/efs-user01/EFSMountCheck.sh
+          #sudo chown efs-user01.efs-user01 /home/efs-user01/EFSMountChange.sh
+          #sudo chown efs-user01.efs-user01 /home/efs-user01/EFSMount_3db_MNT.env
+          #sudo chown efs-user01.efs-user01 /home/efs-user01/EFSLogLifecycle.sh
+          #echo '*/1 * * * * efs-user01 sudo sh /home/efs-user01/EFSMountCheck.sh "/tkk/shaho" | sudo tee -a /var/log/efs_mount_check/tkk/shaho/$(date +\%y\%m\%d).log' | sudo tee -a /etc/crontab
+          #sleep 5
+          #echo '*/1 * * * * efs-user01 sudo sh /home/efs-user01/EFSMountCheck.sh "/tkk/onshikaku" | sudo tee -a /var/log/efs_mount_check/tkk/onshikaku/$(date +\%y\%m\%d).log' | sudo tee -a /etc/crontab
+          #echo '* * */1 * * efs-user01 sudo sh /home/efs-user01/EFSLogLifecycle.sh "/tkk/shaho"' | sudo tee -a /etc/crontab
+          #echo '* * */1 * * efs-user01 sudo sh /home/efs-user01/EFSLogLifecycle.sh "/tkk/onshikaku"' | sudo tee -a /etc/crontab
+          ################################################################################################################################################
+
+
+################################################################################################################################################
+#ECSInstanceScalingPolicy
+  ECSInstanceScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties: 
+      AutoScalingGroupName: !Ref ECSAutoScalingGroup 
+      EstimatedInstanceWarmup: 300
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration: #TargetTrackingScaling
+        DisableScaleIn: false
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 90  
+
+ 
+  # EC2Role:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Statement:
+  #       - Effect: Allow
+  #         Principal:
+  #           Service: [ec2.amazonaws.com]
+  #         Action: ['sts:AssumeRole']
+  #     Description: "Allows ECS-IRK-MT2-BAT instance to call AWS services on your behalf."
+  #     ManagedPolicyArns: 
+  #       - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+  #       - !Sub arn:aws:iam::${AWSaccountID}:policy/IAMP-${Systemname}-${Environment}-DynamoDBOperation
+  #       - !Sub arn:aws:iam::${AWSaccountID}:policy/IAMP-${Systemname}-${Environment}-ECS
+  #     Path: /
+  #     RoleName: !Sub IAMR-${Systemname}-${Environment}-${ClusterType}
+
+  AutoscalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [application-autoscaling.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: !Sub IAMP-${Systemname}-${Environment}-service-autoscaling
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action: ['application-autoscaling:*', 'cloudwatch:DescribeAlarms', 'cloudwatch:PutMetricAlarm',
+              'ecs:DescribeServices', 'ecs:UpdateService']
+            Resource: '*'
+
+  # ASGTerminateHook:
+  #   Type: "AWS::AutoScaling::LifecycleHook"
+  #   Properties:
+  #     AutoScalingGroupName: !Ref ECSAutoScalingGroup
+  #     DefaultResult: "ABANDON"
+  #     HeartbeatTimeout: "900"
+  #     LifecycleTransition: "autoscaling:EC2_INSTANCE_TERMINATING"
+  #     NotificationTargetARN: !Sub arn:aws:sns:ap-northeast-1:${AWSaccountID}:SNS-${Systemname}-${Environment}-ASGLifeCycleHook01
+  #     RoleARN: !Sub arn:aws:iam::${AWSaccountID}:role/IAMR-${Systemname}-${Environment}-ASGLifeCycleHook
+  #     NotificationMetadata: !Sub ECS-${Systemname}-${Environment}-${ClusterType}${Number}
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: ['IAMR-IRK-MT2-BAT']

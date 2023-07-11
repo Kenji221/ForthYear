@@ -1,0 +1,107 @@
+AWSTemplateFormatVersion: "2010-09-09"
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-MNT-AWSBatch.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT AWS Batch
+# Version: 1.0
+# Author: Fujitsu - tokuzumi
+############################
+
+Transform:
+  Name: 'AWS::Include'
+  Parameters:
+    Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  #  ## user form  ##
+  #  :param SystemNameUpper: システム名称(大文字)
+  #  :param EnvironmentNameUpper2: 環境名(mntやmt2)
+  #  :param ComputeEnvironmentNumber: AWS Batchの号機
+  #  :param MaxvCpus: AWS Batchの最大vCPU数
+  #  :param InstanceTypes: AWS Batchのインスタンスタイプ(csv形式で指定)
+  #  :param VolumeSize: AWS BatchのEBSボリュームのサイズ
+  #  :param UserData: AWS Batchのユーザデータ
+  #  ## user form  ##
+
+  MappingFilePATH:
+    Type: String
+    Default: 'example: s3://'
+  SystemNameUpper:
+    Type: String
+    Description: 'example: OQS'
+  EnvironmentNameUpper2:
+    Type: String
+    Description: 'example: MT2'
+  EnvironmentNameLower2:
+    Type: String
+    Description: 'example: mt2'
+  ComputeEnvironmentNumber:
+    Type: String
+    Description: 'example: 01'
+  MaxvCpus:
+    Type: Number
+    Description: 'example: 16'
+  InstanceTypes:
+    Type: CommaDelimitedList
+    Description: 'example: r5.large,r5.xlarge'
+  ImageId:
+    Type: String
+    Description: 'example: ami-xxxxxx or -'
+  VolumeSize:
+    Type: Number
+    Description: 'example: 100'
+  UserData:
+    Type: String
+    Description: '- or base64-encoded text'
+
+
+Conditions:
+  #  ## user form  ##
+  #  :Condition isBKjobCompute: AWS Batchが１号機(RDSのバックアップ用)かどうか
+  #  :Condition UsedManagedAMI: ユーザ管理AMIを使用するか
+  #  :Condition UsedUserData: ユーザデータを使用するか
+  #  :Condition isDev: 開発環境かどうか
+  #  ## user form  ##    
+
+    isBKjobCompute: !Equals [ !Ref ComputeEnvironmentNumber , "01" ]
+    UsedManagedAMI: !Not [ !Equals [ !Ref ImageId , "-" ] ]
+    UsedUserData: !Not [ !Equals [ !Ref UserData , "-" ] ]
+    isDev: !Equals [ !Ref EnvironmentNameUpper2 , "DEV"]
+
+Resources:   
+    BatchComputeEnvironment:
+        Type: "AWS::Batch::ComputeEnvironment"
+        DependsOn: EC2LaunchTemplate
+        Properties:
+            ComputeEnvironmentName: !Sub "BJ-${SystemNameUpper}-${EnvironmentNameUpper2}-VM-XXXBK01"
+            Type: "MANAGED"
+            State: "ENABLED"
+            ServiceRole: !Sub "arn:aws:iam::${AWS::AccountId}:role/service-role/AWSBatchServiceRole"
+            ComputeResources: 
+              Type: "EC2"
+              MinvCpus: 0
+              MaxvCpus: !Ref MaxvCpus
+              DesiredvCpus: 0
+              InstanceTypes: !Ref InstanceTypes
+              ImageId: !If 
+                - UsedManagedAMI
+                - !Ref ImageId
+                - !Ref "AWS::NoValue"
+              Subnets: !If 
+                - isBKjobCompute
+                - !FindInMap [ AwsBatchMapping, OPT, SubnetIds]
+                - !FindInMap [ AwsBatchMapping, BAT, SubnetIds]
+              SecurityGroupIds: !If 
+                - isBKjobCompute
+                - !FindInMap [ AwsBatchMapping, OPT, SecurityGroupIds]
+                - !FindInMap [ AwsBatchMapping, BAT, SecurityGroupIds]
+              Ec2KeyPair: !Sub "key-or-${EnvironmentNameLower2}"
+              InstanceRole: !If 
+                - isDev
+                - "ecsInstanceRole"
+                - !Sub "arn:aws:iam::${AWS::AccountId}:instance-profile/IAMR-${SystemNameUpper}-${EnvironmentNameUpper2}-BJInstance"
+              Tags: 
+                  Name: !Sub "BJ-${SystemNameUpper}-${EnvironmentNameUpper2}-VM-${ComputeEnvironmentNumber}"
+              AllocationStrategy: "BEST_FIT_PROGRESSIVE"
+

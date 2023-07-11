@@ -1,0 +1,104 @@
+Mappings:
+  SystemEnvironmentMapping:
+    OQSDEV:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: DEV
+      Subnet1: subnet-0d8c456061841b4ff
+      Subnet2: subnet-0390edd793008280a
+      Subnet3: subnet-0c504c9242f28d89b
+      LMDSecurityGroupId: sg-01d3a8f86baed3475
+      URL: https://vpc-elk-oqs-dev-es02-ja5dgyvvvmr5xoauldjnhzfsdy.ap-northeast-1.es.amazonaws.com
+
+    OQSMNT:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MNT
+      Subnet1: subnet-0d3b5aa3ceda3351f
+      Subnet2: subnet-0138730d2daa557b0
+      Subnet3: subnet-0e94485b7e83b7ec9
+      LMDSecurityGroupId: sg-07e5b44239bae52ab
+      URL: https://vpc-elk-oqs-mnt-es01-juf27yis5a5gnfqqbw3gv7pmii.ap-northeast-1.es.amazonaws.com
+
+    OQSSTG:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: STG
+      Subnet1: subnet-0ef5548c4bf661711
+      Subnet2: subnet-0ab2cd91350d4af9a
+      Subnet3: subnet-0a89dfb69bd474afa
+      LMDSecurityGroupId: sg-05f55af5eaf78a27a
+      URL: https://vpc-elk-oqs-stg-es01-ga2pylwf5x2dhvdyumcogn4jvy.ap-northeast-1.es.amazonaws.com
+
+    OQSMT2:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MT2
+      Subnet1: subnet-0758aed10698f7656
+      Subnet2: subnet-08d14a1d40aea2bc9
+      Subnet3: subnet-00eda6eec12a2f29b
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      URL: https://vpc-elk-oqs-mt2-es01-5muxpdtwnfd2qojq5omr3c6qei.ap-northeast-1.es.amazonaws.com
+      CWLDestinationRoleArn: 'arn:aws:iam::066756805702:role/IAMR-OQS-MT2-CWLtoKinesisRole'
+
+
+  SystemEnvironmentMapping2:
+    TKKDEV:
+      SystemName2Upper: TKK
+      EnvironmentName2Upper: DEV
+
+    TKKMNT:
+      SystemName2Upper: TKK
+      EnvironmentName2Upper: MNT
+
+    TKKSTG:
+      SystemName2Upper: TKK
+      EnvironmentName2Upper: STG
+
+    TKKMT2:
+      SystemName2Upper: TKK
+      EnvironmentName2Upper: MT2
+
+    YZKDEV:
+      SystemName2Upper: YZK
+      EnvironmentName2Upper: DEV
+
+    YZKMNT:
+      SystemName2Upper: YZK
+      EnvironmentName2Upper: MNT
+
+    YZKSTG:
+      SystemName2Upper: YZK
+      EnvironmentName2Upper: STG
+
+    YZKMT2:
+      SystemName2Upper: YZK
+      EnvironmentName2Upper: MT2
+
+    IRKDEV:
+      SystemName2Upper: IRK
+      EnvironmentName2Upper: DEV
+
+    IRKMNT:
+      SystemName2Upper: IRK
+      EnvironmentName2Upper: MNT
+
+    IRKSTG:
+      SystemName2Upper: IRK
+      EnvironmentName2Upper: STG
+
+    IRKMT2:
+      SystemName2Upper: IRK
+      EnvironmentName2Upper: MT2
+
+    HSKDEV:
+      SystemName2Upper: HSK
+      EnvironmentName2Upper: DEV
+
+    HSKMNT:
+      SystemName2Upper: HSK
+      EnvironmentName2Upper: MNT
+
+    HSKSTG:
+      SystemName2Upper: HSK
+      EnvironmentName2Upper: STG
+
+    HSKMT2:
+      SystemName2Upper: HSK
+      EnvironmentName2Upper: MT2

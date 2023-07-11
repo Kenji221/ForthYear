@@ -1,0 +1,1153 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: This CloudFormation template to create S3 Bucket
+
+Resources:
+  S3Bucket1:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: oqs-mt2
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: oqs-mt2/oqs-mt2-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-oqs-mt2_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 14
+            ExpiredObjectDeleteMarker: True
+  S3Bucket2:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: build-reports-bucket-mt2
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: build-reports-bucket-mt2/build-reports-bucket-mt2-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-build-reports-bucket-mt2_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 7
+            ExpiredObjectDeleteMarker: True
+  S3Bucket3:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: build-source-bucket-mt2
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: build-source-bucket-mt2/build-source-bucket-mt2-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/528f07e5-90ee-4b87-b2ad-636aef7c442a
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-build-source-bucket-mt2_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 14
+            ExpiredObjectDeleteMarker: True
+  S3Bucket4:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-linking-report-input01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-linking-report-input01/s3-oqs-mt2-linking-report-input01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-linking-report-input01_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 60
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket5:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-linking-report-output01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-linking-report-output01/s3-oqs-mt2-linking-report-output01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-linking-report-output01_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 60
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket6:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-ecs-userdata-file01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-ecs-userdata-file01/s3-oqs-mt2-ecs-userdata-file01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+
+
+
+
+
+
+
+
+  S3Bucket7:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-clf01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-clf01/s3-oqs-mt2-clf01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-clf01_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 30
+            ExpiredObjectDeleteMarker: True
+  S3Bucket8:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-elb-log
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-elb-log/s3-oqs-mt2-elb-log-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+            #KMSMasterKeyID
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-elb-log_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 1095
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket9:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-elkbackup01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-elkbackup01/s3-oqs-mt2-elkbackup01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-elkbackup01_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 1
+            ExpiredObjectDeleteMarker: True
+  S3Bucket10:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-qshbackup01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-qshbackup01/s3-oqs-mt2-qshbackup01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-qshbackup01_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 1
+            ExpiredObjectDeleteMarker: True
+  S3Bucket11:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-waf-logs-alb01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-waf-logs-alb01/s3-oqs-mt2-waf-logs-alb01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-waf-logs-alb01_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 30
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket12:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-waf-logs-apigw01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-waf-logs-apigw01/s3-oqs-mt2-waf-logs-apigw01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-waf-logs-apigw01_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 31
+            NoncurrentVersionExpirationInDays: 2
+            #ExpiredObjectDeleteMarker
+  S3Bucket13:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-logfilter
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-logfilter/s3-oqs-mt2-logfilter-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-logfilter_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 7
+            ExpiredObjectDeleteMarker: True
+  S3Bucket14:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-logfilter-for-irk-mt2
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-logfilter-for-irk-mt2/s3-oqs-mt2-logfilter-for-irk-mt2-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-logfilter-for-irk-mt2_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 7
+            ExpiredObjectDeleteMarker: True
+  S3Bucket15:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-proc-result-storage01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-proc-result-storage01/s3-oqs-mt2-proc-result-storage01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-proc-result-storage01_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 30
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket16:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-sitehealthcheck-ssl-load
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-sitehealthcheck-ssl-load/s3-oqs-mt2-sitehealthcheck-ssl-load-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-sitehealthcheck-ssl-load_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 1
+            ExpiredObjectDeleteMarker: True
+  S3Bucket17:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-orgcrl01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-orgcrl01/s3-oqs-mt2-orgcrl01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-orgcrl01_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 1
+            ExpiredObjectDeleteMarker: True
+  S3Bucket18:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-linked-file-storage01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-linked-file-storage01/s3-oqs-mt2-linked-file-storage01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/82027fbc-c3b0-4144-9a93-503bc332af33
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-linked-file-storage01_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 10
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket19:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-accountmanagement01
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-accountmanagement01/s3-oqs-mt2-accountmanagement01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-accountmanagement01_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket20:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-accountmanagement02
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-accountmanagement02/s3-oqs-mt2-accountmanagement02-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-accountmanagement02_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket21:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-accountmanagement03
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-accountmanagement03/s3-oqs-mt2-accountmanagement03-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-accountmanagement03_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket22:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-accountmanagement04
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-accountmanagement04/s3-oqs-mt2-accountmanagement04-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-accountmanagement04_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket23:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-accountmanagement05
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-accountmanagement05/s3-oqs-mt2-accountmanagement05-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-accountmanagement05_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket24:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-accountmanagement06
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-accountmanagement06/s3-oqs-mt2-accountmanagement06-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-accountmanagement06_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 7
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket25:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-master-input
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-master-input/s3-oqs-mt2-master-input-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-master-input_01
+            Prefix: HM10100G_IM10100G/
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket26:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-master-output
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-master-output/s3-oqs-mt2-master-output-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/f1b3a576-486c-418c-b7c7-5fce26fb84f5
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-master-output_01
+            Prefix: if_iryoukikan/
+            Status: Enabled
+            ExpirationInDays: 14
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket27:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-master-eps-output
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-master-eps-output/s3-oqs-mt2-master-eps-output-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/94e5fc4a-3f89-491d-80a5-89bfaee077ce
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-master-eps-output_01
+            Prefix: if_recipe/
+            Status: Enabled
+            ExpirationInDays: 14
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket28:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-atn
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-atn/s3-oqs-mt2-atn-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-atn_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 60
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket29:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-face
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-face/s3-oqs-mt2-face-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-face_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 14
+            ExpiredObjectDeleteMarker: True
+  S3Bucket30:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-face-backend
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-face-backend/s3-oqs-mt2-face-backend-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-face-backend_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 14
+            ExpiredObjectDeleteMarker: True
+  S3Bucket31:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-ikoucheck-bucket01
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-ikoucheck-bucket01/s3-oqs-mt2-ikoucheck-bucket01-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+
+
+
+
+
+
+
+
+  S3Bucket32:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-es-input
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-es-input/s3-oqs-mt2-es-input-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+
+
+
+
+
+
+
+
+  S3Bucket33:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-es-input-tiy
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-es-input-tiy/s3-oqs-mt2-es-input-tiy-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+
+
+
+
+
+
+
+
+  S3Bucket34:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-es-output
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-es-output/s3-oqs-mt2-es-output-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-es-output_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 60
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket35:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-es-output-tiy
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-es-output-tiy/s3-oqs-mt2-es-output-tiy-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-es-output-tiy_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 60
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket36:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-change-ecs-scaling-parameter
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-change-ecs-scaling-parameter/s3-oqs-mt2-change-ecs-scaling-parameter-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+
+
+
+
+
+
+
+
+  S3Bucket37:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-operationdailyreport
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-operationdailyreport/s3-oqs-mt2-operationdailyreport-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-operationdailyreport_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 730
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket38:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-rireki-tmp-duplicate-data
+      VersioningConfiguration:
+        Status: Enabled
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-rireki-tmp-duplicate-data/s3-oqs-mt2-rireki-tmp-duplicate-data-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-rireki-tmp-duplicate-data_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 365
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+  S3Bucket39:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-transaction-check
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-transaction-check/s3-oqs-mt2-transaction-check-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+
+
+
+
+
+
+
+
+  S3Bucket40:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-client-application-log
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-client-application-log/s3-oqs-mt2-client-application-log-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-client-application-log_01
+            #Prefix
+            Status: Enabled
+            ExpirationInDays: 30
+            NoncurrentVersionExpirationInDays: 1
+            #ExpiredObjectDeleteMarker
+
+  S3Bucket41:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: s3-oqs-mt2-auth-backend
+      VersioningConfiguration:
+        Status: Suspended
+      AccessControl: LogDeliveryWrite
+      LoggingConfiguration:
+        DestinationBucketName: s3-oqs-cmn-server-access-log02
+        LogFilePrefix: s3-oqs-mt2-auth-backend/s3-oqs-mt2-auth-backend-
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: True
+        BlockPublicPolicy: True
+        IgnorePublicAcls: True
+        RestrictPublicBuckets: True
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - ServerSideEncryptionByDefault:
+            SSEAlgorithm: aws:kms
+            KMSMasterKeyID: arn:aws:kms:ap-northeast-1:066756805702:key/45deb2af-48e9-499a-ae7a-a2e2dd34d717
+      LifecycleConfiguration:
+        Rules:
+          - Id: S3LIF-RR-s3-oqs-mt2-auth-backend_01
+            #Prefix
+            Status: Enabled
+            #ExpirationInDays
+            NoncurrentVersionExpirationInDays: 14
+            ExpiredObjectDeleteMarker: True

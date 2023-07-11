@@ -1,0 +1,76 @@
+■Install
+Amazon linux2 
+sudo yum install -y docker
+sudo systemctl start docker
+sudo usermod -a -G docker ec2-user
+sudo systemctl enable docker
+sudo curl -L https://github.com/docker/compose/releases/download/1.28.5/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+■Run
+docker run <image-name>
+  -Docker のコンテナを起動する
+
+docker run --name {コンテナ名} -it {image名} /bin/bash
+  -dockerに入って対象のコンテナ名で作成する
+
+docker run -it <image-name> bash
+  -Dockerコンテナを起動させ、コンテナの中に入る
+
+docker exec -it CONTAINER_ID /bin/bash
+  -起動中のコンテナに入る方法
+
+dockr run -v <host conatiner path>:<Docker Container path>
+  -ホストOSのボリュームとコンテナのボリュームをマウントする
+
+■ps
+docker ps
+docker ps -a 
+　-dockerのコンテナの一覧を表示する
+
+■stop / remove
+docker stop <コンテナ名>
+　-stops container for docker 
+
+docker stop $(docker ps -q)
+  - stops all containers
+
+docker rm <container name>
+  -remove docker container 
+
+■images
+docker images 
+  -list images of docker 
+
+docker rmi <image name>
+   - Remove docker image
+
+docker pull <image name>
+   -download docker image from library
+
+docker image build -t <イメージ名>:version -f <Dockerファイルが存在するディレクトリ>
+　　-Create a docker image from the given image and directory where the docker file is in place
+
+docker-compose build
+
+■ Managing Containers 
+docker rm `docker ps -a -q`
+  - Remove all docker containers 
+
+■Ports
+docker run --name some-nginx -d -p 8080:80 nginx
+  -port 8080にポート80を割り振る
+   
+
+/etc/nginx/conf.d
+
+
+
+■Docker config ファイル一覧
+RUN 
+ 
+
+
+
+
+

@@ -1,0 +1,106 @@
+#############################################################
+# Copyright 2022 FUJITSU LIMITED
+# FileName: CFN-IRK-RDS01.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for RDS 
+# Version: 1.0
+# Author: Fujitsu - hou
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  #  ## user form  ##
+  #  :param DBClusterNumber: ['example: 01'] クラスター番号 
+  #  :param SystemNameLower: ['irk'] システム名(小文字)
+  #  :param EnvironmentNameLower: ['mnt']  環境名(小文字)
+  #  :param DataBaseName: ['ird'] DB名
+  #  :param DBSubnet1: ['DBSubnet-a']  サブネット-a
+  #  :param DBSubnet2: ['DBSubnet-c']  サブネット-c
+  #  :param DBSubnet3: ['DBSubnet-d']  サブネット-d
+
+  DBClusterNumber:
+    Type: Number 
+    Default: '01'
+  SystemNameLower:
+    Type: String
+    Default: irk
+  EnvironmentNameLower:
+    Type: String
+    Default: mnt       
+  DataBaseName:
+    Type: String
+    Default: ird
+  DBSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: "DBSubnet-a"
+  DBSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: "DBSubnet-c"
+  DBSubnet3:
+    Type: AWS::EC2::Subnet::Id
+    Description: "DBSubnet-d"
+
+Resources:
+  RDSDBParameterGroup:
+    Type: "AWS::RDS::DBParameterGroup"
+    Properties:
+      DBParameterGroupName: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-param 
+      Description: "DB Parameter Group."          
+      Family: "aurora-postgresql11"
+      Parameters: 
+          lc_messages: "ja_JP.UTF-8"
+          log_connections: "1"
+          log_disconnections: "1"
+          "pgaudit.log": "all,-misc"
+          "pgaudit.log_catalog": "0"
+          "pgaudit.log_level": "log"
+          "pgaudit.log_parameter": "1"
+          "pgaudit.log_relation": "1"
+          "pgaudit.log_statement_once": "1"
+          "pgaudit.role": "rds_pgaudit"
+          "pg_hint_plan.enable_hint": "1"
+          "pg_stat_statements.max": "5000"
+          "pg_stat_statements.save": "1"
+          "pg_stat_statements.track": "TOP"
+          "pg_stat_statements.track_utility": "1"
+          random_page_cost: "2"
+          search_path: "\"$user\""
+          shared_preload_libraries: "pg_stat_statements,pgaudit,pg_hint_plan"
+
+  RDSDBClusterParameterGroup:
+    Type: "AWS::RDS::DBClusterParameterGroup"
+    Properties:
+      DBClusterParameterGroupName: !Sub rds-${SystemNameLower}-${EnvironmentNameLower}-${DataBaseName}${DBClusterNumber}-csparam 
+      Description: "DB Cluster Parameter Group" 
+      Family: "aurora-postgresql11"
+      Parameters: 
+          datestyle: "ISO, YMD"
+          lc_messages: "ja_JP.UTF-8"
+          lc_monetary: "ja_JP.UTF-8"
+          lc_numeric: "ja_JP.UTF-8"
+          lc_time: "ja_JP.UTF-8"
+          log_connections: "1"
+          log_disconnections: "1"
+          "pgaudit.log": "all,-misc"
+          "pgaudit.log_catalog": "0"
+          "pgaudit.log_level": "log"
+          "pgaudit.log_parameter": "1"
+          "pgaudit.log_relation": "1"
+          "pgaudit.log_statement_once": "1"
+          "pgaudit.role": "rds_pgaudit"
+          "pg_hint_plan.enable_hint": "1"
+          random_page_cost: "2"
+          "rds.force_ssl": "1"
+          search_path: "\"$user\""
+          shared_preload_libraries: "pg_stat_statements,pgaudit,pg_hint_plan"
+          timezone: "Asia/Tokyo"
+
+  RDSDBSubnetGroup:
+      Type: "AWS::RDS::DBSubnetGroup"
+      Properties:
+        DBSubnetGroupDescription: "DB subnet group"
+        DBSubnetGroupName: !Sub db-${EnvironmentNameLower}-subnetgroup ####"db-mnt-subnetgroup"
+        SubnetIds:
+          - !Ref DBSubnet1
+          - !Ref DBSubnet2
+          - !Ref DBSubnet3

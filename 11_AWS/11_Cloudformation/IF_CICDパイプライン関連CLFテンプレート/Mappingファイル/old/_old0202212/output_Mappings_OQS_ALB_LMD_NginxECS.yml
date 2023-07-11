@@ -1,0 +1,62 @@
+Mappings:
+  SystemEnvironmentMapping:
+    OQSDEV:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: DEV
+      SystemNameLower: oqs
+      EnvironmentNameLower: dev
+      VpcId: vpc-09515f30187fb29d0
+      Subnet1: subnet-0d8c456061841b4ff
+      Subnet2: subnet-0390edd793008280a
+      Subnet3: subnet-0c504c9242f28d89b
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-0a790c9ee6fd80d64"
+      VpcEndpointId02: "vpce-08651c8ac877a14b7"
+      ALBWSPRXY01Arn: 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/app/ALB-OQS-DEV-WSPRXY01/f79e5fea4927f60d'
+      LMDSecurityGroupId: sg-01d3a8f86baed3475 
+      ZABBIXHOST: CloudWatchLogs
+      URL: https://vpc-elk-oqs-dev-es02-ja5dgyvvvmr5xoauldjnhzfsdy.ap-northeast-1.es.amazonaws.com
+      S3ZBXFILTERBUCKET: s3-oqs-dev-logfilter
+
+    OQSSTG:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: STG
+      SystemNameLower: oqs
+      EnvironmentNameLower: stg
+      VpcId: vpc-0917d0ac264bd09a0
+      Subnet1: subnet-0ef5548c4bf661711
+      Subnet2: subnet-0ab2cd91350d4af9a
+      Subnet3: subnet-0a89dfb69bd474afa
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-04e1c515749ffa274"
+      VpcEndpointId02: "vpce-06f16caa4b8d21683"
+      ALBWSPRXY01Arn: '-'
+      LMDSecurityGroupId: sg-05f55af5eaf78a27a
+      ZABBIXHOST: CloudWatchLogs
+      URL: https://vpc-elk-oqs-stg-es01-ga2pylwf5x2dhvdyumcogn4jvy.ap-northeast-1.es.amazonaws.com
+      S3ZBXFILTERBUCKET: s3-oqs-stg-logfilter
+
+
+    OQSMNT:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MNT
+      SystemNameLower: oqs
+      EnvironmentNameLower: mnt
+      VpcId: vpc-039efc81bad2fea3d
+      Subnet1: subnet-0d3b5aa3ceda3351f
+      Subnet2: subnet-0138730d2daa557b0
+      Subnet3: subnet-0e94485b7e83b7ec9
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-0257e895f4759b48b"
+      VpcEndpointId02: "vpce-0c0e77ee8956bc475"
+      ALBWSPRXY01Arn: '-'
+      LMDSecurityGroupId: sg-07e5b44239bae52ab
+      ZABBIXHOST: CloudWatchLogs
+      URL: https://vpc-elk-oqs-mnt-es01-juf27yis5a5gnfqqbw3gv7pmii.ap-northeast-1.es.amazonaws.com
+      S3ZBXFILTERBUCKET: s3-oqs-mnt-logfilter

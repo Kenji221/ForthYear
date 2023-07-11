@@ -1,0 +1,591 @@
+Mappings:
+  SystemEnvironmentMapping:
+    TKKDEV:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: tkk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet1: subnet-012fc525849c0a12f
+      Subnet2: subnet-0de931d824c2b0f17
+      Subnet3: subnet-0e80d68e49ad7117e
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-TKK-DEV-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-TKK-DEV-BATCodeBuild01"
+      AwsBatInstanceRoleName: "IAMR-TKK-DEV-AWSBAT-Instance"
+      SecurityGroupId: "sg-0d3c60bf08f23206d"
+      KmsKeyId: "61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed"
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-"
+      LMDSecurityGroupId: "-"
+      ZABBIXHOST: "-"
+      URL: "-"
+      S3ZBXFILTERBUCKET: "-"      
+
+    TKKMNT:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: tkk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet1: subnet-00f6c8dfa96416b5f
+      Subnet2: subnet-0733f39d7dc72ca89
+      Subnet3: subnet-0ecb2139cb37f76d2 
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-IRK-MNT-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-IRK-MNT-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MNT-AWSBAT-Instance"
+      SecurityGroupId: "sg-053189344799184b4"
+      KmsKeyId: "ca061e31-5d40-4ed7-9699-3fe67059dfec"
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"
+      LMDSecurityGroupId: sg-0885974d0724c91cd
+      ZABBIXHOST: CloudWatchLogs TKK
+      URL: "-"
+      S3ZBXFILTERBUCKET: s3-irk-mnt-logfilter-for-tkk-mnt      
+
+    TKKSTG:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: STG
+      SystemNameLower: tkk
+      EnvironmentNameLower: stg
+      VpcId: vpc-02438362be49444f0
+      Subnet1: subnet-047c898e058b6a16c
+      Subnet2: subnet-02e2efdac98663495
+      Subnet3: subnet-092176b7e77074d3a   
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "service-role/IAMR-TKK-STG-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-TKK-STG-BATCodeBuild01"
+      AwsBatInstanceRoleName: "IAMR-IRK-MNT-AWSBAT-Instance"   
+      SecurityGroupId: "sg-0e842b94094c8d0d7"
+      KmsKeyId: "61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed"
+      VpcEndpointId01: "vpce-05f7a4e3335617de7"
+      VpcEndpointId02: "vpce-034912d6126d1183e"
+      LMDSecurityGroupId: sg-00810e08135c874de
+      ZABBIXHOST: CloudWatchLogs TKK
+      URL: "-"
+      S3ZBXFILTERBUCKET: s3-tkk-stg-logfilter
+
+    TKKMT2:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: tkk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs TKK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-tkk-mt2      
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    TKKMT2A:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: tkk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs TKK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-tkk-mt2      
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    TKKMT2B:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: tkk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline-B" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild-B"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance-B"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs TKK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-tkk-mt2      
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    IRKDEV:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: irk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet1: subnet-012fc525849c0a12f
+      Subnet2: subnet-0de931d824c2b0f17
+      Subnet3: subnet-0e80d68e49ad7117e
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-IRK-DEV-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-TKK-DEV-BATCodeBuild01"
+      AwsBatInstanceRoleName: "IAMR-TKK-DEV-AWSBAT-Instance"
+      SecurityGroupId: "sg-0d3c60bf08f23206d"
+      KmsKeyId: "61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed"
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-"
+      LMDSecurityGroupId: "-" 
+      ZABBIXHOST: "-" 
+      URL: "-" 
+      S3ZBXFILTERBUCKET: "-"       
+
+    IRKMNT:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: irk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet1: subnet-00f6c8dfa96416b5f
+      Subnet2: subnet-0733f39d7dc72ca89
+      Subnet3: subnet-0ecb2139cb37f76d2
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-IRK-MNT-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-IRK-MNT-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MNT-AWSBAT-Instance"      
+      SecurityGroupId: "sg-053189344799184b4"
+      KmsKeyId: "ca061e31-5d40-4ed7-9699-3fe67059dfec"
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"
+      LMDSecurityGroupId: sg-0885974d0724c91cd
+      ZABBIXHOST: CloudWatchLogs IRK
+      URL: "-" 
+      S3ZBXFILTERBUCKET: s3-irk-mnt-logfilter-for-yzk-mnt      
+
+    IRKSTG:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: STG
+      SystemNameLower: irk
+      EnvironmentNameLower: stg
+      VpcId: vpc-0af6cedd1d668b053
+      Subnet1: subnet-0f7384437964e5634
+      Subnet2: subnet-08bc3f510266bcbe8
+      Subnet3: subnet-0abb8aa2bbe995033
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "service-role/IAMR-IRK-STG-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-STG-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-STG-AWSBAT-Instance"       
+      SecurityGroupId: "sg-0e1ac9d9d234066ed"
+      KmsKeyId: "ca061e31-5d40-4ed7-9699-3fe67059dfec"
+      VpcEndpointId01: "vpce-05aa856e0980051c3"
+      VpcEndpointId02: "vpce-024ed93126676e45d"
+      LMDSecurityGroupId: sg-068a64f16b3102ccb
+      ZABBIXHOST: CloudWatchLogs IRK
+      URL: "-" 
+      S3ZBXFILTERBUCKET: s3-irk-stg-logfilter
+
+    IRKMT2:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: irk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs TKK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-yzk-mt2
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    IRKMT2A:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: irk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs TKK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-yzk-mt2
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    IRKMT2B:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: irk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline-B" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild-B"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance-B"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs TKK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-yzk-mt2
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    YZKDEV:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: yzk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet1: subnet-012fc525849c0a12f
+      Subnet2: subnet-0de931d824c2b0f17
+      Subnet3: subnet-0e80d68e49ad7117e
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-YZK-DEV-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-TKK-DEV-BATCodeBuild01"
+      AwsBatInstanceRoleName: "IAMR-TKK-DEV-AWSBAT-Instance"
+      SecurityGroupId: "sg-0d3c60bf08f23206d"
+      KmsKeyId: "61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed"
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-"
+      LMDSecurityGroupId:  "-" 
+      ZABBIXHOST: "-" 
+      URL:  "-" 
+      S3ZBXFILTERBUCKET: "-"    
+
+    YZKMNT:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: yzk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet1: subnet-00f6c8dfa96416b5f
+      Subnet2: subnet-0733f39d7dc72ca89
+      Subnet3: subnet-0ecb2139cb37f76d2
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-IRK-MNT-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-MNT-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MNT-AWSBAT-Instance"    
+      SecurityGroupId: "sg-053189344799184b4"
+      KmsKeyId: "ca061e31-5d40-4ed7-9699-3fe67059dfec"
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"
+      LMDSecurityGroupId: sg-0885974d0724c91cd
+      ZABBIXHOST: CloudWatchLogs YZK
+      URL: "-" 
+      S3ZBXFILTERBUCKET: s3-yzk-mnt-logfilter
+
+    YZKSTG:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: STG
+      SystemNameLower: yzk
+      EnvironmentNameLower: stg
+      VpcId: vpc-01e2d26b07f654cd6
+      Subnet1: subnet-078222f9bd33ff0c8
+      Subnet2: subnet-0814b2d7c7a1da156
+      Subnet3: subnet-0af03ab94867ad7b4
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "service-role/IAMR-YZK-STG-BATCodePipeline01" 
+      BuildServiceRoleName: "IAMR-YZK-STG-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-YZK-STG-AWSBAT-Instance"
+      SecurityGroupId: "sg-012bdcdf9f2279f2d"
+      KmsKeyId: "5665c543-1665-482b-a9b8-d1256dcf68fe"
+      VpcEndpointId01: "vpce-0a6e3021691529620"
+      VpcEndpointId02: "vpce-037372e8509fae6a6"
+      LMDSecurityGroupId: sg-06879463d2b77cf02
+      ZABBIXHOST: CloudWatchLogs YZK
+      URL: "-"
+      S3ZBXFILTERBUCKET: s3-yzk-stg-logfilter
+
+    YZKMT2:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: yzk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs YZK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-yzk-mt2
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    YZKMT2A:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: yzk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs YZK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-yzk-mt2
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    YZKMT2B:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: yzk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet1: subnet-07659eaa787262322
+      Subnet2: subnet-0e012d7e810d318dc
+      Subnet3: subnet-083b91be35e3627dd
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-IRK-MT2-BATCodePipeline-B" 
+      BuildServiceRoleName: "IAMR-IRK-MT2-BATCodeBuild-B"
+      AwsBatInstanceRoleName: "IAMR-IRK-MT2-AWSBAT-Instance-B"
+      SecurityGroupId: "sg-02364de4058ec03f1"
+      KmsKeyId: "8fe3e3b2-889b-49b9-afed-5c42a43021d4"
+      VpcEndpointId01: "vpce-0bf4dd39c2fb4dd92"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs YZK
+      URL: "-"
+      # S3ZBXFILTERBUCKET: s3-irk-mt2-logfilter-for-yzk-mt2
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+
+    OQSDEV:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: DEV
+      SystemNameLower: oqs
+      EnvironmentNameLower: dev
+      VpcId: vpc-09515f30187fb29d0
+      Subnet1: subnet-0d8c456061841b4ff
+      Subnet2: subnet-0390edd793008280a
+      Subnet3: subnet-0c504c9242f28d89b
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-OQS-DEV-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-DEV-BATCodeBuild01"
+      AwsBatInstanceRoleName: "-"      
+      SecurityGroupId: "sg-036642b8d8240b67a"
+      KmsKeyId: "b12a4d04-333b-4f3f-a549-8f92af81b975"
+      VpcEndpointId01: "vpce-0a790c9ee6fd80d64"
+      VpcEndpointId02: "vpce-08651c8ac877a14b7"
+      LMDSecurityGroupId: sg-01d3a8f86baed3475 
+      ZABBIXHOST: CloudWatchLogs
+      URL: https://vpc-elk-oqs-dev-es02-ja5dgyvvvmr5xoauldjnhzfsdy.ap-northeast-1.es.amazonaws.com
+      S3ZBXFILTERBUCKET: s3-oqs-dev-logfilter
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    OQSMNT:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MNT
+      SystemNameLower: oqs
+      EnvironmentNameLower: mnt
+      VpcId: vpc-039efc81bad2fea3d
+      Subnet1: subnet-0d3b5aa3ceda3351f
+      Subnet2: subnet-0138730d2daa557b0
+      Subnet3: subnet-0e94485b7e83b7ec9
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "service-role/IAMR-OQS-MNT-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-MNT-BATCodeBuild01"  
+      AwsBatInstanceRoleName: "-"   
+      SecurityGroupId: "sg-082cbe7623eca6c48"
+      KmsKeyId: "b12a4d04-333b-4f3f-a549-8f92af81b975"
+      VpcEndpointId01: "vpce-0257e895f4759b48b"
+      VpcEndpointId02: "vpce-0c0e77ee8956bc475"
+      LMDSecurityGroupId: sg-07e5b44239bae52ab
+      ZABBIXHOST: CloudWatchLogs
+      URL: https://vpc-elk-oqs-mnt-es01-juf27yis5a5gnfqqbw3gv7pmii.ap-northeast-1.es.amazonaws.com
+      S3ZBXFILTERBUCKET: s3-oqs-mnt-logfilter
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    OQSSTG:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: STG
+      SystemNameLower: oqs
+      EnvironmentNameLower: stg
+      VpcId: vpc-0917d0ac264bd09a0
+      Subnet1: subnet-0ef5548c4bf661711
+      Subnet2: subnet-0ab2cd91350d4af9a
+      Subnet3: subnet-0a89dfb69bd474afa
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "service-role/IAMR-OQS-STG-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-STG-BATCodeBuild01"
+      AwsBatInstanceRoleName: "-"  
+      SecurityGroupId: "sg-0f81aaaae2649dff2"
+      KmsKeyId: "b12a4d04-333b-4f3f-a549-8f92af81b975"
+      VpcEndpointId01: "vpce-04e1c515749ffa274"
+      VpcEndpointId02: "vpce-06f16caa4b8d21683"
+      LMDSecurityGroupId: sg-05f55af5eaf78a27a
+      ZABBIXHOST: CloudWatchLogs
+      URL: https://vpc-elk-oqs-stg-es01-ga2pylwf5x2dhvdyumcogn4jvy.ap-northeast-1.es.amazonaws.com
+      S3ZBXFILTERBUCKET: s3-oqs-stg-logfilter
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    OQSMT2:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MT2
+      SystemNameLower: oqs
+      EnvironmentNameLower: mt2
+      VpcId: vpc-05a92eb3a01283e6d
+      Subnet1: subnet-0758aed10698f7656
+      Subnet2: subnet-08d14a1d40aea2bc9
+      Subnet3: subnet-00eda6eec12a2f29b
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-OQS-MT2-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-MT2-BATCodeBuild01"  
+      AwsBatInstanceRoleName: "-"   
+      SecurityGroupId: "sg-0f5e4caa975eea86c"
+      KmsKeyId: '1446b969-0fc3-4dde-8f12-e80f1b52f712'
+      VpcEndpointId01: "vpce-045a07e09d5115dcd"
+      VpcEndpointId02: "vpce-0ce599d880c34a0be"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs
+      URL: "https://vpc-elk-oqs-mt2-es01-5muxpdtwnfd2qojq5omr3c6qei.ap-northeast-1.es.amazonaws.com"      
+      # S3ZBXFILTERBUCKET: s3-oqs-mt2-logfilter
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    OQSMT2A:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MT2
+      SystemNameLower: oqs
+      EnvironmentNameLower: mt2
+      VpcId: vpc-05a92eb3a01283e6d
+      Subnet1: subnet-0758aed10698f7656
+      Subnet2: subnet-08d14a1d40aea2bc9
+      Subnet3: subnet-00eda6eec12a2f29b
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-OQS-MT2-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-MT2-BATCodeBuild01"  
+      AwsBatInstanceRoleName: "-"   
+      SecurityGroupId: "sg-0f5e4caa975eea86c"
+      KmsKeyId: '1446b969-0fc3-4dde-8f12-e80f1b52f712'
+      VpcEndpointId01: "vpce-045a07e09d5115dcd"
+      VpcEndpointId02: "vpce-0ce599d880c34a0be"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs
+      URL: "https://vpc-elk-oqs-mt2-es01-5muxpdtwnfd2qojq5omr3c6qei.ap-northeast-1.es.amazonaws.com"      
+      # S3ZBXFILTERBUCKET: s3-oqs-mt2-logfilter
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    OQSMT2B:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MT2
+      SystemNameLower: oqs
+      EnvironmentNameLower: mt2
+      VpcId: vpc-05a92eb3a01283e6d
+      Subnet1: subnet-0758aed10698f7656
+      Subnet2: subnet-08d14a1d40aea2bc9
+      Subnet3: subnet-00eda6eec12a2f29b
+      LogGroupRetentionInDays: 30
+      PipelineServiceRoleName: "IAMR-OQS-MT2-BATCodePipeline01-B"
+      BuildServiceRoleName: "IAMR-OQS-MT2-BATCodeBuild01-B"  
+      AwsBatInstanceRoleName: "-"   
+      SecurityGroupId: "sg-0f5e4caa975eea86c"
+      KmsKeyId: '1446b969-0fc3-4dde-8f12-e80f1b52f712'
+      VpcEndpointId01: "vpce-045a07e09d5115dcd"
+      VpcEndpointId02: "vpce-0ce599d880c34a0be"
+      LMDSecurityGroupId: sg-091afa1cc4d8281a3
+      # ZABBIXHOST: CloudWatchLogs
+      URL: "https://vpc-elk-oqs-mt2-es01-b-3yyniqkkxt6aghju2pgvqhqvpm.ap-northeast-1.es.amazonaws.com"      
+      # S3ZBXFILTERBUCKET: s3-oqs-mt2-logfilter
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    OQSST2:
+      SystemNameUpper: OQS
+      SystemNameLower: oqs
+      EnvironmentNameUpper: ST2
+      EnvironmentNameLower: st2
+      VpcId: vpc-0917d0ac264bd09a0
+      Subnet1: subnet-0ef5548c4bf661711
+      Subnet2: subnet-0ab2cd91350d4af9a
+      Subnet3: subnet-0a89dfb69bd474afa
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "IAMR-OQS-ST2-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-ST2-BATCodeBuild01"  
+      AwsBatInstanceRoleName: "-"   
+      SecurityGroupId: "sg-0bd9c7d1dbfc4e1b0"
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      VpcEndpointId01: "vpce-04e1c515749ffa274"
+      VpcEndpointId02: "vpce-06f16caa4b8d21683"
+      LMDSecurityGroupId: sg-06b1e6b59286d0f3b
+      # ZABBIXHOST: CloudWatchLogs
+      URL: "https://vpc-elk-oqs-st2-es01-a-5bud2u73ycd6f6vb5hbuuyimgy.ap-northeast-1.es.amazonaws.com"      
+      # S3ZBXFILTERBUCKET: s3-oqs-mt2-logfilter
+      BuildComputeType: BUILD_GENERAL1_MEDIUM
+
+    OQSST2A:
+      SystemNameUpper: OQS
+      SystemNameLower: oqs
+      EnvironmentNameUpper: ST2
+      EnvironmentNameLower: st2
+      VpcId: vpc-0917d0ac264bd09a0
+      Subnet1: subnet-0ef5548c4bf661711
+      Subnet2: subnet-0ab2cd91350d4af9a
+      Subnet3: subnet-0a89dfb69bd474afa
+      LogGroupRetentionInDays: 1827
+      PipelineServiceRoleName: "IAMR-OQS-ST2-BATCodePipeline01"
+      BuildServiceRoleName: "IAMR-OQS-ST2-BATCodeBuild01"  
+      AwsBatInstanceRoleName: "-"   
+      SecurityGroupId: "sg-0bd9c7d1dbfc4e1b0"
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      VpcEndpointId01: "vpce-04e1c515749ffa274"
+      VpcEndpointId02: "vpce-06f16caa4b8d21683"
+      LMDSecurityGroupId: sg-06b1e6b59286d0f3b
+      # ZABBIXHOST: CloudWatchLogs
+      URL: "https://vpc-elk-oqs-st2-es01-a-5bud2u73ycd6f6vb5hbuuyimgy.ap-northeast-1.es.amazonaws.com"      
+      # S3ZBXFILTERBUCKET: s3-oqs-mt2-logfilter
+      BuildComputeType: BUILD_GENERAL1_MEDIUM

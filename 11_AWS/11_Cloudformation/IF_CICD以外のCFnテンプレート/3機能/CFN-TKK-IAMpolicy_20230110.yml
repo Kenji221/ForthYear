@@ -1,0 +1,187 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-MNT-IAM_202211.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Network
+# Version: 1.0
+# Author: Fujitsu - ichikawa
+############################
+AWSTemplateFormatVersion: 2010-09-09
+
+# Transform:
+#   Name: 'AWS::Include'
+#   Parameters:
+#     Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  SystemNameUpper:
+    Type: String
+    Default: 'example: TKK'
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'example: MT2'
+
+Resources:
+  # :param :全て拒否ルールにて作成
+  # ### MT2-APContainerAction-Cognito IAM Policy ###
+  IAMPMT2APContainerActionCognito:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-Cognito
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-APContainerAction-DynamoDB IAM Policy ###
+  IAMPMT2APContainerActionDynamoDB:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-APContainerAction-DynamoDB-MSA40402 IAM Policy ###
+  IAMPMT2APContainerActionDynamoDBMSA40402:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-DynamoDB-MSA40402-A
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-APContainerAction-MSA40401 IAM Policy ###
+  IAMPMT2APContainerActionMSA40401:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-MSA40401-A
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-APContainerAction-S3Put IAM Policy ###
+  IAMPMT2APContainerActionS3Put:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-APContainerAction-S3Put
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+#  # ### MT2-BATContainerAction IAM Policy ###
+  IAMPMT2BATContainerActiont:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATContainerAction
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-AWSBAT-BatJob IAM Policy ###
+  IAMPMT2AWSBATBatJob:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-AWSBAT-BatJob-Temp IAM Policy ###
+  IAMPMT2AWSBATBatJobTemp:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSBAT-BatJob-Temp
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-BATTaskAction IAM Policy ###
+  IAMPMT2BATTaskAction:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATTaskAction
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-Glue-KMSDecrypt IAM Policy ###
+  IAMPMT2GlueKMSDecrypt:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Glue-KMSDecrypt
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-GlueJob IAM Policy ###
+  IAMPMT2GlueJob:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-GlueJob
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-HTTPRES IAM Policy ###
+  IAMPMT2HTTPRES:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-HTTPRES
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-SFCommonRunningCheck IAM Policy ###
+  IAMPMT2SFCommonRunningCheck:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-SFCommonRunningCheck
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+  # ### MT2-SFRunningCheck IAM Policy ###
+  IAMPMT2SFRunningCheck:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-SFRunningCheck
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+
+
+  # ### BAT InstanceProfile ### 
+  # BATInstanceProfile: 
+  #   Type: "AWS::IAM::InstanceProfile"
+  #   Properties: 
+  #     Roles: 
+  #       - !Ref IAMRABAT

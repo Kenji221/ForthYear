@@ -1,0 +1,465 @@
+#############################################################
+# Copyright 2020 FUJITSU LIMITED
+# FileName: CLF-XXX-XXX-SNSTOPIC.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for 3DB Web ECS
+# Version: 1.0
+# Author: konishi
+#############################################################
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  Systemname:
+    Type: String
+    Description: Specify the system to deploy
+    Default: 'IRK'
+    AllowedValues: ['TKK','IRK','YZK']
+  Environment:
+    Type: String
+    Description: Specify the environment to deploy
+    Default: 'MT2'
+    AllowedValues: ['DEV','STG','MT1','MT2','PRO']
+  NeedCommonSNS:
+    Type: String
+    Description: Need common sns
+    Default: true
+    AllowedValues: [true, false]
+
+Conditions:
+  CreateCommonSNS: 
+    !Equals [!Ref NeedCommonSNS,true]   
+  
+Resources:
+  LifeCicleHookTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-${Environment}-ASGLifeCycleHook01
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-${Environment}-ASGLifeCycleHook01
+  
+  LifeCicleHookTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics: 
+        - !Ref LifeCicleHookTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+              - SNS:Receive
+            Resource: !Ref LifeCicleHookTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+ 
+  BatchErrorsTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-${Environment}-BatchErrors
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-${Environment}-BatchErrors
+  
+  BatchErrorsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics: 
+        - !Ref BatchErrorsTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+            Resource: !Ref BatchErrorsTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+ 
+  BatchInvalidErrorTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-${Environment}-BatchInvalidError
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-${Environment}-BatchInvalidError
+  
+  BatchErrorsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics: 
+        - !Ref BatchInvalidErrorTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+            Resource: !Ref BatchInvalidErrorTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+                
+          - Sid: "AWSEvents_CWE-IRK-MT2-BatchCompute-InvalidStatusCheck_Id71ad4313-ebfb-48d2-ac69-6a4a24aede9f"
+            Effect: Allow
+            Principal:
+              Service: "events.amazonaws.com"
+            Action:
+              - SNS:Publish
+            Resource: !Ref BatchInvalidErrorTopic
+  
+  LambdaErrorsAPTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-${Environment}-LambdaErrors-AP_INFRA
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-${Environment}-LambdaErrors-AP_INFRA
+  
+  LambdaErrorsAPTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics: 
+        - !Ref LambdaErrorsAPTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+              - SNS:Receive
+            Resource: !Ref LambdaErrorsAPTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+  
+  LogsDeliveryErrorsAPTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-${Environment}-LogsDeliveryErrors-AP_INFRA
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-${Environment}-LogsDeliveryErrors-AP_INFRA
+   
+  LogsDeliveryErrorsAPTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics: 
+        - !Ref LogsDeliveryErrorsAPTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+              - SNS:Receive
+            Resource: !Ref LogsDeliveryErrorsAPTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+  
+  RdsEventsTopic:
+    Type: AWS::SNS::Topic
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-${Environment}-RDS-EVENTS
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-${Environment}-RDS-EVENTS
+   
+  RdsEventsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Properties:
+      Topics: 
+        - !Ref RdsEventsTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+            Resource: !Ref RdsEventsTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+  
+  AWSHealthTopic:
+    Type: AWS::SNS::Topic
+    Condition: CreateCommonSNS
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-CMN-AWSHealth02
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-CMN-AWSHealth02
+   
+  AWSHealthTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Condition: CreateCommonSNS
+    Properties:
+      Topics: 
+        - !Ref AWSHealthTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+            Resource: !Ref AWSHealthTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+                
+          - Sid: "AWSEvents_CWE-IRK-CMN-AWSHealth02_Id4d9da1a9-3ffc-4f3a-b7f4-a9007a6a5ac5"
+            Effect: Allow
+            Principal:
+              Service: "events.amazonaws.com"
+            Action:
+              - SNS:Publish
+            Resource: !Ref AWSHealthTopic
+                
+  
+  EcsScalingInOutTopic:
+    Type: AWS::SNS::Topic
+    Condition: CreateCommonSNS
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-CMN-EcsScalingInOut02
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-CMN-EcsScalingInOut02
+   
+  EcsScalingInOutTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Condition: CreateCommonSNS
+    Properties:
+      Topics: 
+        - !Ref EcsScalingInOutTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+              - SNS:Receive
+            Resource: !Ref EcsScalingInOutTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+                
+          - Sid: "AWSEvents_CWE-IRK-CMN-EcsScalingInOut02_Id14885214346573"
+            Effect: Allow
+            Principal:
+              Service: "events.amazonaws.com"
+            Action:
+              - SNS:Publish
+            Resource: !Ref EcsScalingInOutTopic
+  
+  EcsScalingLaunchUnsuccessfulTopic:
+    Type: AWS::SNS::Topic
+    Condition: CreateCommonSNS
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-CMN-EcsScalingLaunchUnsuccessful02
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-CMN-EcsScalingLaunchUnsuccessful02
+   
+  EcsScalingLaunchUnsuccessfulTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Condition: CreateCommonSNS
+    Properties:
+      Topics: 
+        - !Ref EcsScalingLaunchUnsuccessfulTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+              - SNS:Receive
+            Resource: !Ref EcsScalingLaunchUnsuccessfulTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+                
+          - Sid: "AWSEvents_CWE-IRK-CMN-EcsScalingLaunchUnsuccessful02_Id8619311967602"
+            Effect: Allow
+            Principal:
+              Service: "events.amazonaws.com"
+            Action:
+              - SNS:Publish
+            Resource: !Ref EcsScalingLaunchUnsuccessfulTopic             
+  
+  LambdaConccurentExecutionsTopic:
+    Type: AWS::SNS::Topic
+    Condition: CreateCommonSNS
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-CMN-LambdaConccurentExecutions-INFRA02
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-CMN-LambdaConccurentExecutions-INFRA02
+   
+  LambdaConccurentExecutionsTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Condition: CreateCommonSNS
+    Properties:
+      Topics: 
+        - !Ref LambdaConccurentExecutionsTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+              - SNS:Receive
+            Resource: !Ref LambdaConccurentExecutionsTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+                
+  
+  CostExplorerTopic:
+    Type: AWS::SNS::Topic
+    Condition: CreateCommonSNS
+    Properties: 
+      DisplayName: !Sub SNS-${Systemname}-CMN-CostExplorer02
+      FifoTopic: false
+      TopicName: !Sub SNS-${Systemname}-CMN-CostExplorer02
+   
+  CostExplorerTopicPolicy:
+    Type: AWS::SNS::TopicPolicy
+    Condition: CreateCommonSNS
+    Properties:
+      Topics: 
+        - !Ref CostExplorerTopic
+      PolicyDocument: 
+        Version: '2012-10-17'
+        Id: "__default_policy_ID"
+        Statement:
+          - Sid: "__default_statement_ID"
+            Effect: Allow
+            Principal: 
+              AWS: "*"
+            Action:
+              - SNS:GetTopicAttributes
+              - SNS:SetTopicAttributes
+              - SNS:AddPermission
+              - SNS:RemovePermission
+              - SNS:DeleteTopic
+              - SNS:Subscribe
+              - SNS:ListSubscriptionsByTopic
+              - SNS:Publish
+            Resource: !Ref CostExplorerTopic
+            Condition: 
+              StringEquals:
+                AWS:SourceOwner: !Ref AWS::AccountId
+                 
+          - Sid: "AWSBudgets-notification-1"
+            Effect: Allow
+            Principal:
+              Service: "budgets.amazonaws.com"
+            Action:
+              - SNS:Publish
+            Resource: !Ref CostExplorerTopic
+
+
+        

@@ -1,0 +1,20 @@
+
+## Host to Host file transoport
+$ scp ec2-user@10-0-0-37:/home/ec2-user/ssl/cert ec2-user@10.0.0.74 :/home/user/tmp/
+ -i <ssh key>
+
+ is needed when there is no password set 
+
+
+## how to change 
+ mv <original directory> <change directory>
+
+
+## how to unzip a zip file
+  { gunzip / gzip -d } <filename>
+
+ cp -a /home/ec2-user/master/ssl /home/ec2-user/ssl/revssl
+
+
+ ■VI
+先頭文字の空白を消す　 :%s/^\s\+//

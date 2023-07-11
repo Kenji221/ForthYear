@@ -1,0 +1,385 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-IRK-NW01_202212.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Network
+# Version: 1.0
+# Author: Fujitsu - tokuzumi
+############################
+
+AWSTemplateFormatVersion: "2010-09-09"
+
+Transform:
+  Name: 'AWS::Include'
+  Parameters:
+    Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  #  ## user form  ##
+  #  :param PeeringVPC
+  #  :param TGWid
+  #  :param SystemNameUpper
+  #  :param EnvironmentNameUpper
+  #  :param MappingFilePATH
+  MappingFilePATH:
+    Type: String
+    Default: 'example: s3://'
+  SystemNameUpper:
+    Type: String
+    Default: 'OQS'
+    AllowedValues: ['OQS','IRK','TKK','YZK']
+  SystemNameLower:
+    Type: String
+    Default: 'oqs'
+    AllowedValues: ['oqs','irk','tkk','yzk']
+  EnvironmentNameUpper2:
+    Type: String
+    Default: 'MT2'
+    AllowedValues: ['MNT','DEV','STG','PRO','MT1','MT2','ST1','ST2']
+  EnvironmentNameLower2:
+    Type: String
+    Default: 'mt2'
+    AllowedValues: ['mnt','dev','stg','pro','mt1','mt2','st1','st2']
+
+
+Resources:
+#------------------------SecurityGroup---------------------#
+  # #  ### SG-ALB-WEB01  ###
+  # SGforAlbBWEB01B:
+  #   Type: 'AWS::EC2::SecurityGroup'
+  #   Properties:
+  #     GroupDescription: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-B
+  #     GroupName: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-B
+  #     VpcId: !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, VPCID]
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-B
+  # #  ### SG-ALB-WEB01  ###
+  # SGforAlbWSPRXY01B:
+  #   Type: 'AWS::EC2::SecurityGroup'
+  #   Properties:
+  #     GroupDescription: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-B
+  #     GroupName: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-B
+  #     VpcId: !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, VPCID]
+  #     Tags:
+  #       - Key: Name
+  #         Value: !Sub SG-ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-B
+
+#------------------Create ELB-----------------------------#
+  #  ### NLB 001 ###
+  NLB001:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-001-B
+      Scheme: internal
+      Type: network
+      Subnets: 
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: 'access_logs.s3.enabled'
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-001-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 002 ###
+  NLB002:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-002-B
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-002-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 003 ###
+  NLB003:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-003-B
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-003-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+
+  #  ### NLB 004 ###
+  NLB004:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-004-B
+      Scheme: internal
+      Type: network
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-004-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 005 ###
+  NLB005:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-005-B
+      Scheme: internal
+      Type: network
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-005-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 006 ###
+  NLB006:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-006-B
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-006-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 007 ###
+  NLB007:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-007-B
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-007-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 008 ###
+  NLB008:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-008-B
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-008-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 009 ###
+  NLB009:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-009-B
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-009-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### NLB 010 ###
+  NLB010:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-010-B
+      Scheme: internal
+      Type: network 
+      Subnets:
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR01]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR02]
+        - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBAFR03]
+      IpAddressType: ipv4
+      LoadBalancerAttributes: 
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub NLB-${SystemNameUpper}-${EnvironmentNameUpper2}-010-B
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+  #  ### ALB WEB01 ###
+  ALBWEB01:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-B
+      Scheme: internal
+      Type: application
+      Subnets:
+       - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR01]
+       - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR02]
+       - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR03]
+      SecurityGroups:
+       - sg-09663ce24c43008ee
+      IpAddressType: ipv4
+      LoadBalancerAttributes:
+       - Key: access_logs.s3.enabled
+         Value: true
+       - Key: access_logs.s3.bucket
+         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+       - Key: access_logs.s3.prefix
+         Value: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WEB01-B
+       - Key: idle_timeout.timeout_seconds
+         Value: 70
+       - Key: deletion_protection.enabled
+         Value: true
+       - Key: routing.http2.enabled
+         Value: true
+       - Key: routing.http.drop_invalid_header_fields.enabled
+         Value: false
+       - Key: routing.http.xff_client_port.enabled
+         Value: false
+       - Key: routing.http.preserve_host_header.enabled
+         Value: false
+       - Key: routing.http.xff_header_processing.mode
+         Value: append
+       - Key: load_balancing.cross_zone.enabled
+         Value: true
+       - Key: routing.http.desync_mitigation_mode
+         Value: defensive
+       - Key: waf.fail_open.enabled
+         Value: false
+       - Key: routing.http.x_amzn_tls_version_and_cipher_suite.enabled
+         Value: false
+  #  ### ALB WSPRXY01 ###
+#  ALBWSPRXY01:
+#    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+#    Properties:
+#      Name: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-B
+#      Scheme: internal
+#      Type: application
+#      Subnets:
+#       - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR01]
+#       - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR02]
+#       - !FindInMap [!Ref SystemNameUpper, !Ref EnvironmentNameUpper2, SUBWFR03]
+#      SecurityGroups:
+#       - sg-03c7bc1c53b008409
+#      IpAddressType: ipv4
+#      LoadBalancerAttributes:
+#       - Key: access_logs.s3.enabled
+#         Value: true
+#       - Key: access_logs.s3.bucket
+#         Value: !Sub s3-${SystemNameLower}-${EnvironmentNameLower2}-elb-log
+#       - Key: access_logs.s3.prefix
+#         Value: !Sub ALB-${SystemNameUpper}-${EnvironmentNameUpper2}-WSPRXY01-B
+#       - Key: idle_timeout.timeout_seconds
+#         Value: 62
+#       - Key: deletion_protection.enabled
+#         Value: true
+#       - Key: routing.http2.enabled
+#         Value: true
+#       - Key: routing.http.drop_invalid_header_fields.enabled
+#         Value: false
+#       - Key: routing.http.xff_client_port.enabled
+#         Value: false
+#       - Key: routing.http.preserve_host_header.enabled
+#         Value: false
+#       - Key: routing.http.xff_header_processing.mode
+#         Value: append
+#       - Key: load_balancing.cross_zone.enabled
+#         Value: true
+#       - Key: routing.http.desync_mitigation_mode
+#         Value: defensive
+#       - Key: waf.fail_open.enabled
+#         Value: false
+#       - Key: routing.http.x_amzn_tls_version_and_cipher_suite.enabled
+#         Value: false

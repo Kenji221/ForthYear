@@ -1,0 +1,2482 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-MNT-IAM_202211.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Network
+# Version: 1.0
+# Author: Fujitsu - ichikawa
+AWSTemplateFormatVersion: 2010-09-09
+
+# Transform:
+#   Parameters:
+#     Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  #  ## user form  ##
+  #  :param PeeringVPC: デプロイ済みの共通環境VPCのIDを指定
+  #  :param TGWid: デプロイ済みトランジットGWのIDを指定
+  #  :param SystemNameUpper: システム名称（大文字）
+  #  :param EnvironmentNameUpper: 環境名（大文字）
+  # MappingFilePATH:
+  #   Type: String
+  #   Default: 'example: s3://'
+  SystemNameUpper:
+    Type: String
+    Default: 'OQS'
+  EnvironmentNameUpper:
+    Type: String
+    Default: 'MT2'
+  #EnvironmentNameUpper2:
+  #  Type: String
+  #  Default: 'MT2'
+  # PeeringVPC:
+  #   Type: String
+  #   Default: 'example: vpc-123456789abcd'
+  # TGWid:
+  #   Type: String
+  #   Default: 'example: tgw-123456789abcd'
+Resources:
+  # :param :全て拒否ルールにて作成
+  
+  # ### IAMP-OQS-INF-AnalyticsFullAccess IAM Policy ###
+  IAMPINFAnalyticsFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-AnalyticsFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-AnalyticsReadOnlyAccess IAM Policy ###
+  IAMPINFAnalyticsReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-AnalyticsReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-ApplicationFullAccess IAM Policy ###
+  IAMPINFApplicationFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ApplicationFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-ApplicationReadOnlyAccess IAM Policy ###
+  IAMPINFApplicationReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ApplicationReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-ComputeFullAccess IAM Policy ###
+  IAMPINFComputeFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ComputeFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-ComputeReadOnlyAccess IAM Policy ###
+  IAMPINFComputeReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ComputeReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-ContainersFullAccess IAM Policy ###
+  IAMPINFContainersFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ContainersFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-ContainersReadOnlyAccess IAM Policy ###
+  IAMPINFContainersReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ContainersReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-CostManagementReadOnlyAccess IAM Policy ###
+  IAMPINFCostManagementReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-CostManagementReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-DatabaseFullAccess IAM Policy ###
+  IAMPINFDatabaseFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-DatabaseFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-DatabaseReadOnlyAccess IAM Policy ###
+  IAMPINFDatabaseReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-DatabaseReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-DeveloperFullAccess IAM Policy ###
+  IAMPINFDeveloperFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-DeveloperFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-DeveloperReadOnlyAccess IAM Policy ###
+  IAMPINFDeveloperReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-DeveloperReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-ManagementFullAccess IAM Policy ###
+  IAMPINFManagementFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ManagementFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-ManagementReadOnlyAccess IAM Policy ###
+  IAMPINFManagementReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-ManagementReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-NetworkingFullAccess IAM Policy ###
+  IAMPINFNetworkingFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-NetworkingFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-NetworkingReadOnlyAccess IAM Policy ###
+  IAMPINFNetworkingReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-NetworkingReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-SecurityFullAccess IAM Policy ###
+  IAMPINFSecurityFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-SecurityFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-SecurityReadOnlyAccess IAM Policy ###
+  IAMPINFSecurityReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-SecurityReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-StorageFullAccess IAM Policy ###
+  IAMPINFStorageFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-StorageFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-INF-StorageReadOnlyAccess IAM Policy ###
+  IAMPINFStorageReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-INF-StorageReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-AnalyticsFullAccess IAM Policy ###
+  IAMPAPLAnalyticsFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-AnalyticsFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-AnalyticsReadOnlyAccess IAM Policy ###
+  IAMPAPLAnalyticsReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-AnalyticsReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-ApplicationFullAccess IAM Policy ###
+  IAMPAPLApplicationFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ApplicationFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-ApplicationReadOnlyAccess IAM Policy ###
+  IAMPAPLApplicationReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ApplicationReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-ComputeFullAccess IAM Policy ###
+  IAMPAPLComputeFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ComputeFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-ComputeReadOnlyAccess IAM Policy ###
+  IAMPAPLComputeReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ComputeReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-ContainersFullAccess IAM Policy ###
+  IAMPAPLContainersFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ContainersFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-ContainersReadOnlyAccess IAM Policy ###
+  IAMPAPLContainersReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ContainersReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-CostManagementReadOnlyAccess IAM Policy ###
+  IAMPAPLCostManagementReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-CostManagementReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-DatabaseFullAccess IAM Policy ###
+  IAMPAPLDatabaseFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-DatabaseFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-DatabaseReadOnlyAccess IAM Policy ###
+  IAMPAPLDatabaseReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-DatabaseReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-DeveloperFullAccess IAM Policy ###
+  IAMPAPLDeveloperFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-DeveloperFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-DeveloperReadOnlyAccess IAM Policy ###
+  IAMPAPLDeveloperReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-DeveloperReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-ManagementFullAccess IAM Policy ###
+  IAMPAPLManagementFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ManagementFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-ManagementReadOnlyAccess IAM Policy ###
+  IAMPAPLManagementReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-ManagementReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-NetworkingFullAccess IAM Policy ###
+  IAMPAPLNetworkingFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-NetworkingFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-NetworkingReadOnlyAccess IAM Policy ###
+  IAMPAPLNetworkingReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-NetworkingReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-SecurityFullAccess IAM Policy ###
+  IAMPAPLSecurityFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-SecurityFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-SecurityReadOnlyAccess IAM Policy ###
+  IAMPAPLSecurityReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-SecurityReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-StorageFullAccess IAM Policy ###
+  IAMPAPLStorageFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-StorageFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-APL-StorageReadOnlyAccess IAM Policy ###
+  IAMPAPLStorageReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-APL-StorageReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-JSK-AnalyticsFullAccess IAM Policy ###
+  IAMPJSKAnalyticsFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-JSK-AnalyticsFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-JSK-DenyDataAccess IAM Policy ###
+  IAMPJSKDenyDataAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-JSK-DenyDataAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-JSK-ManagementReadOnlyAccess IAM Policy ###
+  IAMPJSKManagementReadOnlyAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-JSK-ManagementReadOnlyAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-JSK-StartExecutionAccess IAM Policy ###
+  IAMPJSKStartExecutionAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-JSK-StartExecutionAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-SAIGAI-Operation IAM Policy ###
+  IAMPSAIGAIOperation:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-SAIGAI-Operation
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+     
+   # ### IAMP-OQS-MT2-AWSLambdaBasicExecution IAM Policy ###
+  IAMPAWSLambdaBasicExecution:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaBasicExecution
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-AWSLambdaBasicExecution-AutoOperate IAM Policy ###
+  IAMPAWSLambdaBasicExecutionAutoOperate:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaBasicExecution-AutoOperate
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-AWSLambdaBasicExecutionRole-InvokeFunction IAM Policy ###
+  IAMPAWSLambdaBasicExecutionRoleInvokeFunction:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaBasicExecutionRole-InvokeFunction
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-AWSLambdaBasicExecutionRole-MAIN IAM Policy ###
+  IAMPAWSLambdaBasicExecutionRoleMAIN:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaBasicExecutionRole-MAIN
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-AWSLambdaENIManagementAccess-InvokeFunction IAM Policy ###
+  IAMPAWSLambdaENIManagementAccessInvokeFunction:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaENIManagementAccess-InvokeFunction
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-AWSLambdaENIManagementAccess-MAIN IAM Policy ###
+  IAMPAWSLambdaENIManagementAccessMAIN:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaENIManagementAccess-MAIN
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-AWSLambdaInvokeRole-InvokeFunction IAM Policy ###
+  IAMPAWSLambdaInvokeRoleInvokeFunction:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaInvokeRole-InvokeFunction
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-AWSLambdaS3Access IAM Policy ###
+  IAMPAWSLambdaS3Access:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-AWSLambdaS3Access
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BAS IAM Policy ###
+  IAMPBAS:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BAS
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BatchJobManagementFullAccessPolicy IAM Policy ###
+  IAMPBatchJobManagementFullAccessPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BatchJobManagementFullAccessPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BatchJob-RunnableStatusCheckrole IAM Policy ###
+  IAMPBatchJobRunnableStatusCheckrole:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BatchJob-RunnableStatusCheckrole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BATCodeBuild01 IAM Policy ###
+  IAMPBATCodeBuild01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodeBuild01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BATCodePipeline01 IAM Policy ###
+  IAMPBATCodePipeline01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodePipeline01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BATContainerAction01 IAM Policy ###
+  IAMPBATContainerAction01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATContainerAction01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BATContainerAction02 IAM Policy ###
+  IAMPBATContainerAction02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATContainerAction02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BATContainerActionRireki01 IAM Policy ###
+  IAMPBATContainerActionRireki01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATContainerActionRireki01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BATECS IAM Policy ###
+  IAMPBATECS:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATECS
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BATECS-AthenaFullAccess IAM Policy ###
+  IAMPBATECSAthenaFullAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATECS-AthenaFullAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BATECS-AthenaFullAccess02 IAM Policy ###
+  IAMPBATECSAthenaFullAccess02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BATECS-AthenaFullAccess02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BJInstance IAM Policy ###
+  IAMPBJInstance:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BJInstance
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-BKJOB IAM Policy ###
+  IAMPBKJOB:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-BKJOB
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-ChangeEcsScalingParameter IAM Policy ###
+  IAMPChangeEcsScalingParameter:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ChangeEcsScalingParameter
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-CHUKAN-ERROR-MONITORING IAM Policy ###
+  IAMPCHUKANERRORMONITORING:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-CHUKAN-ERROR-MONITORING
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-CWE-EPS-TEST-TOOL-OUTPUT IAM Policy ###
+  IAMPCWEEPSTESTTOOLOUTPUT:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-CWE-EPS-TEST-TOOL-OUTPUT
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-CWLtoKinesisRole IAM Policy ###
+  IAMPCWLtoKinesisRole:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-CWLtoKinesisRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-EC2AutoBackupAuth IAM Policy ###
+  IAMPEC2AutoBackupAuth:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-EC2AutoBackupAuth
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-EC2AutoOperateAuth IAM Policy ###
+  IAMPEC2AutoOperateAuth:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-EC2AutoOperateAuth
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-ECSAutoOperate IAM Policy ###
+  IAMPECSAutoOperate:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECSAutoOperate
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-ECSInstanceDraining IAM Policy ###
+  IAMPECSInstanceDraining:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ECSInstanceDraining
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-elkbackup01 IAM Policy ###
+  IAMPelkbackup01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-elkbackup01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-elkrepository01 IAM Policy ###
+  IAMPelkrepository01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-elkrepository01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-ELKSnapshotAuth IAM Policy ###
+  IAMPELKSnapshotAuth:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-ELKSnapshotAuth
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-HSM IAM Policy ###
+  IAMPHSM:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-HSM
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-KMSDecrypt01 IAM Policy ###
+  IAMPKMSDecrypt01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-KMSDecrypt01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-KMSDecrypt02 IAM Policy ###
+  IAMPKMSDecrypt02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-KMSDecrypt02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-LMD-EPS-TEST-TOOL-OUTPUT IAM Policy ###
+  IAMPLMDEPSTESTTOOLOUTPUT:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-LMD-EPS-TEST-TOOL-OUTPUT
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-OperationDailyReport-CWLogInsight IAM Policy ###
+  IAMPOperationDailyReportCWLogInsight:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-OperationDailyReport-CWLogInsight
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-Permissions-Policy-For-CWL-JlisCrlBatch IAM Policy ###
+  IAMPPermissionsPolicyForCWLJlisCrlBatch:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Permissions-Policy-For-CWL-JlisCrlBatch
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-Permissions-Policy-For-CWL-OrgCrlBatch IAM Policy ###
+  IAMPPermissionsPolicyForCWLOrgCrlBatch:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Permissions-Policy-For-CWL-OrgCrlBatch
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-Permissions-Policy-For-CWL-rds-log01-cluster IAM Policy ###
+  IAMPPermissionsPolicyForCWLrdslog01cluster:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Permissions-Policy-For-CWL-rds-log01-cluster
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-Permissions-Policy-For-CWL-RDS-OQS-MT2-QSH01-EVENTS IAM Policy ###
+  IAMPPermissionsPolicyForCWLRDSOQSMT2QSH01EVENTS:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Permissions-Policy-For-CWL-RDS-${SystemNameUpper}-${EnvironmentNameUpper}-QSH01-EVENTS
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-Permissions-Policy-For-CWL-rds-qsh01-postgresql IAM Policy ###
+  IAMPPermissionsPolicyForCWLrdsqsh01postgresql:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Permissions-Policy-For-CWL-rds-qsh01-postgresql
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+
+       
+   # ### IAMP-OQS-MT2-RDSSTARTAUTH IAM Policy ###
+  IAMPRDSSTARTAUTH:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-RDSSTARTAUTH
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-RDSSTOPAUTH IAM Policy ###
+  IAMPRDSSTOPAUTH:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-RDSSTOPAUTH
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-SF-EPS-TEST-TOOL-OUTPUT IAM Policy ###
+  IAMPSFEPSTESTTOOLOUTPUT:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-SF-EPS-TEST-TOOL-OUTPUT
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-TRANSACTION-CHECK IAM Policy ###
+  IAMPTRANSACTIONCHECK:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-TRANSACTION-CHECK
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBCodeBuild01 IAM Policy ###
+  IAMPWEBCodeBuild01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBCodeBuild02 IAM Policy ###
+  IAMPWEBCodeBuild02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBCodePipeline01 IAM Policy ###
+  IAMPWEBCodePipeline01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBCodePipeline02 IAM Policy ###
+  IAMPWEBCodePipeline02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBContainerAction01 IAM Policy ###
+  IAMPWEBContainerAction01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerAction01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBContainerAction02 IAM Policy ###
+  IAMPWEBContainerAction02:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerAction02
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBContainerAction03 IAM Policy ###
+  IAMPWEBContainerAction03:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerAction03
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBContainerAction04 IAM Policy ###
+  IAMPWEBContainerAction04:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerAction04
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBContainerActionLogUpload01 IAM Policy ###
+  IAMPWEBContainerActionLogUpload01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerActionLogUpload01
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-WEBECS IAM Policy ###
+  IAMPWEBECS:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-WEBECS
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-XRayAccessPolicy IAM Policy ###
+  IAMPXRayAccessPolicy:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-XRayAccessPolicy
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+
+       
+   # ### IAMP-OQS-MT2-PipelineStart-NGINX-01-A IAM Policy ###
+  IAMPPipelineStartNGINX01:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-PipelineStart-NGINX-01-A
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-MT2-PipelineStart-NGINX-03-A IAM Policy ###
+  IAMPPipelineStartNGINX03:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-PipelineStart-NGINX-03-A
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+        
+   # ### IAMP-OQS-MT2-Permissions-Policy-For-CWL-WEB-A-OQS-MT2 IAM Policy ###
+  IAMPPermissionsPolicyForCWLWEBOQSMT2:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Permissions-Policy-For-CWL-WEB-A-${SystemNameUpper}-${EnvironmentNameUpper}
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+            
+   # ### IAMP-OQS-CMN-SNSPUBLISH IAM Policy ###
+  IAMPSNSPUBLISH:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-SNSPUBLISH
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-CMN-DenyDataAccess IAM Policy ###
+  IAMPDenyDataAccess:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-DenyDataAccess
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-CMN-LAMBDA-CLOUDWATCHLOGS IAM Policy ###
+  IAMPLAMBDACLOUDWATCHLOGS:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-LAMBDA-CLOUDWATCHLOGS
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-CMN-SSM-S3 IAM Policy ###
+  IAMPSSMS3:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-SSM-S3
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+       
+   # ### IAMP-OQS-CMN-SSMTOLAMBDA IAM Policy ###
+  IAMPSSMTOLAMBDA:
+    Type: 'AWS::IAM::ManagedPolicy'
+    Properties:
+      ManagedPolicyName: !Sub IAMP-${SystemNameUpper}-CMN-SSMTOLAMBDA
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Deny
+            Action: '*'
+            Resource: '*'
+   
+   
+  #policy上から順番で追加はここまでです
+
+
+
+  # ### IAMR ASGLifeCycleHook IAM Role ### 
+  # 2023/01/04 環境設計書に記載なし
+  # IAMRASGLifeCycleHook:
+  # Type: 'AWS::IAM::Role'
+  # Properties: 
+  #     RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ASGLifeCycleHook
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service:
+  #               - autoscaling.amazonaws.com
+  #           Action:
+  #             - 'sts:AssumeRole'
+  #     ManagedPolicyArns:
+  #       - arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole
+  # ### IAMR BAT IAM Policy ### 
+  IAMRABAT:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BAT
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPBATECSAthenaFullAccess
+        - !Ref IAMPBATECS
+  # ### IAMR BatchJobRunnableStatusCheckrole IAM role ### 
+  IAMRBatchJobRunnableStatusCheckrole:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BatchJob-RunnableStatusCheckrole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPAWSLambdaBasicExecution
+        - !Ref IAMPBatchJobRunnableStatusCheckrole
+  # ### IAMR BATCodeBuild01 IAM role ### 
+  IAMRBATCodeBuild01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodeBuild01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - !Ref IAMPBATCodeBuild01
+  # ### IAMR BATContainerAction01 IAM role ### 
+  IAMRBATContainerAction01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BATContainerAction01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - !Ref IAMPKMSDecrypt01
+        - !Ref IAMPBATECSAthenaFullAccess
+        - !Ref IAMPBATContainerAction01
+  # ### IAMR BATContainerActionRireki01 IAM role ### 
+  IAMRBATContainerActionRireki01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BATContainerActionRireki01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPBATContainerActionRireki01
+  # ### IAMR BATTaskAction01 IAM role ### 
+  IAMRBATTaskAction01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BATTaskAction01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  # ### IAMR BJInstance IAM role ### 
+  IAMRBJInstance:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BJInstance
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+        - !Ref IAMPBJInstance
+  # ### IAMR BKJOB IAM role ### 
+  IAMRBKJOB:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BKJOB
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+        - arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess
+        - !Ref IAMPBKJOB
+  # ### IAMR BKJOB IAM role ### 
+  IAMRChangeEcsScalingParameter:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ChangeEcsScalingParameter
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPAWSLambdaBasicExecution
+        - !Ref IAMPChangeEcsScalingParameter
+  # ### IAMR CHUKAN-ERROR-MONITORING IAM role ### 
+  IAMRCHUKANERRORMONITORING:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-CHUKAN-ERROR-MONITORING
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPCHUKANERRORMONITORING
+  # ### IAMR CWLtoKinesisRole IAM role ### 
+  IAMRCWLtoKinesisRole:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-CWLtoKinesisRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logs.ap-northeast-1.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPCWLtoKinesisRole
+  # ### IAMR EC2AutoBackup IAM role ### 
+  IAMREC2AutoBackup:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-EC2AutoBackup
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPEC2AutoBackupAuth
+  # ### IAMR EC2AutoOperate IAM role ### 
+  IAMREC2AutoOperate:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-EC2AutoOperate
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPEC2AutoOperateAuth
+  # ### IAMR ECSAutoOperate IAM role ### 
+  IAMRECSAutoOperate:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ECSAutoOperate
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPAWSLambdaBasicExecutionAutoOperate
+        - !Ref IAMPECSAutoOperate
+  # ### IAMR ECSInstanceDraining IAM role ### 
+  IAMRECSInstanceDraining:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ECSInstanceDraining
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole
+        - !Ref IAMPECSInstanceDraining
+  # ### IAMR elkrepository01 IAM role ### 
+  IAMRelkrepository01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-elkrepository01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - es.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPelkrepository01
+  # ### IAMR ELKSnapshot IAM role ### 
+  IAMRELKSnapshot:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ELKSnapshot
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy
+        - !Ref IAMPELKSnapshotAuth
+  # ### IAMR OperationDailyReport-CWLogInsight IAM role ### 
+  IAMROperationDailyReportCWLogInsight:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-OperationDailyReport-CWLogInsight
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPAWSLambdaBasicExecutionRoleInvokeFunction
+        - !Ref IAMPOperationDailyReportCWLogInsight
+  # ### IAMR PipelineStart-NGINX-01 IAM role ### 
+  IAMRPipelineStartNGINX01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-PipelineStart-NGINX-01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPPipelineStartNGINX01
+  # ### IAMR PipelineStart-NGINX-03 IAM role ### 
+  IAMRPipelineStartNGINX03:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-PipelineStart-NGINX-03
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPPipelineStartNGINX03
+  # ### IAMR RDSSTART IAM role ### 
+  IAMRRDSSTART:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-RDSSTART
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPRDSSTARTAUTH
+  # ### IAMR RDSSTOP IAM role ### 
+  IAMRRDSSTOP:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-RDSSTOP
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPRDSSTOPAUTH
+  # ### IAMR StepFunctionsRole01 IAM role ### 
+  IAMRStepFunctionsRole01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-StepFunctionsRole01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - states.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPBatchJobManagementFullAccessPolicy
+        - !Ref IAMPXRayAccessPolicy
+  # ### IAMR TRANSACTION-CHECK IAM role ### 
+  IAMRTRANSACTIONCHECK:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-TRANSACTION-CHECK
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPTRANSACTIONCHECK
+  # ### IAMR VPCFlowLogs IAM role ### 
+  # IAMRVPCFlowLogs:
+  #   Type: 'AWS::IAM::Role'
+  #   Properties: 
+  #     RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-VPCFlowLogs
+  #     AssumeRolePolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             Service:
+  #               - vpc-flow-logs.amazonaws.com
+  #           Action:
+  #             - 'sts:AssumeRole'
+  #     ManagedPolicyArns:
+  #       - arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+  # ### IAMR WEB IAM role ### 
+  IAMRWEB:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEB
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCloudHSMReadOnlyAccess
+        - !Ref  IAMPWEBECS
+  # ### IAMR WEBCodeBuild01 IAM role ### 
+  IAMRWEBCodeBuild01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - !Ref IAMPWEBCodeBuild01
+  # ### IAMR WEBCodeBuild02 IAM role ### 
+  IAMRWEBCodeBuild02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeBuild02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codebuild.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - !Ref IAMPWEBCodeBuild02
+  # ### IAMR WEBCodeDeploy01 IAM role ### 
+  IAMRWEBCodeDeploy01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeDeploy01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codedeploy.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS
+  # ### IAMR WEBCodeDeploy02 IAM role ### 
+  IAMRWEBCodeDeploy02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodeDeploy02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codedeploy.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS
+  # ### IAMR WEBCodePipeline01 IAM role ### 
+  IAMRWEBCodePipeline01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPWEBCodePipeline01
+  # ### IAMR WEBCodePipeline02 IAM role ### 
+  IAMRWEBCodePipeline02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBCodePipeline02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPWEBCodePipeline02
+  # ### IAMR WEBContainerAction01 IAM role ### 
+  IAMRWEBContainerAction01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerAction01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - !Ref IAMPWEBContainerAction01
+  # ### IAMR WEBContainerAction02 IAM role ### 
+  IAMRWEBContainerAction02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerAction02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - !Ref IAMPWEBContainerAction02
+  # ### IAMR WEBContainerAction03 IAM role ### 
+  IAMRWEBContainerAction03:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerAction03
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - !Ref IAMPWEBContainerAction03
+  # ### IAMR WEBContainerActionLogUpload01 IAM role ### 
+  IAMRWEBContainerActionLogUpload01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerActionLogUpload01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPWEBContainerActionLogUpload01
+  # ### IAMR WEBTaskAction01 IAM role ### 
+  IAMRWEBTaskAction01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBTaskAction01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  # ### IAMR WEBTaskAction02 IAM role ### 
+  IAMRWEBTaskAction02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBTaskAction02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+  # ### IAMR ACCOUNTMANAGE-CustomAuthorizerFunction-1D7EHX229L7W0 IAM role ### 
+  #IAMRACCOUNTMANAGECustomAuthorizerFunction1D7EHX229L7W0:
+  #  Type: 'AWS::IAM::Role'
+  #  Properties: 
+  #    RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ACCOUNTMANAGE-CustomAuthorizerFunction-1D7EHX229L7W0
+  #    AssumeRolePolicyDocument:
+  #      Version: "2012-10-17"
+  #      Statement:
+  #        - Effect: Allow
+  #          Principal:
+  #            Service:
+  #              - codebuild.amazonaws.com
+  #          Action:
+  #            - 'sts:AssumeRole'
+  #    ManagedPolicyArns:
+  #      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  # ### IAMR ACCOUNTMANAGE-CustomAuthorizerFunction-1RS9HA63RM1X6 IAM role ### 
+  #IAMRACCOUNTMANAGECustomAuthorizerFunction1RS9HA63RM1X6:
+  #  Type: 'AWS::IAM::Role'
+  #  Properties: 
+  #    RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ACCOUNTMANAGE-CustomAuthorizerFunction-1RS9HA63RM1X6
+  #    AssumeRolePolicyDocument:
+  #      Version: "2012-10-17"
+  #      Statement:
+  #        - Effect: Allow
+  #          Principal:
+  #            Service:
+  #              - codebuild.amazonaws.com
+  #          Action:
+  #            - 'sts:AssumeRole'
+  #    ManagedPolicyArns:
+  #      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  # ### IAMR ACCOUNTMANAGE-CustomAuthorizerFunction-JSHEWS0JU0P6 IAM role ### 
+  #IAMRACCOUNTMANAGECustomAuthorizerFunctionJSHEWS0JU0P6:
+  #  Type: 'AWS::IAM::Role'
+  #  Properties: 
+  #    RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ACCOUNTMANAGE-CustomAuthorizerFunction-JSHEWS0JU0P6
+  #    AssumeRolePolicyDocument:
+  #      Version: "2012-10-17"
+  #      Statement:
+  #        - Effect: Allow
+  #          Principal:
+  #            Service:
+  #              - codebuild.amazonaws.com
+  #          Action:
+  #            - 'sts:AssumeRole'
+  #    ManagedPolicyArns:
+  #      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+  # ### IAMR FACEAPI IAM role ### 
+  IAMRFACEAPI:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-FACEAPI
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonCognitoPowerUser
+        - !Ref IAMPAWSLambdaBasicExecution
+        - arn:aws:iam::aws:policy/AmazonVPCFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess
+  # ### IAMR ACCOUNTMANAGEMENT04 IAM role ### 
+  IAMRACCOUNTMANAGEMENT04:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ACCOUNTMANAGEMENT04
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonCognitoPowerUser
+        - !Ref IAMPAWSLambdaBasicExecution
+  # ### IAMR ACCOUNTMANAGEMENT05 IAM role ### 
+  IAMRACCOUNTMANAGEMENT05:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ACCOUNTMANAGEMENT05
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonCognitoPowerUser
+        - !Ref IAMPAWSLambdaBasicExecution
+  # ### IAMR ACCOUNTMANAGEMENT06 IAM role ### 
+  IAMRACCOUNTMANAGEMENT06:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-ACCOUNTMANAGEMENT06
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonCognitoPowerUser
+        - !Ref IAMPAWSLambdaBasicExecution
+  # ### IAMR BAS IAM role ### 
+  IAMRBAS:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BAS
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryPowerUser
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+        - arn:aws:iam::aws:policy/CloudWatchAgentAdminPolicy
+        - !Ref IAMPBAS
+        - !Ref IAMPelkbackup01
+        - !Ref IAMPHSM
+  # ### IAMR BATCodePipeline01 IAM role ### 
+  IAMRBATCodePipeline01:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BATCodePipeline01
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - codepipeline.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPBATCodePipeline01
+  # ### IAMR BATContainerAction02 IAM role ### 
+  IAMRBATContainerAction02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-BATContainerAction02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - !Ref IAMPKMSDecrypt02
+        - !Ref IAMPBATECSAthenaFullAccess02
+        - !Ref IAMPBATContainerAction02
+  # ### IAMR cloudwatchlogs-JlisCrlBatch IAM role ### 
+  IAMRcloudwatchlogsJlisCrlBatch:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-cloudwatchlogs-JlisCrlBatch
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logs.ap-northeast-1.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPPermissionsPolicyForCWLJlisCrlBatch
+  # ### IAMR cloudwatchlogs-OrgCrlBatch IAM role ###
+  IAMRcloudwatchlogsOrgCrlBatch:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-cloudwatchlogs-OrgCrlBatch
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logs.ap-northeast-1.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPPermissionsPolicyForCWLOrgCrlBatch
+  # ### IAMR cloudwatchlogs-rds-log01-cluster IAM role ###
+  IAMRcloudwatchlogsrdslog01cluster:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-cloudwatchlogs-rds-log01-cluster
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logs.ap-northeast-1.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPPermissionsPolicyForCWLrdslog01cluster
+  # ### IAMR cloudwatchlogs-rds-qsh01-events IAM role ###
+  IAMRcloudwatchlogsrdsqsh01events:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-cloudwatchlogs-rds-qsh01-events
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logs.ap-northeast-1.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPPermissionsPolicyForCWLRDSOQSMT2QSH01EVENTS
+  # ### IAMR cloudwatchlogs-rds-qsh01-postgresql IAM role ###
+  IAMRcloudwatchlogsrdsqsh01postgresql:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-cloudwatchlogs-rds-qsh01-postgresql
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logs.ap-northeast-1.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPPermissionsPolicyForCWLrdsqsh01postgresql
+  # ### IAMR cloudwatchlogs-WEB-OQS-MT2 IAM role ###
+  IAMRcloudwatchlogsWEB:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-cloudwatchlogs-WEB-${SystemNameUpper}-${EnvironmentNameUpper}
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - logs.ap-northeast-1.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPPermissionsPolicyForCWLWEBOQSMT2
+  # ### IAMR CWE-EPS-TEST-TOOL-OUTPUT IAM role ###
+  IAMRCWEEPSTESTTOOLOUTPUT:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-CWE-EPS-TEST-TOOL-OUTPUT
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - events.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPLMDEPSTESTTOOLOUTPUT
+  # ### IAMR lambda-CWLtoZABBIX-InvokeFunction IAM role ###
+  IAMRlambdaCWLtoZABBIXInvokeFunction:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-lambda-CWLtoZABBIX-InvokeFunction
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPAWSLambdaInvokeRoleInvokeFunction
+        - !Ref IAMPAWSLambdaS3Access
+        - !Ref IAMPAWSLambdaBasicExecutionRoleInvokeFunction
+        - !Ref IAMPAWSLambdaENIManagementAccessInvokeFunction
+  # ### IAMR lambda-CWLtoZABBIX-MAIN IAM role ###
+  IAMRlambdaCWLtoZABBIXMAIN:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-lambda-CWLtoZABBIX-MAIN
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPAWSLambdaENIManagementAccessMAIN
+        - !Ref IAMPAWSLambdaBasicExecutionRoleMAIN
+  # ### IAMR LMD-EPS-TEST-TOOL-OUTPUT IAM role ###
+  IAMRLMDEPSTESTTOOLOUTPUT:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-LMD-EPS-TEST-TOOL-OUTPUT
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPAWSLambdaBasicExecution
+        - !Ref IAMPAWSLambdaENIManagementAccessMAIN
+        - !Ref IAMPKMSDecrypt01
+        - !Ref IAMPLMDEPSTESTTOOLOUTPUT
+  # ### IAMR WEBContainerAction04 IAM role ###
+  IAMRWEBContainerAction04:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-WEBContainerAction04
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ecs-tasks.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+        - !Ref IAMPWEBContainerAction04
+  # ### IAMR IAMR-OQS-CMN-Lambda-GetInstancePatchList02 IAM role ###
+  IAMRIAMROQSCMNLambdaGetInstancePatchList02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-IAMR-OQS-CMN-Lambda-GetInstancePatchList02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+        - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaRole
+        - !Ref IAMPLAMBDACLOUDWATCHLOGS
+        - !Ref IAMPSSMS3
+  # ### IAMR IAMR-OQS-CMN-Lambda-GitUpdate02 IAM role ###
+  IAMRIAMROQSCMNLambdaGitUpdate02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-IAMR-OQS-CMN-Lambda-GitUpdate02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonSSMFullAccess
+        - arn:aws:iam::aws:policy/AmazonEC2FullAccess
+        - arn:aws:iam::aws:policy/CloudWatchLogsFullAccess
+#        - arn:aws:iam::aws:policy/AWSCodePipelineFullAccess
+  # ### IAMR IAMR-OQS-CMN-SSM-SNSPublish02 IAM role ###
+  IAMRIAMROQSCMNSSMSNSPublish02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-IAMR-OQS-CMN-SSM-SNSPublish02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+                - ssm.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPSNSPUBLISH
+  # ### IAMR IAMR-QOS-CMN-SSMTOLAMBDA02 IAM role ###
+  IAMRIAMROQSCMNSSMTOLAMBDA02:
+    Type: 'AWS::IAM::Role'
+    Properties: 
+      RoleName: !Sub IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-IAMR-QOS-CMN-SSMTOLAMBDA02
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ssm.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - !Ref IAMPSSMTOLAMBDA
+
+  # ### BAT InstanceProfile ### 
+  # BATInstanceProfile: 
+  #   Type: "AWS::IAM::InstanceProfile"
+  #   Properties: 
+  #     Roles: 
+  #       - !Ref IAMRABAT
+
+ 

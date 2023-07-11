@@ -1,0 +1,248 @@
+#############################################################
+# Copyright 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-Security.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for Security
+# Version: 1.0
+# Author: Fujitsu - hou
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  #  ## user form  ##
+  #  :param SystemNameUpper: ['OQS'] システム名称(大文字)
+  #  :param EnvironmentNameUpper01: ['CMN']　共通環境名(大文字)
+  #  :param EnvironmentNameUpper02: ['MNT']  環境名(大文字)
+  #  :param RsourceGroupTagKey: ['example: InspectorGroup'] KeyName
+  #  :param WebALBName: ['example: ALB-OQS-DEV-WEB01/xxxxxxxxxxxx']
+  #  :param NginxALBName: ['example: ALB-OQS-DEV-WSPRXY01/xxxxxxxxxxx']
+  #  :param APIId: ['example: uctbg6vlqh']
+  #  :param RuleId: ['example: 206d5a66-3203-4bf1-8e12-2b90a0b6befe']
+  #  :param OperatingSystem: ['AMAZON_LINUX','AMAZON_LINUX_2','AMAZON_LINUX_2022','CENTOS','DEBIAN','MACOS','ORACLE_LINUX','RASPBIAN','REDHAT_ENTERPRISE_LINUX','ROCKY_LINUX','SUSE','UBUNTU','WINDOWS']
+  #  :param PatchBaselineName: ['AWSから以外のName設定']
+  #  :param CreateInspector: ['Conditionsを設定したため、単体実施可能']
+  #  :param CreateWAFRegional: ['Conditionsを設定したため、単体実施可能']
+  #  :param CreateSecurityHub: ['Conditionsを設定したため、単体実施可能']
+  #  :param CreateGuardDuty: ['Conditionsを設定したため、単体実施可能']
+  #  :param CreatePatchBaseline: ['Conditionsを設定したため、単体実施可能']
+  SystemNameUpper:
+    Type: String
+    Default: "OQS"
+  EnvironmentNameUpper01:
+    Type: String
+    Default: "CMN"
+  EnvironmentNameUpper02:
+    Type: String
+    Default: "MNT"
+  RsourceGroupTagKey:
+    Type: String
+    Default: "Inspector Group"
+  WebALBName:
+    Type: String
+    Default: "ALB-OQS-DEV-WEB01/xxxxxxxxxxx"
+    AllowedValues: ["ALB-OQS-DEV-WEB01/xxxxxxxxxxx"]
+  NginxALBName:
+    Type: String
+    Default: "ALB-OQS-DEV-WSPRXY01/xxxxxxxxxxxxx"
+    AllowedValues: ["ALB-OQS-DEV-WSPRXY01/xxxxxxxxxxxxx"]
+  # APIId:
+  #   Type: String
+  #   Default: 'uctbg6vlqh'
+  #   AllowedValues: ['uctbg6vlqh' ]
+  # RuleId:
+  #   Type: String
+  #   Default: "-"
+  OperatingSystem:
+    Type: String
+    Default: "AMAZON_LINUX_2"
+    AllowedValues: ["WINDOWS", "AMAZON_LINUX_2"]
+  PatchBaselineName:
+    Type: String
+    Default: "-"
+  CreateInspector:
+    Type: String
+    Default: "Inspector"
+  CreateWAFRegional:
+    Type: String
+    Default: "WAFRegional"
+  CreateSecurityHub:
+    Type: String
+    Default: "SecurityHub"
+  CreateGuardDuty:
+    Type: String
+    Default: "GuardDuty"
+  CreatePatchBaseline:
+    Type: String
+    Default: "PatchBaseline"
+
+Conditions:
+  CreateInspector: !Equals
+    - !Ref CreateInspector
+    - Inspector
+  CreateWAFRegional: !Equals
+    - !Ref CreateWAFRegional
+    - WAFRegional
+  CreateSecurityHub: !Equals
+    - !Ref CreateSecurityHub
+    - SecurityHub
+  CreateGuardDuty: !Equals
+    - !Ref CreateGuardDuty
+    - GuardDuty
+  CreatePatchBaseline: !Equals
+    - !Ref CreatePatchBaseline
+    - PatchBaseline
+
+Resources:
+  #-------------------Inspector--------------------#
+  InspectorResourceGroup01:
+    Type: "AWS::Inspector::ResourceGroup"
+    Condition: CreateInspector
+    Properties:
+      ResourceGroupTags:
+        - Key: !Ref RsourceGroupTagKey
+          Value: !Sub "INS-${SystemNameUpper}-${EnvironmentNameUpper01}-LinuxIG01"
+
+  InspectorAssessmentTarget01:
+    Type: "AWS::Inspector::AssessmentTarget"
+    Condition: CreateInspector
+    Properties:
+      AssessmentTargetName: !Sub "INS-${SystemNameUpper}-${EnvironmentNameUpper01}-TG-Linux01"
+      ResourceGroupArn: !Ref InspectorResourceGroup01
+
+  InspectorAssessmentTemplate01:
+    Type: "AWS::Inspector::AssessmentTemplate"
+    Condition: CreateInspector
+    Properties:
+      AssessmentTemplateName: !Sub "INS-${SystemNameUpper}-${EnvironmentNameUpper01}-TMP-Linux"
+      AssessmentTargetArn: !Ref InspectorAssessmentTarget01
+      DurationInSeconds: 3600
+      RulesPackageArns:
+        - !Sub "arn:aws:inspector:${AWS::Region}:406045910587:rulespackage/0-7WNjqgGu"
+        - !Sub "arn:aws:inspector:${AWS::Region}:406045910587:rulespackage/0-YI95DVd7"
+        - !Sub "arn:aws:inspector:${AWS::Region}:406045910587:rulespackage/0-gHP9oWNT"
+        - !Sub "arn:aws:inspector:${AWS::Region}:406045910587:rulespackage/0-bBUQnxMq"
+
+  InspectorResourceGroup02:
+    Type: "AWS::Inspector::ResourceGroup"
+    Condition: CreateInspector
+    Properties:
+      ResourceGroupTags:
+        - Key: !Ref RsourceGroupTagKey
+          Value: !Sub "INS-${SystemNameUpper}-${EnvironmentNameUpper01}-WoindwsIG01"
+
+  InspectorAssessmentTarget02:
+    Type: "AWS::Inspector::AssessmentTarget"
+    Condition: CreateInspector
+    Properties:
+      AssessmentTargetName: !Sub "INS-${SystemNameUpper}-${EnvironmentNameUpper01}-TG-Woindws01"
+      ResourceGroupArn: !Ref InspectorResourceGroup02
+
+  InspectorAssessmentTemplate02:
+    Type: "AWS::Inspector::AssessmentTemplate"
+    Condition: CreateInspector
+    Properties:
+      AssessmentTemplateName: !Sub "INS-${SystemNameUpper}-${EnvironmentNameUpper01}-TMP-Woindws"
+      AssessmentTargetArn: !Ref InspectorAssessmentTarget02
+      DurationInSeconds: 3600
+      RulesPackageArns:
+        - !Sub "arn:aws:inspector:${AWS::Region}:406045910587:rulespackage/0-7WNjqgGu"
+        - !Sub "arn:aws:inspector:${AWS::Region}:406045910587:rulespackage/0-YI95DVd7"
+        - !Sub "arn:aws:inspector:${AWS::Region}:406045910587:rulespackage/0-gHP9oWNT"
+        - !Sub "arn:aws:inspector:${AWS::Region}:406045910587:rulespackage/0-bBUQnxMq"
+
+  #-------------------WAF----------------------#
+
+  # ALBWAFRegionalWebACL:
+  #   Type: "AWS::WAFRegional::WebACL"
+  #   Condition: CreateWAFRegional
+  #   Properties:
+  #     Name: !Sub 'WAF-${SystemNameUpper}-${EnvironmentNameUpper02}-ALB'
+  #     MetricName: !Sub 'WAFMETRIC${SystemNameUpper}-${EnvironmentNameUpper02}ALB01'
+  #     DefaultAction:
+  #       Type: "ALLOW"
+  #     Rules:
+  #       -
+  #         Action:
+  #           Type: BLOCK
+  #         Priority: 1
+  #         RuleId: !Ref  RuleId
+
+  # ALBWAFRegionalWebACLAssociation01:
+  #   Type: "AWS::WAFRegional::WebACLAssociation"
+  #   Condition: CreateWAFRegional
+  #   Properties:
+  #     ResourceArn: !Sub 'arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${WebALBName}'
+  #     WebACLId: !Ref ALBWAFRegionalWebACL
+
+  # ALBWAFRegionalWebACLAssociation02:
+  #   Type: "AWS::WAFRegional::WebACLAssociation"
+  #   Condition: CreateWAFRegional
+  #   Properties:
+  #     ResourceArn: !Sub 'arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/app/${NginxALBName}'
+  #     WebACLId: !Ref ALBWAFRegionalWebACL
+
+  # APIWAFRegionalWebACL:
+  #   Type: "AWS::WAFRegional::WebACL"
+  #   Condition: CreateWAFRegional
+  #   Properties:
+  #     Name: !Sub 'WAF-${SystemNameUpper}-${EnvironmentNameUpper02}-APIGW'
+  #     MetricName: !Sub 'WAFMETRIC${SystemNameUpper}-${EnvironmentNameUpper02}APIGW'
+  #     DefaultAction:
+  #       Type: "ALLOW"
+  #     Rules:
+  #       -
+  #         Action:
+  #           Type: BLOCK
+  #         Priority: 1
+  #         RuleId: !Ref  RuleId
+
+  # APIWAFRegionalWebACLAssociation01:
+  #   Type: "AWS::WAFRegional::WebACLAssociation"
+  #   Condition: CreateWAFRegional
+  #   Properties:
+  #     ResourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIId}/*'
+  #     WebACLId: !Ref APIWAFRegionalWebACL
+
+  #------------------SecurityHub---------------#
+
+  SecurityHubHub:
+    Type: "AWS::SecurityHub::Hub"
+    Condition: CreateSecurityHub
+
+  ##------------------GuardDuty------------------#
+
+  GuardDuty:
+    Type: AWS::GuardDuty::Detector
+    Condition: CreateGuardDuty
+    Properties:
+      Enable: true
+
+  #------------------SystemsManager-------------------#
+
+  PatchBaseline:
+    Type: AWS::SSM::PatchBaseline
+    Condition: CreatePatchBaseline
+    Properties:
+      Name: !Ref PatchBaselineName
+      Description: Baseline
+      OperatingSystem: !Ref OperatingSystem
+      ApprovalRules:
+        PatchRules:
+          - PatchFilterGroup:
+              PatchFilters:
+                - Key: SEVERITY ## ADVISORY_ID | ARCH | BUGZILLA_ID | CLASSIFICATION | CVE_ID | EPOCH |MSRC_SEVERITY | NAME | PATCH_ID | PATCH_SET | PRIORITY | PRODUCT | PRODUCT_FAMILY |RELEASE | REPOSITORY | SECTION | SECURITY | SEVERITY | VERSION
+                  Values:
+                    - Critical
+                    - Important
+                - Key: CLASSIFICATION
+                  Values:
+                    - Security
+            ApproveAfterDays: 7
+            ComplianceLevel: HIGH
+          - PatchFilterGroup:
+              PatchFilters:
+                - Key: CLASSIFICATION
+                  Values:
+                    - Bugfix
+            ApproveAfterDays: 7
+            ComplianceLevel: HIGH

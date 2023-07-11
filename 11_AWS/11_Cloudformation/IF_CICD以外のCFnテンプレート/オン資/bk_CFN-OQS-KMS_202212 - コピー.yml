@@ -1,0 +1,259 @@
+############################
+# Copyrightc 2022 FUJITSU LIMITED
+# FileName: CFN-OQS-MNT-IAM_202211.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Network
+# Version: 1.0
+# Author: Fujitsu - ichikawa
+############################
+AWSTemplateFormatVersion: 2010-09-09
+
+# Transform:
+#   Name: 'AWS::Include'
+#   Parameters:
+#     Location: !Sub '${MappingFilePATH}'
+
+Parameters:
+  #  ## user form  ##
+  #  :param PeeringVPC: デプロイ済みの共通環境VPCのIDを指定
+  #  :param TGWid: デプロイ済みトランジットGWのIDを指定
+  #  :param SystemNameUpper: システム名称（大文字）
+  #  :param EnvironmentNameUpper: 環境名（大文字）
+  # MappingFilePATH:
+  #   Type: String
+  #   Default: 'example: s3://'
+  #SystemNameUpper:
+  #  Type: String
+  #  Default: 'example: OQS'
+  #EnvironmentNameUpper:
+  #  Type: String
+  #  Default: 'example: MNT'
+  #EnvironmentNameUpper2:
+  #  Type: String
+  #  Default: 'example: MT1'
+  # PeeringVPC:
+  #   Type: String
+  #   Default: 'example: vpc-123456789abcd'
+  # TGWid:
+  #   Type: String
+  #   Default: 'example: tgw-123456789abcd'
+Resources:
+  # ### KMS /aws/cloudtrail ###
+  KMSCloudtrail:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Enabled: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      MultiRegion: false
+      EnableKeyRotation: true
+      
+  # ### KMS Alias /aws/cloudtrail ###
+  # AliasNameは"alias//""と指定する
+  KMSCloudtrailAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: "alias//aws/cloudtrail"
+      TargetKeyId: !Ref KMSCloudtrail
+
+  # ### KMS /aws/cloudwatchlogs ###
+  KMSCloudWatchlogs:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Enabled: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-2
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      MultiRegion: false
+      EnableKeyRotation: true
+# ### KMS Alias /aws/cloudwatchlogs ###
+# AliasNameは"alias//""と指定する
+  KMSCloudWatchlogsAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: "alias//aws/cloudwatchlogs"
+      TargetKeyId: !Ref KMSCloudWatchlogs
+
+# ### KMS /aws/s3/mt2-for-cb ###
+  KMSS3mt2forcb:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Enabled: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      MultiRegion: false
+      EnableKeyRotation: true
+# ### KMS Alias /aws/s3/mt2-for-cb ###
+# AliasNameは"alias//""と指定する
+  KMSS3mt2forcbAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: "alias//aws/s3/mt2-for-cb"
+      TargetKeyId: !Ref KMSS3mt2forcb
+
+# ### KMS /aws/s3/mt2-for-3kinou ###
+  KMSS3mt2for3kinou:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Description: "3機能とのS3マスタ連携用KMSキー"
+      Enabled: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      MultiRegion: false
+      EnableKeyRotation: true
+# ### KMS Alias /aws/s3/mt2-for-3kinou ###
+# AliasNameは"alias//""と指定する
+  KMSS3mt2for3kinouAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: "alias//aws/s3/mt2-for-3kinou"
+      TargetKeyId: !Ref KMSS3mt2for3kinou
+
+# ### KMS /aws/s3 ###
+  KMSS3:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Enabled: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      MultiRegion: false
+      EnableKeyRotation: true
+# ### KMS Alias /aws/s3 ###
+# AliasNameは"alias//""と指定する
+  KMSS3Alias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: "alias//aws/s3"
+      TargetKeyId: !Ref KMSS3
+
+# ### KMS /cmn/s3 ###
+  KMSCMNS3:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Enabled: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      MultiRegion: false
+      EnableKeyRotation: true
+# ### KMS Alias /cmn/s3 ###
+# AliasNameは"alias//""と指定する
+  KMSCMNS3Alias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: "alias//cmn/s3"
+      TargetKeyId: !Ref KMSCMNS3
+
+# ### KMS /aws/mt2-for-eps ###
+  KMSmt2foreps:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Description: "電子処方箋本体とのS3マスタ連携用KMSキー"
+      Enabled: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      MultiRegion: false
+      EnableKeyRotation: true
+# ### KMS Alias /aws/mt2-for-eps ###
+# AliasNameは"alias//""と指定する
+  KMSmt2forepsAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: "alias//aws/mt2-for-eps"
+      TargetKeyId: !Ref KMSmt2foreps
+
+# ### KMS /aws/mt2-for-git ###
+  KMSmt2forgit:
+    Type: "AWS::KMS::Key"
+    Properties:
+      Description: "CICD構築S3バケット用"
+      Enabled: true
+      KeyUsage: "ENCRYPT_DECRYPT"
+      KeyPolicy:
+        Version: 2012-10-17
+        Id: key-default-1
+        Statement:
+          - Sid: "Enable IAM User Permissions"
+            Effect: Allow
+            Principal:
+              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
+            Action: "kms:*"
+            Resource: "*"
+      KeySpec: "SYMMETRIC_DEFAULT"
+      MultiRegion: false
+      EnableKeyRotation: true
+# ### KMS Alias /aws/mt2-for-git ###
+# AliasNameは"alias//""と指定する
+  KMSS3for3kinouAlias:
+    Type: 'AWS::KMS::Alias'
+    Properties:
+      AliasName: "alias//aws/mt2-for-git"
+      TargetKeyId: !Ref KMSmt2forgit

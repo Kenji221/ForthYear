@@ -1,0 +1,350 @@
+############################
+# Copyright© 2019 FUJITSU LIMITED
+# FileName: CLF-OQS-MNT-WEBECS01.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for MNT Web ECS
+# Version: 1.0
+# Author: Fujitsu - minegishi
+############################
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  #  ## user form  ##
+  #  :param Environment: システム環境の指定（DEV/STG/MNT/PRO）
+  #  :param VpcId: ECSで対象となるVPCIDを指定
+  #  :param ClusterType: ECSクラスタ名などに使用されるコンテナ識別を指定
+  #  :param Number: 同一コンテナタイプで何番目のクラスタか指定
+  #  :param KeyName: ECSでデプロイされるEC2インスタンスでsshログインに使用されるキーペア名を指定
+  #  :param SubnetId: ECSで対象となるSubnetIDを指定
+  #  :param DesiredCapacity: ECSで利用するEC2インスタンスの数を指定
+  #  :param MaxSize: AutoScaling設定時のEC2インスタンス最大数を指定
+  #  :param InstanceType: EC2インスタンスのサイズを指定
+  #  :param AWSRegionToAMI: EC2で利用するAMI IDを指定※ただし、事前にECS暗号化済みのカスタムイメージを指定すること
+  #
+  Environment:
+    Type: String
+    Description: Specify the environment to deploy
+    Default: 'MNT'
+    AllowedValues: ['DEV','STG','MNT','PRO','MT1','MT2']
+  VpcId:
+    Type: String
+    Description: Select a VPC that allows instances access to the Internet
+    Default: 'example:vpc-039efc81bad2fea3d'
+  ClusterType:
+    Type: String
+    Description: ECS Cluster Type
+    Default: 'WEB'
+    AllowedValues: ['WEB','BAT']
+  Number:
+    Type: String
+    Description: ECS Cluster Number
+    Default: '01'
+    AllowedValues: ['01','02','03','04','05']
+  KeyName:
+    Type: String
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the ECS instances
+    Default: 'key-or-mt2'
+  SubnetId:
+    Type: CommaDelimitedList
+    Description: Select at two subnets in your selected VPC
+    Default: 'example:subnet-0d22de316cb640cd0,subnet-0e729861753df0845,subnet-0bce319c2d46fc0f9'
+  SecurityGroup:
+    Type: CommaDelimitedList
+    Description: SecurityGroup id for the ECS instances
+    Default: 'example:sg-0bb48ea4f7bd39cea,sg-09bbf66be76e59f58'
+  DesiredCapacity:
+    Type: Number
+    Default: '1'
+    Description: Number of instances to launch in your ECS cluster.
+  MinSize:
+    Type: Number
+    Default: '1'
+    Description: Minimum number of instances that can be launched in your ECS cluster.
+  MaxSize:
+    Type: Number
+    Default: '2'
+    Description: Maximum number of instances that can be launched in your ECS cluster.
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: r5.4xlarge
+    ConstraintDescription: Please choose a valid instance type.
+  AWSRegionToAMI:
+    Description: EC2 instance AMI Image
+    Type: String
+    Default: ami-057c2f81d45d2127c
+  EbsVolumeSize:
+    Type: Number
+    Description: >
+      Optional - Specifies the Size in GBs, of the newly created Amazon
+      Elastic Block Store (Amazon EBS) volume
+    Default: '400'
+  EbsVolumeType:
+    Type: String
+    Description: Optional - Specifies the Type of (Amazon EBS) volume
+    Default: 'gp2'
+    AllowedValues:
+      - ''
+      - standard
+      - io1
+      - gp2
+      - sc1
+      - st1
+    ConstraintDescription: Must be a valid EC2 volume type.
+  DeviceName:
+    Type: String
+    Default: '/dev/xvda'
+    Description: Optional - Specifies the device mapping for the Volume
+  MinInstancesInService:
+    Type: Number
+    Default: '3'
+    Description: Minimum number of instances that should be running during updating in your ECS cluster.
+Resources:
+  #  ##  ECS  ##
+  #  :param : ECSCluster: ECSのクラスタ定義をデプロイ
+  #  :param : ECSAutoScalingGroup: EC2のAutoScalingの設定
+  #  :param : ContainerInstances: EC2インスタンスをデプロイ
+  #  :param : EC2Role: WEB ECSで設定を行う
+  #  :param : AutoscalingRole:
+  #  :param : EC2InstanceProfile:
+  #
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub ECS-OQS-${Environment}-${ClusterType}${Number}
+      Tags:
+        - Key: AutoOperate
+          Value: !Sub ${ClusterType}${Number}-${Environment}
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      # AutoScalingGroupName: !Sub AS-OQS-${Environment}-${ClusterType}ECS${Number}
+      VPCZoneIdentifier: !Ref SubnetId
+      LaunchConfigurationName: !Ref ContainerInstances
+      HealthCheckGracePeriod: 300 #ヘルスチェックの猶予期間
+      MinSize: !Ref MinSize
+      MaxSize: !Ref MaxSize
+      DesiredCapacity: !Ref DesiredCapacity
+      TerminationPolicies: NewestInstance
+      Tags:
+        - Key: Name
+          Value: !Sub EC2-OQS-${Environment}-${ClusterType}ECS${Number}
+          PropagateAtLaunch: 'true'
+        - Key: BillingGroup
+          Value: !Sub OQS-${Environment}
+          PropagateAtLaunch: 'true'
+        - Key: AutoOperate
+          Value: !Sub ${ClusterType}-${Environment}
+          PropagateAtLaunch: 'true'
+    #CreationPolicy:
+    #  ResourceSignal:
+    #    Timeout: PT15M
+    UpdatePolicy:
+#      AutoScalingReplacingUpdate:
+#        WillReplace: 'true'
+      AutoScalingRollingUpdate:
+        MinInstancesInService: !Ref MinInstancesInService
+        PauseTime: PT10M
+
+  ContainerInstances:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref AWSRegionToAMI
+      SecurityGroups: !Ref SecurityGroup
+      InstanceType: !Ref InstanceType
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      KeyName: !Ref KeyName
+      BlockDeviceMappings:
+      - DeviceName: !Ref DeviceName
+        Ebs:
+         VolumeSize: !Ref EbsVolumeSize
+         VolumeType: !Ref EbsVolumeType
+######################################################################################
+####USERDATA area############
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          hostnamectl set-hostname ecs-oqs-mt2-web01
+
+          yum install aws-cli -y
+          yum install wget -y
+          wget https://s3.ap-northeast-1.amazonaws.com/amazoncloudwatch-agent-ap-northeast-1/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+          rpm -U ./amazon-cloudwatch-agent.rpm
+          sleep 15
+          aws s3 cp s3://s3-oqs-mt2-ecs-userdata-file01/web_amazon-cloudwatch-agent.json /tmp/amazon-cloudwatch-agent.json
+          cp /tmp/amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/
+          /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2  -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+
+          echo ECS_CLUSTER=ECS-OQS-${Environment}-${ClusterType}${Number} >> /etc/ecs/ecs.config
+          echo ECS_IMAGE_PULL_BEHAVIOR=always >> /etc/ecs/ecs.config
+          yum install -y aws-cfn-bootstrap
+          ACTIVATIONURL='dsm://10.108.17.11:4120/'
+          MANAGERURL='https://10.108.17.11:4119'
+          CURLOPTIONS='--silent --tlsv1.2'
+          linuxPlatform='';
+          agentVersion='20.0.0.1681';
+          isRPM='';
+          curl $MANAGERURL/software/deploymentscript/platform/linuxdetectscriptv1/ -o /tmp/PlatformDetection $CURLOPTIONS --insecure
+          . /tmp/PlatformDetection
+          platform_detect
+          echo Downloading agent package...
+          package='agent.rpm'
+          curl $MANAGERURL/software/agent/$linuxPlatform/$agentVersion -o /tmp/$package $CURLOPTIONS --insecure
+          echo Installing agent package...
+          rpm -ihv /tmp/agent.rpm
+          sleep 15
+          /opt/ds_agent/dsa_control -r
+          /opt/ds_agent/dsa_control -a $ACTIVATIONURL "policyid:12"
+          # /opt/ds_agent/dsa_control -a dsm://10.108.17.11:4120/ "policyid:12"
+          sudo sysctl -w net.core.somaxconn=65535
+          sudo sysctl -w net.ipv4.tcp_max_syn_backlog=65535
+          sudo sysctl -w net.core.netdev_max_backlog=65535
+          sudo sysctl -w net.ipv4.tcp_fin_timeout=30
+          sudo sysctl -w net.ipv4.tcp_tw_reuse=0
+          # 性能取得ツール用設定
+          # yum -y install amazon-efs-utils
+          # mkdir -p /home/ec2-user/performancetest
+          # chown ec2-user:ec2-user /home/ec2-user/performancetest
+          # mount -t efs fs-55ea0375:/ /home/ec2-user/performancetest
+          # yum -y install tcpdump
+
+  #ECSインスタンスのスケーリングポリシー設定
+  ECSInstanceScalingPolicy:
+    Type: AWS::AutoScaling::ScalingPolicy
+    Properties:
+      AutoScalingGroupName: !Ref ECSAutoScalingGroup #必須
+      EstimatedInstanceWarmup: 300
+      PolicyType: TargetTrackingScaling
+      TargetTrackingConfiguration: #TargetTrackingScalingの場合必須
+        DisableScaleIn: false
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ASGAverageCPUUtilization
+        TargetValue: 90
+#  service:
+#    Type: AWS::ECS::Service
+#    DependsOn: ALBListener
+#    Properties:
+#      Cluster: !Ref 'ECSCluster'
+#      DesiredCount: '1'
+#      LoadBalancers:
+#      - ContainerName: simple-app
+#        ContainerPort: '80'
+#        TargetGroupArn: !Ref 'ECSTG'
+#      Role: !Ref 'ECSServiceRole'
+#      TaskDefinition: !Ref 'taskdefinition'
+#  ECSServiceRole:
+#    Type: AWS::IAM::Role
+#    Properties:
+#      AssumeRolePolicyDocument:
+#        Statement:
+#        - Effect: Allow
+#          Principal:
+#            Service: [ecs.amazonaws.com]
+#          Action: ['sts:AssumeRole']
+#      Path: /
+#      Policies:
+#      - PolicyName: ecs-service
+#        PolicyDocument:
+#          Statement:
+#          - Effect: Allow
+#            Action: ['elasticloadbalancing:DeregisterInstancesFromLoadBalancer', 'elasticloadbalancing:DeregisterTargets',
+#              'elasticloadbalancing:Describe*', 'elasticloadbalancing:RegisterInstancesWithLoadBalancer',
+#              'elasticloadbalancing:RegisterTargets', 'ec2:Describe*', 'ec2:AuthorizeSecurityGroupIngress']
+#            Resource: '*'
+#  ServiceScalingTarget:
+#    Type: AWS::ApplicationAutoScaling::ScalableTarget
+#    DependsOn: service
+#    Properties:
+#      MaxCapacity: 1
+#      MinCapacity: 1
+#      ResourceId: !Join ['', [service/, !Ref 'ECSCluster', /, !GetAtt [service, Name]]]
+#      RoleARN: !GetAtt [AutoscalingRole, Arn]
+#      ScalableDimension: ecs:service:DesiredCount
+#      ServiceNamespace: ecs
+#  ServiceScalingPolicy:
+#    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+#    Properties:
+#      PolicyName: AStepPolicy
+#      PolicyType: StepScaling
+#      ScalingTargetId: !Ref 'ServiceScalingTarget'
+#      StepScalingPolicyConfiguration:
+#        AdjustmentType: PercentChangeInCapacity
+#        Cooldown: 60
+#        MetricAggregationType: Average
+#        StepAdjustments:
+#        - MetricIntervalLowerBound: 0
+#          ScalingAdjustment: 200
+#  ALB500sAlarmScaleUp:
+#    Type: AWS::CloudWatch::Alarm
+#    Properties:
+#      EvaluationPeriods: '1'
+#      Statistic: Average
+#      Threshold: '10'
+#      AlarmDescription: Alarm if our ALB generates too many HTTP 500s.
+#      Period: '60'
+#      AlarmActions: [!Ref 'ServiceScalingPolicy']
+#      Namespace: AWS/ApplicationELB
+#      Dimensions:
+#        - Name: LoadBalancer
+#          Value: !GetAtt
+#            - ECSALB
+#            - LoadBalancerFullName
+#      ComparisonOperator: GreaterThanThreshold
+#      MetricName: HTTPCode_ELB_5XX_Count
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ec2.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      ManagedPolicyArns:
+      #  - arn:aws:iam::aws:policy/AWSCodeCommitFullAccess
+        - !Sub arn:aws:iam::066756805702:policy/IAMP-OQS-${Environment}-${ClusterType}ECS
+      Path: /
+      RoleName: !Sub IAMR-OQS-${Environment}-${ClusterType}
+      Policies:
+      - PolicyName: !Sub IAMP-OQS-${Environment}-ECS
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action: ['ec2:DescribeTags', 'ecs:CreateCluster', 'ecs:DeregisterContainerInstance', 'ecs:DiscoverPollEndpoint',
+              'ecs:Poll', 'ecs:RegisterContainerInstance', 'ecs:StartTelemetrySession', 'ecs:UpdateContainerInstancesState',
+              'ecr:GetAuthorizationToken', 'ecr:BatchCheckLayerAvailability', 'ecr:GetDownloadUrlForLayer', 'ecr:BatchGetImage',
+              'ecs:Submit*', 'logs:CreateLogStream', 'logs:PutLogEvents']
+            Resource: '*'
+  AutoscalingRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [application-autoscaling.amazonaws.com]
+          Action: ['sts:AssumeRole']
+      Path: /
+      Policies:
+      - PolicyName: !Sub IAMP-OQS-${Environment}-service-autoscaling
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action: ['application-autoscaling:*', 'cloudwatch:DescribeAlarms', 'cloudwatch:PutMetricAlarm',
+              'ecs:DescribeServices', 'ecs:UpdateService']
+            Resource: '*'
+  ASGTerminateHook:
+    Type: "AWS::AutoScaling::LifecycleHook"
+    Properties:
+      AutoScalingGroupName: !Ref ECSAutoScalingGroup
+      DefaultResult: "ABANDON"
+      HeartbeatTimeout: "900"
+      LifecycleTransition: "autoscaling:EC2_INSTANCE_TERMINATING"
+      NotificationMetadata:  !Sub ECS-OQS-${Environment}-${ClusterType}${Number}
+      NotificationTargetARN: !Sub arn:aws:sns:ap-northeast-1:936323190821:SNS-OQS-${Environment}-ASGLifeCycleHook
+      RoleARN: !Sub arn:aws:iam::936323190821:role/IAMR-OQS-${Environment}-ASGLifeCycleHook
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles: [!Ref 'EC2Role']

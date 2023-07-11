@@ -1,0 +1,658 @@
+#############################################################
+# Copyright 2019 FUJITSU LIMITED
+# FileName: CLF-CICD-BatchECS-Template.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for BatchECS CI/CD
+# Version: 1.0
+# Author: Fujitsu - hou
+#############################################################
+AWSTemplateFormatVersion: "2010-09-09"
+Transform:
+  Name: 'AWS::Include'
+  Parameters:
+    Location: !Sub '${MappingFilePATH}'
+
+
+Parameters:
+  #  ## user form  ##
+  #  :param ClusterNumber: ['01','02']
+  #  :param SystemEnvironmentName: ['TKKDEV','TKKMNT','TKKSTG','OQSDEV','OQSMNT','OQSSTG','OQSMT2']
+  #  :param ProjectNumber: [Example:'99999']
+  #  :param MaxCapacity: ScalableTarget MAX
+  #  :param DesiredCount: EcsService Desired
+  #  :param MinCapacity: ScalableTarget Min
+  #  :param TargetValue: ScalingPolicy 70
+  #  :param BuildBucketName: ['tkk-build-source-bucket-dev1','irk-build-source-bucket-mnt','tkk-build-source-bucket-stg','build-source-bucket-dev','build-source-bucket-mnt','build-source-bucket-stg','build-source-bucket-mt2']
+  #  :param LambdaBucketName:
+  #  :param LambdaZipKey:
+  #  :param LOGLEVEL:
+
+  MappingFilePATH:
+    Type: String
+    Default: 'example: s3://'
+  ClusterNumber:
+    Type: Number 
+    Default: '01'
+    AllowedValues: ['01','02']
+  SystemEnvironmentName: 
+    Type: String
+    Default: 'TKKDEV'
+    AllowedValues: ['TKKDEV','TKKMNT','TKKSTG','OQSDEV','OQSMNT','OQSSTG','OQSMT2']
+  ProjectNumber:
+    Type: Number
+    Description: 'Example:99999'
+  LargeType:
+    Type: String
+    Description: 'A'
+  SmallType:
+    Type: String
+    Description: 'a'
+  MaxCapacity:
+    Type: Number
+    Default: 0
+  DesiredCount:
+    Type: Number
+    Default: 0
+  MinCapacity:
+    Type: Number
+    Default: 0
+  TargetValue:
+    Type: Number
+    Default: 70
+  BuildBucketName: 
+    Type: String
+    Default: 'build-source-bucket-mt2'
+    AllowedValues: ['tkk-build-source-bucket-dev1','irk-build-source-bucket-mnt','tkk-build-source-bucket-stg','build-source-bucket-dev','build-source-bucket-mnt','build-source-bucket-stg','build-source-bucket-mt2']
+  LambdaBucketName:
+    Type: String
+    Default: 's3-oqs-mt2-clf01'
+  LambdaZipKey:
+    Type: String
+    Default: '-'
+  LOGLEVEL:
+    Type: String
+    Default: 'INFO'
+  CreateLambda:
+    Type: String
+    Default: 'ON'
+    AllowedValues: ['ON','OFF']
+
+
+Conditions:
+  IsOqs: !Equals 
+    - !FindInMap [ SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower ]
+    - oqs
+
+  IsDev: !Equals 
+    - !FindInMap [ SystemEnvironmentMapping, !Ref SystemEnvironmentName,EnvironmentNameLower]
+    - dev
+  CreateLambda: !Equals
+  - !Ref CreateLambda
+  - "ON"
+
+
+Resources:  
+  Repository:
+    Type: AWS::ECR::Repository
+    Properties: 
+      RepositoryName: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}-${EnvironmentNameLower}'  
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      LifecyclePolicy: 
+        LifecyclePolicyText: | 
+          {
+            "rules": [
+              {
+                "rulePriority": 1,
+                "description": "Keep two images, expire all others",
+                "selection": {
+                  "tagStatus": "any",
+                  "countType": "imageCountMoreThan",
+                  "countNumber": 2
+                },
+                "action": {
+                  "type": "expire"
+                }
+              }
+            ]
+          }
+
+
+      RepositoryPolicyText: !If
+      - IsOqs
+      - {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "specific-VPCE-OR-User-only",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "ecr:*",
+              "Condition": {
+                "StringNotEquals": {
+                  "aws:PrincipalTag/ecrAuth": "true",
+                  "aws:sourceVpce": [
+                    {
+                      "Fn::FindInMap": [SystemEnvironmentMapping,!Ref SystemEnvironmentName, VpcEndpointId01 ]
+                    },
+                    {
+                      "Fn::FindInMap": [SystemEnvironmentMapping,!Ref SystemEnvironmentName, VpcEndpointId02 ]
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      - !If
+        - IsDev
+        - !Ref "AWS::NoValue"
+        - {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "ecr-deny-default",
+                "Effect": "Deny",
+                "Principal": {
+                  "AWS": [
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:iam::${AWS::AccountId}:role/${EscBatInstanceRoleName}",
+                        {
+                          "EscBatInstanceRoleName": {
+                            "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, EscBatInstanceRoleName ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:iam::${AWS::AccountId}:role/${BuildServiceRoleName}",
+                        {
+                          "BuildServiceRoleName": {
+                            "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, BuildServiceRoleName ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:iam::${AWS::AccountId}:role/${ExecutionRoleName}",
+                        {
+                          "ExecutionRoleName": {
+                            "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, ExecutionRoleName ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:iam::${AWS::AccountId}:role/${PipelineServiceRoleName}",
+                        {
+                          "PipelineServiceRoleName": {
+                            "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, PipelineServiceRoleName ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "Action": "ecr:*",
+                "Condition": {
+                  "StringNotEquals": {
+                    "aws:PrincipalTag/ecrAuth": "true",
+                    "aws:sourceVpce": [
+                      {
+                        "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, VpcEndpointId01 ]
+                      },
+                      {
+                        "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, VpcEndpointId02 ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "Sid": "AllAllow",
+                "Effect": "Allow",
+                "Principal": {
+                  "AWS": [
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:iam::${AWS::AccountId}:role/${EscBatInstanceRoleName}",
+                        {
+                          "EscBatInstanceRoleName": {
+                            "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, EscBatInstanceRoleName ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:iam::${AWS::AccountId}:role/${BuildServiceRoleName}",
+                        {
+                          "BuildServiceRoleName": {
+                            "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, BuildServiceRoleName ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:iam::${AWS::AccountId}:role/${ExecutionRoleName}",
+                        {
+                          "ExecutionRoleName": {
+                            "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, ExecutionRoleName ]
+                          }
+                        }
+                      ]
+                    },          
+                    {
+                      "Fn::Sub": [
+                        "arn:aws:iam::${AWS::AccountId}:role/${PipelineServiceRoleName}",
+                        {
+                          "PipelineServiceRoleName": {
+                            "Fn::FindInMap": [ SystemEnvironmentMapping, !Ref SystemEnvironmentName, PipelineServiceRoleName ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "Action": "ecr:*"
+              }
+            ]
+          }
+
+
+  Taskdefinition:
+    Type: 'AWS::ECS::TaskDefinition'
+    Properties:
+      Family: !Sub 
+      - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}-task-${EnvironmentNameLower}' 
+      - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+        EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      ContainerDefinitions:
+        - MemoryReservation: 300
+          Image: !Sub 
+            - '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${SystemNameLower}-msa${ProjectNumber}-${SmallType}-${EnvironmentNameLower}:latest' 
+            - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+              EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub 
+                - 'MSA${ProjectNumber}-${LargeType}-${SystemNameUpper}-${EnvironmentNameUpper}' 
+                - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                  EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+              awslogs-region: !Sub '${AWS::Region}'
+          Name: !Sub 
+            - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}' 
+            - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 0
+              Protocol: tcp
+      ExecutionRoleArn: !Sub 
+        - 'arn:aws:iam::${AWS::AccountId}:role/${ExecutionRoleName}'
+        - ExecutionRoleName: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,ExecutionRoleName]
+      NetworkMode: bridge
+      TaskRoleArn: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,TaskRoleName] 
+      RequiresCompatibilities: 
+        - 'EC2'
+
+  DiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties: 
+        Description: Discovery Service for the Demo Application
+        DnsConfig:
+          RoutingPolicy: MULTIVALUE
+          DnsRecords:
+            - TTL: 60
+              Type: SRV
+        HealthCheckCustomConfig: 
+          FailureThreshold: 1 
+        Name: !Sub 
+          - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}-service-${EnvironmentNameLower}' 
+          - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+            EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+        NamespaceId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,PrivateNamespaceId]
+
+  EcsService:
+    Type: AWS::ECS::Service
+    Properties: 
+      Cluster: !Sub 
+        - 'ECS-${SystemNameUpper}-${EnvironmentNameUpper}-BAT${ClusterNumber}' 
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      DeploymentController: 
+        Type: ECS
+      DesiredCount: !Ref DesiredCount
+      LaunchType: EC2
+      PlacementStrategies: 
+        - Field: attribute:ecs.availability-zone
+          Type: spread
+        - Field: instanceId
+          Type: spread
+      SchedulingStrategy: REPLICA
+      ServiceName: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}-service-${EnvironmentNameLower}' 
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      TaskDefinition: !Ref Taskdefinition
+      ServiceRegistries: 
+        - RegistryArn: !GetAtt DiscoveryService.Arn
+          ContainerName: !Sub 
+          - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}' 
+          - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          ContainerPort: 8080
+
+  ScalableTarget:
+    Type: AWS::ApplicationAutoScaling::ScalableTarget
+    DependsOn: EcsService
+    Properties:     
+      MaxCapacity: !Ref MaxCapacity
+      MinCapacity: !Ref MinCapacity
+      ResourceId: !Sub 
+        - 'service/ECS-${SystemNameUpper}-${EnvironmentNameUpper}-BAT${ClusterNumber}/${SystemNameLower}-msa${ProjectNumber}-${SmallType}-service-${EnvironmentNameLower}'  
+        - SystemNameUpper:  !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      RoleARN: !Sub 'arn:aws:iam::${AWS::AccountId}:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService' 
+      ScalableDimension: ecs:service:DesiredCount
+      ServiceNamespace: ecs
+    
+  ScalingPolicy:
+    Type: AWS::ApplicationAutoScaling::ScalingPolicy
+    Properties: 
+      PolicyName: !Sub 
+        - 'AS-${SystemNameUpper}-${EnvironmentNameUpper}-BAT${ClusterNumber}' 
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      PolicyType: TargetTrackingScaling
+      ScalingTargetId: !Ref ScalableTarget
+      TargetTrackingScalingPolicyConfiguration: 
+        TargetValue: !Ref TargetValue 
+        PredefinedMetricSpecification:
+          PredefinedMetricType: ECSServiceAverageCPUUtilization
+
+  CodeBuild:
+    Type: AWS::CodeBuild::Project
+    Properties: 
+      Name: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}-codebuild-project-${EnvironmentNameLower}' 
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      Artifacts: 
+        Type: NO_ARTIFACTS
+      Environment: 
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0
+        PrivilegedMode: true
+        Type: LINUX_CONTAINER
+      ServiceRole: !Sub 
+        - 'arn:aws:iam::${AWS::AccountId}:role/${BuildServiceRoleName}' 
+        - BuildServiceRoleName: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,BuildServiceRoleName]
+      Source:
+        Type: S3
+        Location: !Sub 
+          - '${BuildBucketName}/${SystemNameUpper}-MSA${ProjectNumber}-${LargeType}.zip' 
+          - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]        
+      VpcConfig: 
+        SecurityGroupIds: 
+          - !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SecurityGroupId]
+        Subnets:
+          - !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,Subnet1]
+          - !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,Subnet2]        
+        VpcId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,VpcId]
+      LogsConfig: 
+          CloudWatchLogs: 
+            Status: ENABLED
+          S3Logs: 
+            Status: DISABLED 
+      Tags: !If 
+        - IsOqs
+        - 
+          - Key: "Name"
+            Value: "CRED_CHECK"
+        - !Ref "AWS::NoValue"
+        
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties: 
+      Name: !Sub 
+        - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}-pipeline-${EnvironmentNameLower}' 
+        - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+          EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+      RoleArn: !Sub 
+        - 'arn:aws:iam::${AWS::AccountId}:role/${PipelineServiceRoleName}'
+        -  PipelineServiceRoleName: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,PipelineServiceRoleName]
+      ArtifactStore: 
+        Location: !Ref BuildBucketName
+        Type: S3
+      Stages: 
+        - 
+          Name: Source
+          Actions: 
+            -  
+              Name: Source
+              ActionTypeId: 
+                Category: Source
+                Owner: AWS
+                Provider: S3
+                Version: 1
+              OutputArtifacts: 
+                - Name: SourceArtifact
+              Configuration: 
+                S3Bucket: !Ref BuildBucketName
+                S3ObjectKey: !Sub 
+                  - '${SystemNameUpper}-MSA${ProjectNumber}-${LargeType}.zip' 
+                  - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+                PollForSourceChanges: true
+        - 
+          Name: Build
+          Actions: 
+            -   
+              Name: Build
+              ActionTypeId: 
+                  Category: Build
+                  Owner: AWS
+                  Provider: CodeBuild
+                  Version: 1
+              Configuration: 
+                ProjectName: !Sub 
+                  - '${SystemNameLower}-msa${ProjectNumber}-${SmallType}-codebuild-project-${EnvironmentNameLower}' 
+                  - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+                    EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+              InputArtifacts: 
+                - Name: SourceArtifact
+              OutputArtifacts: 
+                - Name: BuildArtifact
+              Region: !Sub '${AWS::Region}'
+        -
+          Name: Deploy
+          Actions: 
+            - 
+              Name: Deploy
+              ActionTypeId: 
+                  Category: Deploy
+                  Owner: AWS
+                  Provider: ECS 
+                  Version: 1
+              Configuration: 
+                ClusterName: !Sub 
+                  - 'ECS-${SystemNameUpper}-${EnvironmentNameUpper}-BAT${ClusterNumber}' 
+                  - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+                    EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+                ServiceName: !Sub 
+                  - '${SystemNameLower}-msa${ProjectNumber}-service-${EnvironmentNameLower}' 
+                  - SystemNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameLower]
+                    EnvironmentNameLower: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameLower]
+                FileName: imageDetail.json
+              InputArtifacts: 
+                - Name: BuildArtifact
+              Region: !Sub '${AWS::Region}'
+
+  LogGroup:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Properties: 
+      KmsKeyId: !Sub
+        - 'arn:aws:kms:${AWS::Region}:${AWS::AccountId}:key/${KmsKeyId}' 
+        - KmsKeyId: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,KmsKeyId]
+      LogGroupName: !Sub 
+        - 'MSA${ProjectNumber}-${LargeType}-${SystemNameUpper}-${EnvironmentNameUpper}' 
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      RetentionInDays: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,LogGroupRetentionInDays]
+
+
+
+#-----------------LambdaFunction---------------#
+
+  LambdaFunction:
+    Type: "AWS::Lambda::Function"
+    Condition: CreateLambda 
+    Properties:
+      Description: "CloudWatch logs To ES and Zabbix edge function"
+      Environment: 
+        Variables: 
+          ZABBIX_CONN_RETRY_COUNT: "3"
+          ZABBIX_CONN_RETRY_INTERVAL: "1"
+          S3_ZBXFILTER_FILE: !Sub 
+          - '${SystemNameUpper}-${EnvironmentNameUpper}-LogFilteringList.txt'
+          - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+            EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+          LOCAL_ES_ENDPOINT_URL: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,URL] 
+          S3_ZBXFILTER_BUCKET: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,S3ZBXFILTERBUCKET]
+          LOCAL_AWS_REGION: !Ref AWS::Region
+          ZABBIX_CONN_TIMEOUT: "0.5"
+          ZABBIX_SERVER: "10.108.17.12" 
+          LOG_LEVEL: !Ref LOGLEVEL
+          ZABBIX_HOST: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,ZABBIXHOST]  
+      FunctionName: !Sub 
+        - 'LMD-${SystemNameUpper}-${EnvironmentNameUpper}-CWLtoELK-ZABBIX-MSA${ProjectNumber}-${LargeType}-${SystemNameUpper}-${EnvironmentNameUpper}'
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      Handler: "lambda_function.lambda_handler"
+      Architectures: 
+        - "x86_64"
+      Code:  
+        S3Bucket: !Ref LambdaBucketName  
+        S3Key: !Ref LambdaZipKey        
+      MemorySize: 128
+      Role: !Sub 
+        - 'arn:aws:iam::${AWS::AccountId}:role/IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-lambda-CWLtoZABBIX-InvokeFunction' 
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]      
+      Runtime: "python3.8"
+      Timeout: 900
+      TracingConfig: 
+        Mode: "PassThrough"
+      VpcConfig: 
+        SubnetIds: 
+          - !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,Subnet1]
+          - !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,Subnet2] 
+          - !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,Subnet3]                    
+        SecurityGroupIds: 
+          - !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,LMDSecurityGroupId]  
+      EphemeralStorage: 
+        Size: 512
+
+#-----------------KinesisStream---------------#
+  KinesisStream:
+    Type: "AWS::Kinesis::Stream"
+    Condition: CreateLambda    
+    Properties:
+      Name: !Sub 
+        - 'KDS-${SystemNameUpper}-${EnvironmentNameUpper}-MSA${ProjectNumber}-${LargeType}-${SystemNameUpper}-${EnvironmentNameUpper}'
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      RetentionPeriodHours: 24
+      StreamEncryption: 
+        EncryptionType: "KMS"
+        KeyId: "alias/aws/kinesis"
+      ShardCount: 1
+
+#-----------------LambdaEventSourceMapping---------------#
+
+  LambdaEventSourceMapping:
+    Type: "AWS::Lambda::EventSourceMapping"
+    Condition: CreateLambda     
+    Properties:
+      BatchSize: 1000
+      EventSourceArn: !Sub
+        - 'arn:aws:kinesis:${AWS::Region}:${AWS::AccountId}:stream/KDS-${SystemNameUpper}-${EnvironmentNameUpper}-MSA${ProjectNumber}-${LargeType}-${SystemNameUpper}-${EnvironmentNameUpper}'
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      FunctionName: !GetAtt LambdaFunction.Arn
+      Enabled: true
+      MaximumBatchingWindowInSeconds: 0
+      ParallelizationFactor: 10
+      MaximumRecordAgeInSeconds: -1
+      BisectBatchOnFunctionError: false
+      MaximumRetryAttempts: -1
+      TumblingWindowInSeconds: 0
+      StartingPosition: "LATEST"
+    DependsOn: 
+      - KinesisStream
+
+#-----------------SubscriptionFilterRole---------------#
+
+  SubscriptionFilterRole:
+    Type: AWS::IAM::Role
+    Condition: CreateLambda   
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: 
+                - logs.ap-northeast-1.amazonaws.com
+          Action: 
+              - 'sts:AssumeRole'          
+      RoleName: !Sub
+        - 'IAMR-${SystemNameUpper}-${EnvironmentNameUpper}-cloudwatchlogs-MSA${ProjectNumber}-${LargeType}-${SystemNameUpper}-${EnvironmentNameUpper}'
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+
+#-----------------SubscriptionFilterRolePolicy---------------#
+
+  SubscriptionFilterRolePolicy:
+    Type: 'AWS::IAM::Policy'
+    Condition: CreateLambda   
+    Properties:
+      PolicyName: !Sub
+        - 'IAMP-${SystemNameUpper}-${EnvironmentNameUpper}-Permissions-Policy-For-CWL-MSA${ProjectNumber}-${LargeType}-${SystemNameUpper}-${EnvironmentNameUpper}'
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: 'kinesis:PutRecord'
+            Resource: !GetAtt KinesisStream.Arn
+          - Effect: Allow
+            Action: 'iam:PassRole'
+            Resource: !GetAtt SubscriptionFilterRole.Arn
+      Roles: 
+        - !Ref SubscriptionFilterRole
+
+#-----------------SubscriptionFilter---------------#
+
+  SubscriptionFilter:
+    Type: AWS::Logs::SubscriptionFilter
+    Condition: CreateLambda      
+    Properties: 
+      DestinationArn: !GetAtt KinesisStream.Arn
+      FilterPattern: ""
+      LogGroupName: !Sub 
+        - 'MSA${ProjectNumber}-${LargeType}-${SystemNameUpper}-${EnvironmentNameUpper}' 
+        - SystemNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,SystemNameUpper]
+          EnvironmentNameUpper: !FindInMap [SystemEnvironmentMapping,!Ref SystemEnvironmentName,EnvironmentNameUpper]
+      RoleArn: !GetAtt SubscriptionFilterRole.Arn
+    DependsOn: 
+      - SubscriptionFilterRolePolicy

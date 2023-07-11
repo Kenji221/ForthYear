@@ -1,0 +1,331 @@
+Mappings:
+  SystemEnvironmentMapping:
+    TKKDEV:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: tkk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed'
+      NamespaceId: ns-ry7ad7yslgpndsyx
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-" 
+
+    TKKSTG:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: STG
+      SystemNameLower: tkk
+      EnvironmentNameLower: stg
+      VpcId: vpc-02438362be49444f0
+      Subnet: 
+        - "subnet-047c898e058b6a16c"
+        - "subnet-02e2efdac98663495"
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: '61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed'
+      NamespaceId: ns-ry7ad7yslgpndsyx
+      VpcEndpointId01: "vpce-05f7a4e3335617de7"
+      VpcEndpointId02: "vpce-034912d6126d1183e"      
+
+    TKKMNT:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: tkk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-00f6c8dfa96416b5f"
+        - "subnet-0733f39d7dc72ca89"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'ca061e31-5d40-4ed7-9699-3fe67059dfec'
+      NamespaceId: ns-awmnw55r3rvnuyjz
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"
+
+    YZKDEV:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: yzk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed'
+      NamespaceId: ns-ry7ad7yslgpndsyx
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-" 
+
+    YZKSTG:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: STG
+      SystemNameLower: yzk
+      EnvironmentNameLower: stg
+      VpcId: vpc-01e2d26b07f654cd6
+      Subnet: 
+        - "subnet-078222f9bd33ff0c8"
+        - "subnet-0814b2d7c7a1da156"
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: '5665c543-1665-482b-a9b8-d1256dcf68fe'
+      NamespaceId: ns-wak2porfvv6uxg45
+      VpcEndpointId01: "vpce-0a6e3021691529620"
+      VpcEndpointId02: "vpce-037372e8509fae6a6" 
+
+    YZKMNT:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: yzk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-00f6c8dfa96416b5f"
+        - "subnet-0733f39d7dc72ca89"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'ca061e31-5d40-4ed7-9699-3fe67059dfec'
+      NamespaceId: ns-awmnw55r3rvnuyjz    
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"      
+
+    IRKDEV:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: DEV
+      SystemNameLower: irk
+      EnvironmentNameLower: dev
+      VpcId: vpc-04d90ddcfd80744dd
+      Subnet: 
+        - "subnet-012fc525849c0a12f"
+        - "subnet-0de931d824c2b0f17"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '61fc2ee6-5b95-4c95-a08c-f4ef1ffc96ed'
+      NamespaceId: ns-ry7ad7yslgpndsyx
+      VpcEndpointId01: "-"
+      VpcEndpointId02: "-"     
+
+    IRKSTG:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: STG
+      SystemNameLower: irk
+      EnvironmentNameLower: stg
+      VpcId: vpc-0af6cedd1d668b053
+      Subnet: 
+        - "subnet-0f7384437964e5634"
+        - "subnet-08bc3f510266bcbe8"
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: 'ca061e31-5d40-4ed7-9699-3fe67059dfec'
+      NamespaceId: ns-awmnw55r3rvnuyjz
+      VpcEndpointId01: "vpce-05aa856e0980051c3"
+      VpcEndpointId02: "vpce-024ed93126676e45d" 
+
+    IRKMNT:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: MNT
+      SystemNameLower: irk
+      EnvironmentNameLower: mnt
+      VpcId: vpc-0bd4e7e14f22dabb6
+      Subnet: 
+        - "subnet-00f6c8dfa96416b5f"
+        - "subnet-0733f39d7dc72ca89"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'ca061e31-5d40-4ed7-9699-3fe67059dfec'
+      NamespaceId: ns-awmnw55r3rvnuyjz
+      VpcEndpointId01: "vpce-095cd5cbb6a31bb01"
+      VpcEndpointId02: "vpce-01e7e67bb22865299"  
+
+    OQSDEV:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: DEV
+      SystemNameLower: oqs
+      EnvironmentNameLower: dev
+      VpcId: vpc-09515f30187fb29d0
+      Subnet: 
+        - "subnet-0d8c456061841b4ff"
+        - "subnet-0390edd793008280a"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-0a790c9ee6fd80d64"
+      VpcEndpointId02: "vpce-08651c8ac877a14b7"
+
+    OQSSTG:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: STG
+      SystemNameLower: oqs
+      EnvironmentNameLower: stg
+      VpcId: vpc-0917d0ac264bd09a0
+      Subnet: 
+        - "subnet-0ef5548c4bf661711"
+        - "subnet-0ab2cd91350d4af9a"
+      LogGroupRetentionInDays: 1825
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-04e1c515749ffa274"
+      VpcEndpointId02: "vpce-06f16caa4b8d21683"
+
+    OQSMNT:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MNT
+      SystemNameLower: oqs
+      EnvironmentNameLower: mnt
+      VpcId: vpc-039efc81bad2fea3d
+      Subnet: 
+        - "subnet-0d3b5aa3ceda3351f"
+        - "subnet-0138730d2daa557b0"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: 'b12a4d04-333b-4f3f-a549-8f92af81b975'
+      NamespaceId: ns-elbhrh2s6herwtly
+      VpcEndpointId01: "vpce-0257e895f4759b48b"
+      VpcEndpointId02: "vpce-0c0e77ee8956bc475"
+
+    TKKMT2:
+      SystemNameUpper: TKK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: tkk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet: 
+        - "subnet-07659eaa787262322"
+        - "subnet-0e012d7e810d318dc"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '8fe3e3b2-889b-49b9-afed-5c42a43021d4'
+      NamespaceId: ns-faadhbhhilhy4ocw
+      VpcEndpointId01: "vpce-01db8a71f4640821f"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+
+    YZKMT2:
+      SystemNameUpper: YZK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: yzk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet: 
+        - "subnet-07659eaa787262322"
+        - "subnet-0e012d7e810d318dc"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '8fe3e3b2-889b-49b9-afed-5c42a43021d4'
+      NamespaceId: ns-faadhbhhilhy4ocw
+      VpcEndpointId01: "vpce-01db8a71f4640821f"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+
+    IRKMT2:
+      SystemNameUpper: IRK
+      EnvironmentNameUpper: MT2
+      SystemNameLower: irk
+      EnvironmentNameLower: mt2
+      VpcId: vpc-01313a6bdc4461f57
+      Subnet: 
+        - "subnet-07659eaa787262322"
+        - "subnet-0e012d7e810d318dc"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '8fe3e3b2-889b-49b9-afed-5c42a43021d4'
+      NamespaceId: ns-faadhbhhilhy4ocw
+      VpcEndpointId01: "vpce-01db8a71f4640821f"
+      VpcEndpointId02: "vpce-0b6724f7e3d5f9dbd"
+
+    OQSMT2:
+      SystemNameUpper: OQS
+      EnvironmentNameUpper: MT2
+      SystemNameLower: oqs
+      EnvironmentNameLower: mt2
+      VpcId: vpc-05a92eb3a01283e6d
+      Subnet: 
+        - "subnet-0758aed10698f7656"
+        - "subnet-08d14a1d40aea2bc9"
+      LogGroupRetentionInDays: 30
+      KmsKeyId: '1446b969-0fc3-4dde-8f12-e80f1b52f712'
+      NamespaceId: ns-wxjbfzmfi4az4r5a
+      VpcEndpointId01: "vpce-045a07e09d5115dcd"
+      VpcEndpointId02: "vpce-0ce599d880c34a0be"
+
+  NLBArnMapping:
+    TKKDEV:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:012752345683:loadbalancer/net/NLB-TKK-DEV-001/9ff64fbfba985710'
+
+    TKKSTG:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:012752345683:loadbalancer/net/NLB-TKK-STG-001/14e6348b6da42852'
+
+    TKKMNT:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:715264876534:loadbalancer/net/NLB-IRK-MNT-001/056ddb3fbd8c292d'
+    
+    TKKPRO:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:012752345683:loadbalancer/net/NLB-TKK-PRO-001/805fdaef7b0af2bb'
+
+    TKKMT2:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:457550092927:loadbalancer/net/NLB-IRK-MT2-001-A/980e2134e787c164'
+    
+    YZKDEV:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:012752345683:loadbalancer/net/NLB-TKK-DEV-001/9ff64fbfba985710'
+
+    YZKSTG:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:686681713577:loadbalancer/net/NLB-YZK-STG-001/67be3109dea337ae'
+
+    YZKMNT:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:715264876534:loadbalancer/net/NLB-IRK-MNT-001/056ddb3fbd8c292d'
+
+    YZKPRO:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:686681713577:loadbalancer/net/NLB-YZK-PRO-001/b8ed473cb57d2341'
+
+    YZKMT2:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:457550092927:loadbalancer/net/NLB-IRK-MT2-001-A/980e2134e787c164'
+
+    IRKDEV:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:012752345683:loadbalancer/net/NLB-TKK-DEV-001/9ff64fbfba985710'
+
+    IRKSTG:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:715264876534:loadbalancer/net/NLB-IRK-STG-001/fe388cb0ddd5bb44'
+
+    IRKMNT:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:715264876534:loadbalancer/net/NLB-IRK-MNT-001/056ddb3fbd8c292d'
+
+    IRKPRO:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:715264876534:loadbalancer/net/NLB-IRK-PRO-001/944b1406c19f22fe'
+
+    IRKMT2:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:457550092927:loadbalancer/net/NLB-IRK-MT2-001-A/980e2134e787c164'
+
+    OQSDEV:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-001/7ebcb48a74022687'
+      '002': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-002/32482e38d4589100'
+      '003': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-003/1d80086401453ece'
+      '004': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-004/714b2654ff8502a0'
+      '005': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-005/7f1d46adc33b02e2'
+      '006': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-006/62d9263bc1abacd2'
+      '007': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-007/41d07eb261f7c5c1'
+      '008': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-008/cc9157ca4cd427b3'
+      '009': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-DEV-009/e15c6a3fed07514e'
+
+    OQSSTG:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-001/0c34343e286dbf5b'
+      '002': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-002/76b2371304fc94ea'
+      '003': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-003/f7a7781fe73f2b65'
+      '004': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-004/9d7db63affddc411'
+      '005': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-005/07707b48a7be3739'
+      '006': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-005/07707b48a7be3739'
+      '007': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-007/670f8035f4e382c2'
+      '008': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-008/35de1e7477ab9fe2'
+      '009': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-STG-009/12ff01b2dfb28288'
+
+    OQSMNT:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-001/e12fbd179ab59573'
+      '002': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-002/85a77e505f7ca74a'
+      '003': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-003/22d944f978c96404'
+      '004': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-004/036e94d241c009a3'
+      '005': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-005/8badf0924eb041b9'
+      '006': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-006/009fdee14e67381c'
+      '007': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-007/15317ed953e4ba01'
+      '008': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-008/95b85a85d54c3cd9'
+      '009': 'arn:aws:elasticloadbalancing:ap-northeast-1:936323190821:loadbalancer/net/NLB-OQS-MNT-009/77444c1378ce1b44'
+
+    OQSMT2:
+      '001': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-001/8f0e9dd416c972b3'
+      '002': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-002/5266856b00af2e10'
+      '003': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-003/a069dc0b31b95186'
+      '004': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-004/2bf5de508630a784'
+      '005': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-005/5576116ac114a641'
+      '006': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-006/89700becd411291d'
+      '007': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-007/88023defc0bc9bad'
+      '008': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-008/c18df5fb2016500a'
+      '009': 'arn:aws:elasticloadbalancing:ap-northeast-1:066756805702:loadbalancer/net/NLB-OQS-MT2-009/5a5022c1332cc8a2'

@@ -1,0 +1,97 @@
+#############################################################
+# Copyright 2020 FUJITSU LIMITED
+# FileName: CLF-XXX-XXX-CloudWatchAlarm.yml
+# FileType: YAML
+# OverViews: CloudFormation Template for 3DB CloudWatchAlarm
+# Version: 1.0
+# Author: konishi
+#############################################################
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+
+  Systemname:
+    Type: String
+    Description: Specify the system to deploy
+    Default: 'IRK'
+    AllowedValues: ['TKK','IRK','YZK']
+  Environment:
+    Type: String
+    Description: Specify the environment to deploy
+    Default: 'MT2'
+    AllowedValues: ['DEV','STG','MT1','MT2','PRO']
+ 
+Resources: 
+  ECSWeb01ScaleInAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties: 
+      AlarmName: !Sub CWA-ECS-${Systemname}-${Environment}-WEB01-ScaleIn
+      AlarmDescription: ECS Instance ScaleIn
+      ActionsEnabled: true
+      MetricName: CPUReservation
+      Namespace: AWS/ECS
+      Statistic: Average
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub ECS-${Systemname}-${Environment}-WEB01
+      Period: 60
+      EvaluationPeriods: 15
+      DatapointsToAlarm: 15
+      Threshold: 32
+      ComparisonOperator: LessThanThreshold
+      TreatMissingData: notBreaching
+      
+  ECSWeb01ScaleOutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub CWA-ECS-${Systemname}-${Environment}-WEB01-ScaleOut
+      AlarmDescription: ECS Instance ScaleOut
+      ActionsEnabled: true
+      MetricName: CPUReservation
+      Namespace: AWS/ECS
+      Statistic: Average
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub ECS-${Systemname}-${Environment}-WEB01
+      Period: 60
+      EvaluationPeriods: 2
+      DatapointsToAlarm: 2
+      Threshold: 45
+      ComparisonOperator: GreaterThanThreshold
+      TreatMissingData: notBreaching
+
+  ECSWeb02ScaleInAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties: 
+      AlarmName: !Sub CWA-ECS-${Systemname}-${Environment}-WEB02-ScaleIn
+      AlarmDescription: ECS Instance ScaleIn
+      ActionsEnabled: true
+      MetricName: CPUReservation
+      Namespace: AWS/ECS
+      Statistic: Average
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub ECS-${Systemname}-${Environment}-WEB02
+      Period: 60
+      EvaluationPeriods: 15
+      DatapointsToAlarm: 15
+      Threshold: 65
+      ComparisonOperator: LessThanThreshold
+      
+  ECSWeb02ScaleOutAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: !Sub CWA-ECS-${Systemname}-${Environment}-WEB02-ScaleOut
+      AlarmDescription: ECS Instance ScaleOut
+      ActionsEnabled: true
+      MetricName: CPUReservation
+      Namespace: AWS/ECS
+      Statistic: Average
+      Dimensions:
+        - Name: ClusterName
+          Value: !Sub ECS-${Systemname}-${Environment}-WEB02
+      Period: 60
+      EvaluationPeriods: 2
+      DatapointsToAlarm: 2
+      Threshold: 90
+      ComparisonOperator: GreaterThanThreshold
+

@@ -1,0 +1,10 @@
+Mappings:
+  IRK:
+    MT2:
+      VPCID: "vpc-01313a6bdc4461f57"
+      SUBAFR01: "subnet-0e341ca434222334b"
+      SUBAFR02: "subnet-02fe515d875228f9e"
+      SUBAFR03: "subnet-0c1ffdfa80853b774"
+      SUBWFR01: "subnet-09b9d799d37739589"
+      SUBWFR02: "subnet-0084553cf34a0161c"
+      SUBWFR03: "subnet-0cba6bc41f466cedd"
